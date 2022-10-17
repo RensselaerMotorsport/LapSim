@@ -1,0 +1,45 @@
+import math
+
+cf = 1.6 #unitless
+cd = 1.42 #unitless
+cl = 2.77 #do not know what total lift of RM25?
+total_mass = 295 #kg
+g = 9.8 #m/s**2
+rho = 1.23 #kg/m**2
+frontal_A = 1.54 #m**2
+
+
+def calc_max_corner_speed(icr):
+    """
+    icr - inverse corner radius in rad
+ 
+    Output = max velocity possible in a given segment with corner radius icr
+    *** does not inclue downforce ***
+    """
+    v_max = (((cf*total_mass*g)**2)/(total_mass/icr)**2 + (.5*rho*frontal_A*cd)**2)**.25
+
+
+def find_max_decel_F(v_exit, icr):
+    """
+    v_exit -  exit velocity of the previous segment in m/s
+    icr - inverse corner radius in rad
+
+    Output = Max deceleration force including brakes and drag in newtons
+    """
+    max_decel_F = .5*rho*(v_exit**2)*frontal_A*cd + math.sqrt(((cf**2)*((total_mass*g)**2))-(((total_mass**2)*(v_exit**4))/(icr**2)))
+
+def max_entry_v_brake(v_exit, d_step, max_decel_F):
+    """
+    v_exit - exit velocity of the previous segment in m/s
+    d_step - Distance step in meters
+    max_decel_F - Max deceleleration force including brakes and drag in newtons
+    
+    Output = Maximum speed from which it is possible to decelerate under corning conditions in m/s
+    """
+
+    max_entry_v = math.sqrt((v_exit**2) + 2*d_step*max_decel_F/total_mass)
+
+#### v_exit is used as the velocity for the segment here. Since v_exit is used to calculate centripital force we underestimate 
+#### centripital force slightly. However because we are within a segment the change should not matter enough. 
+
+#### loop diagram that describe how these equations are used is under braking notes in the pdfs folder
