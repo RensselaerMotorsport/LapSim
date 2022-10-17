@@ -3,11 +3,11 @@ import math
 cf = 1.6 #unitless
 cd = 1.42 #unitless
 cl = 2.77 #do not know what total lift of RM25?
+# downforce will change normal force terms
 total_mass = 295 #kg
 g = 9.8 #m/s**2
 rho = 1.23 #kg/m**2
 frontal_A = 1.54 #m**2
-
 
 def calc_max_corner_speed(icr):
     """
