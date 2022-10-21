@@ -1,12 +1,12 @@
-import car_simple
-from straightlineequations import calculate_drag_force
-car = Car("../data/rm25.json") #initiate the car class
+#import car_simple
+#from straightlineequations import calculate_drag_force
+#car = Car("../data/rm25.json") #initiate the car class
 #Collecting required attributes for calculations
-carmass=car.attrs['mass_car'] #Car mass
-cd=car.attrs['Cd'] #coefficent of drag
-rho=car.attrs['rho'] #Air density
-A=car.attrs['A'] #frontal wing area
-mu=1.48*10**-5 #kinematic viscosity of air in m2/s at 15C
+#carmass=car.attrs['mass_car'] #Car mass
+#cd=car.attrs['Cd'] #coefficent of drag
+#rho=car.attrs['rho'] #Air density
+#A=car.attrs['A'] #frontal wing area
+mu=1.6
 yaccleration=9.8 #m/s2
 
 def normal_force(carmass,yaccleration):
@@ -28,9 +28,12 @@ def cornervmax(mu, carmass, yaccleration, cd, rho, A, radius):
     cd, the coefficent of drag on the car
     rho, the density of air
     A, the frontal car area
-    radius, the instanteous radius
+    radius, the instaneous radius of the corner
+    There might be an error somewhere in the provided equation
     
     Returns vmax, the maxiumum speed of the car at that instanteous radius"""
     normal=normal_force(carmass,yaccleration)
     drag=.5*rho*A*cd
-    return ((mu*normal)**2/((carmass/radius)**2+(drag)**2))**(1/4)
+    return ((mu*normal)**(2)/((carmass/(1/radius))**(2)+(drag)**2))**(1/4)
+
+print(cornervmax(mu,295,yaccleration,1.41,1.162,1,.11594202))
