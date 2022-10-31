@@ -30,65 +30,29 @@ Cx2 = 1/2*(1+offset_ratio_F)
 Cx3 = 1/2*(1-offset_ratio_R)
 Cx4 = 1/2*(1+offset_ratio_R)
 
-def calc_long_weight_transfer_1(ax):
+def calc_long_weight_transfer(ax, Cx):
     """
     Calculates weight transfer due to longitudinal acceleration
     
     Inputs: 
     ax - Longitudinal Acceleration
+    Cx - Weight transfer coef (also determines which tire load to calculate)
 
     Outputs:
-    weight_transfer_1 - weight transfer of tire 1
+    weight_transfer - weight transfer of tire
     """
-
-    return -Cx1*W*(h/L)*(ax/g)
-
-def calc_long_weight_transfer_2(ax):
-    """
-    Calculates weight transfer due to longitudinal acceleration
     
-    Inputs: 
-    ax - Longitudinal Acceleration
-
-    Outputs:
-    weight_transfer_2 - weight transfer of tire 2
-    """
-
-    return -Cx2*W*(h/L)*(ax/g)
-
-def calc_long_weight_transfer_3(ax):
-    """
-    Calculates weight transfer due to longitudinal acceleration
-    
-    Inputs: 
-    ax - Longitudinal Acceleration
-
-    Outputs:
-    weight_transfer_3 - weight transfer of tire 3
-    """
-
-    return Cx3*W*(h/L)*(ax/g)
-
-def calc_long_weight_transfer_4(ax):
-    """
-    Calculates weight transfer due to longitudinal acceleration
-    
-    Inputs: 
-    ax - Longitudinal Acceleration
-
-    Outputs:
-    weight_transfer_4 - weight transfer of tire 4
-    """
-
-    return Cx4*W*(h/L)*(ax/g)
+    if Cx == Cx1 or Cx == Cx2:
+        return -Cx*W*(h/L)*(ax/g)
+    elif Cx == Cx3 or Cx == Cx4:
+        return Cx*W*(h/L)*(ax/g) #means we are finding weight transfer for tire 3 or 4 (rear tires)
+    else:
+        raise ValueError; 'Cx must be equal to one of the four weight transfer coef'
 
 
 Cf = 1.6 #coef of friction
 
-W1 = 353.63 #Weight on tire 1 in steady state
-W2 = 398.12 #Weight on tire 2 in steady state
-W3 = 591.61 #Weight on tire 3 in steady state
-W4 = 569.37 #Weight on tire 4 in steady state
+Steady_weight = np.array([353.63, 298.12, 591.61, 569.37]) #array of steady state tire loads with entry [0] equal to tire number 1
 
 def calc_friction_force(t_no,ax):
     """
@@ -104,20 +68,33 @@ def calc_friction_force(t_no,ax):
     """
 
     if t_no == 1:
-        return (W1+calc_long_weight_transfer_1(ax))*Cf
+        return (Steady_weight[0]+calc_long_weight_transfer(ax,Cx1))*Cf
 
-    if t_no == 2:
-        return (W2+calc_long_weight_transfer_2(ax))*Cf
+    elif t_no == 2:
+        return (Steady_weight[1]+calc_long_weight_transfer(ax,Cx2))*Cf
     
-    if t_no == 3:
-        return (W3+calc_long_weight_transfer_3(ax))*Cf
+    elif t_no == 3:
+        return (Steady_weight[2]+calc_long_weight_transfer(ax,Cx3))*Cf
     
-    if t_no == 4:
-        return (W4+calc_long_weight_transfer_4(ax))*Cf
+    elif t_no == 4:
+        return (Steady_weight[3]+calc_long_weight_transfer(ax, Cx4))*Cf
+    else:
+        raise ValueError; 't_no must be 1,2,3, or 4'
 
+
+torque_at_wheels = np.array(1,2) #not actually, find these values from our csv files with torque for our lowest gear at lowest RPM (only for launch)
+wheel_effective_radius = .2032
+tranny_efficiency = .9
+
+available_engine_force = (torque_at_wheels * tranny_efficiency)/wheel_effective_radius
+throttle_pos = 1 #any number between 0-1, 1 is max throttle
+throttle = available_engine_force*throttle_pos
 
 
 # torque to driven wheel is given by the same excel files that give torque for a given gear
-# throttle is equal to the available engine force * the throttle position (between 0 and 1)
-# available engine force = (torque at wheels * tranny efficiency (.9))/wheel effective radius (.2032)
 # if torque force to driven wheels is greater than friction force decrease throttle (slip occurs)
+# only need to check driven wheels (I think the front tires which is tire 1 and 2) 
+# if slip occurs, decrease throttle by some factor and restart the segment
+
+
+
