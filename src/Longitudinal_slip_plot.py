@@ -46,7 +46,7 @@ H = b9*Fz+b10
 
 Sv_x = b11*Fz+b12
 
-n = 20 #resolution
+n = 50 #resolution
 
 k = np.linspace(-1,1,n)
 
@@ -67,7 +67,7 @@ plt.title("Slip Ratio vs Longitudinal Force")
 plt.xlabel("Slip Ratio", fontsize = 14)
 plt.ylabel("Longitudinal Force", fontsize = 14)
 plt.xlim(-1,1)
-plt.ylim(-2000000,2000000) #subject to change
+plt.ylim(-3000000,3000000) #subject to change
 plt.plot([Fx,k])
 plt.show()
 
