@@ -36,4 +36,23 @@ def cornervmax(mu, carmass, yaccleration, cd, rho, A, radius):
     drag=.5*rho*A*cd
     return ((mu*normal)**(2)/((carmass/(1/radius))**(2)+(drag)**2))**(1/4)
 
+def lateralacceleration(v,radius):
+    """Provides the lateral accleration of the car during a turn
+    
+    Given: v, the speed of the vehicle at a point
+    R, the instanteous radius at that point.
+    
+    Returns: al, the lateral accleration at that point."""
+    return v**2/radius
+
+def longitudinalaccleration(vprevious,vcurrent,tprevious,tcurrent):
+    """Provides the longitudinal accleration of the vehicle at a certain time.
+    
+    Given: vprevious, the velocity at the previous time step
+    vcurrent, the velocity at the current timestep
+    tprevious, the overall time at the previous time step
+    tcurrent, the overal time at the current timestep"""
+    return (vcurrent-vprevious)/(tcurrent-tprevious)
+    # this is one possible implementation of this, could look into doing it with distances if we have specified distance values instead of time values
+
 print(cornervmax(mu,295,yaccleration,1.41,1.162,1,.11594202))
