@@ -69,7 +69,18 @@ def calc_lat_weight_transfer(ay,t_no):
     Weight transfer in N
     
     """
-    
+    #W needs to be W prime, see page 702 of Race Car Vehicle Dynamics
+    #Wprime=
+    if t_no ==1:
+        return Cx1*W*(b/l)
+    elif t_no ==2:
+        return Cx2*W*(b/l)
+    elif t_no==3:
+        return Cx3*W*(a/l)
+    elif t_no==4:
+        return Cx4*W*(a/l)
+    else:
+        raise Value Error; 't_no must be 1,2,3, or 4 (denotes tire number)'
 
 
 def calc_dyn_p(v):
