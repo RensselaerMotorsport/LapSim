@@ -1,5 +1,13 @@
 """A module to model the weight transfer of a four tire vehicle"""
 
+########Limitations########
+#Neglects dampering effects of suspension system
+#neglects any tire slip and thus tire deformation
+#neglects the effect of heat on tires
+#neglects difference in areas between front and rear (uses one param - frontal area) important for aero analysis
+#neglects changes in aero loads in yaw
+
+
 
 import numpy as np
 
@@ -18,7 +26,7 @@ y_ = .60137 #m
 Y_ = .00737 #m
 
 b_ = .92564 #m
-B_ = .59936 #m
+a_ = .59936 #m
 
 Tf = 1.228 #track length front in m
 Tr = 1.188 #track length rear in m
@@ -72,15 +80,15 @@ def calc_lat_weight_transfer(ay,t_no):
     #W needs to be W prime, see page 702 of Race Car Vehicle Dynamics
     #Wprime=
     if t_no ==1:
-        return Cx1*W*(b/l)
+        return Cx1*W*(b_/L)
     elif t_no ==2:
-        return Cx2*W*(b/l)
+        return Cx2*W*(b_/L)
     elif t_no==3:
-        return Cx3*W*(a/l)
+        return Cx3*W*(a_/L)
     elif t_no==4:
-        return Cx4*W*(a/l)
+        return Cx4*W*(a_/L)
     else:
-        raise Value Error; 't_no must be 1,2,3, or 4 (denotes tire number)'
+        raise ValueError; 't_no must be 1,2,3, or 4 (denotes tire number)'
 
 
 def calc_dyn_p(v):
@@ -97,13 +105,12 @@ def calc_dyn_p(v):
 
 Cl = 2 #coef of lift (might need to be negative)
 frontal_area = 1 #frontal area in m^2
-Cpm = 1 #coef of pitching moment (not verified)
-Crm = 1 #coef of rolling moment (not verified)
-Clf = .5*Cl+Cpm #coef of front lift
-Clr = .5*Cl-Cpm #coef of rear lift 
+Clf = 1 #coef of front lift
+Clr = 1 #coef of rear lift 
+### Could use rolling and pitching moment coefficients, however I do not have that data, thus we solve PM and RM with Clf, Clr, and Cl###
 
-Kr = 1 #rear roll rate in N-m/rad (not verified)
-Kf = 1 #front roll rate in N-m/rad (not verified)
+Kr = 6263.5101387 #rear roll rate in N-m/rad 
+Kf = 30255.49782 #front roll rate in N-m/rad
 
 def add_aero_loads(v,t_no):
     """ 
@@ -119,8 +126,8 @@ def add_aero_loads(v,t_no):
     q = calc_dyn_p(v)
     LF = Clf*q*frontal_area
     LR = Clr*q*frontal_area
-    PM = Cpm*q*frontal_area*L
-    RM = Crm*q*frontal_area*L
+    PM = (Clf-.5*Cl)*q*frontal_area*L
+    RM = (.5*Cl-Clr)*q*frontal_area*L
     
     if t_no == 1:
         return (-LF*.5) - Kf/(Kf+Kr)*(RM/Tf)
