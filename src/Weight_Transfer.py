@@ -148,6 +148,7 @@ def calc_total_weight_transfer(ax, ay, v, t_no):
     Inputs:
     ax - longitudinal acceleration
     ay - lateral acceleration
+    v - velocity 
     t_no = tire number
 
     Outputs:
