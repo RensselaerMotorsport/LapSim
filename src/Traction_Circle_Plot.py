@@ -1,9 +1,10 @@
-""""A module to plot the traction circle of each tire"""
+"""A module to plot the traction circle of each tire"""
 
 import numpy as np
 import math 
 from math import pi
 from Weight_Transfer import calc_total_weight_transfer
+from Weight_Transfer import add_aero_loads
 from matplotlib import pyplot as plt
 
 m = 295 #total mass of car+driver
@@ -74,20 +75,69 @@ def calc_total_Fn(ax, ay, v, t_no):
     return Steady_weight[t_no]+calc_total_weight_transfer(ax, ay, v, t_no)
 
 
-ax = 5
-ay = 5
-v = 5
+def plot_friction_circle(ax, ay, v, t_no):
+    """
+    Plots the tire friction circle (elipse)
 
-u=0    #x-position of the center
-v=0    #y-position of the center
-lat= mew*calc_total_Fn(ax,ay,v,i)    #radius on the x-axis
-long= mew*calc_total_Fn(ax,ay,v,i)  #radius on the y-axis
+    Inputs:
+    ax - longitudinal acceleration
+    ay - lateral acceleration
+    v - velocity 
+    t_no - tire number
 
-t = np.linspace(0, 2*pi, 100)
-for i in range(3):
+    Output:
+    Plot of tire friction circle
+    """
+
+    u=0    #x-position of the center
+    v=0    #y-position of the center
+    total_Fn = calc_total_Fn(ax,ay,v,t_no)
+
+    a = np.zeros(4)
+    for i in range(1,4):
+        a[i] = add_aero_loads(v,i)
+    total_aero_loads = np.sum(a)
+    
+    result_y = ay*m
+    result_x = ax*m
+    smol_resultant_y = result_y*((total_Fn)/(total_aero_loads+np.sum(Steady_weight)))
+    smol_resultant_x = result_x*((total_Fn)/(total_aero_loads+np.sum(Steady_weight)))
+
+
+    t = np.linspace(0, 2*pi, 100)
+
+    lat= mew*total_Fn   #radius on the x-axis
+    long= mew*total_Fn  #radius on the y-axis
+    plt.title("Friction Circle of Tire {}".format(t_no))
+    plt.xlabel("Lateral Force (N)")
+    plt.ylabel("Longitudinal Force (N)")
     plt.plot(u+lat*np.cos(t) , v+long*np.sin(t) )
+    plt.arrow(0,0,smol_resultant_x,smol_resultant_y, width=10)
     plt.grid(color='lightgray',linestyle='--')
     plt.show()
+    print(total_Fn,"Newtons")
 
 
+def plot_vehicle_friction_plot(ax, ay, v):
+    """
+    Plots the vehicle friction circle 
+    
+    Inputs:
+    ax - longitudinal acceleration
+    ay - lateral acceleration
+    v - velocity 
 
+
+    Output:
+    Plot of total vehicle friction circle
+    """
+
+    
+    plt.title("Friction Circle of Vehicle")
+    plt.xlabel("Lateral Force (N)")
+    plt.ylabel("Longitudinal Force (N)")
+    plt.plot(u+lat*np.cos(t) , v+long*np.sin(t) )
+    plt.arrow(0,0,smol_resultant_x,smol_resultant_y, width=10)
+    plt.grid(color='lightgray',linestyle='--')
+    plt.show()
+    
