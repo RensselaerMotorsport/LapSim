@@ -16,13 +16,20 @@ def calculate_drag_force(car, initial_velocity=0.001):
     return coeff_drag * 0.5 * air_density * (initial_velocity ** 2) * frontal_area
 
 
-def calculate_engine_force(car, wheel_torque, trans_efficiency=0.95):
+def calculate_engine_force(car, wheel_torque, trans_efficiency=0.9):
     tire_radius = car.attrs["tire_radius"]
 
     return (wheel_torque * trans_efficiency) / tire_radius
 
 
-def calculate_friction_force(coeff_friction, car_mass, driver_mass, coeff_lift, air_density, frontal_area, initial_velocity = 0):
+def calculate_friction_force(car, initial_velocity=0):
+    coeff_friction = car["coeff_friction"]
+    car_mass = car["mass_car"]
+    driver_mass = car["mass_driver"]
+    coeff_lift = car["Cl"]
+    air_density = car["rho"]
+    frontal_area = car["A"]
+
     return coeff_friction * ((car_mass + driver_mass) * 9.81) + (coeff_lift * 0.5 * air_density * (initial_velocity**2) * frontal_area)
 
 
@@ -57,19 +64,19 @@ def calc_road_speed(gear: int, rpm: int, car, transmission_efficiency: int = 0.9
     return ((rpm / (final_drive * gear_ratio * transmission_efficiency) * 6) * 3.14) / 180 * tire_radius
 
 
-def calc_torque(gear: int, torque: float, car, transmission_efficiency: int = 0.9):
+def calc_torque_at_wheels(gear: int, torque: float, car, transmission_efficiency: int = 0.9):
     """Finds torque at wheels given a gear and torque"""
     final_drive = car.attrs["final_drive"]
     gear_ratio = car.attrs["gear_ratio"][gear]
 
-    return torque * gear_ratio * final_drive * transmission_efficiency
+    return torque * gear_ratio * final_drive * transmission_efficiency / 2
 
 
-def get_engine_force(gear: int, torque: float, car):
+def get_tangent_force_at_wheels(gear: int, torque: float, car):
     """Finds engine force"""
     tire_radius = car.attrs["tire_radius"]
 
-    return (calc_torque(gear, torque, car)) / tire_radius
+    return (calc_torque_at_wheels(gear, torque, car)) / tire_radius
 
 
 def get_drag_force(velocity: float, car):

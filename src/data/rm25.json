@@ -20,5 +20,6 @@
   "engine_sprocket_teeth": 13,
   "diff_sprocket_teeth": 37,
   "tire_radius": 0.2032,
-  "gear_ratios": [2.75,2,1.667,1.44]
+  "gear_ratios": [2.75,2,1.667,1.44],
+  "final_drive": 6.66
 }
