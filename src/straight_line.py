@@ -9,8 +9,6 @@ from classes.car_simple import Car
 
 import pandas as pd
 
-gear_torque = pd.read_csv("./data/torque_for_each_gear.csv")
-rpm_v_road_speed = pd.read_csv("./data/rpm_vs_road_speed.csv")
 rpm_torque = pd.read_csv("./data/emrax_torque.csv")
 
 step = 0.1  # meters
