@@ -102,7 +102,7 @@ def calc_road_speed(gear: int, rpm: int, car, transmission_efficiency: int = 0.9
     tire_radius = car.attrs["tire_radius"]
     gear_ratio = car.attrs["gear_ratios"][gear - 1]
 
-    return ((rpm / (final_drive * gear_ratio * transmission_efficiency) * 6) * math.pi) / 180 * tire_radius
+    return ((rpm / (final_drive * gear_ratio * transmission_efficiency) * 1/60) * 2*math.pi) * tire_radius
 
 
 def calc_rpm_given_speed(gear: int, velocity: float, car, transmission_efficiency: int = 0.9):
