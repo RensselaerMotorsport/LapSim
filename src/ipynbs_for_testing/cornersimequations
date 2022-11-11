@@ -45,14 +45,13 @@ def lateralacceleration(v,radius):
     Returns: al, the lateral accleration at that point."""
     return v**2/radius
 
-def longitudinalaccleration(vprevious,vcurrent,tprevious,tcurrent):
+def longitudinalaccleration(vprevious,vcurrent,xprevious,xcurrent):
     """Provides the longitudinal accleration of the vehicle at a certain time.
     
     Given: vprevious, the velocity at the previous time step
     vcurrent, the velocity at the current timestep
     tprevious, the overall time at the previous time step
     tcurrent, the overal time at the current timestep"""
-    return (vcurrent-vprevious)/(tcurrent-tprevious)
-    # this is one possible implementation of this, could look into doing it with distances if we have specified distance values instead of time values
+    return ((vcurrent)**2-(vprevious)**2)/(2*(xcurrent-xprevious))
 
 print(cornervmax(mu,295,yaccleration,1.41,1.162,1,.11594202))
