@@ -10,12 +10,12 @@ import pandas as pd
 
 gear_torque = pd.read_csv("./data/torque_for_each_gear.csv")
 rpm_v_road_speed = pd.read_csv("./data/rpm_vs_road_speed.csv")
-rpm_torque = pd.read_csv("./data/rpm_torque.csv")
+rpm_torque = pd.read_csv("./data/emrax_torque.csv")
 
 step = 0.1  # meters
 initial_velocity = 0.01  # meters per second
 
-car = Car("data/rm25.json")
+car = Car("data/rm26.json")
 
 distance_travelled = 0
 total_distance = 75  # meters

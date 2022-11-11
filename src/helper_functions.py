@@ -24,8 +24,6 @@ def find_torque_given_velocity(velocity: float, wheel_torque, rpm_v_road_speed, 
             rpm = row["RPM"]
         else:
             break
-    print(rpm)
-    print(rpm_torque.loc[rpm_torque.rpm == rpm, 'torque'])
     engine_torque = rpm_torque.loc[rpm_torque.rpm == rpm, 'torque'].reset_index(drop=True)[0]
 
     torque = 0
