@@ -23,12 +23,12 @@ def calculate_engine_force(car, wheel_torque, trans_efficiency=0.9):
 
 
 def calculate_friction_force(car, initial_velocity=0):
-    coeff_friction = car["coeff_friction"]
-    car_mass = car["mass_car"]
-    driver_mass = car["mass_driver"]
-    coeff_lift = car["Cl"]
-    air_density = car["rho"]
-    frontal_area = car["A"]
+    coeff_friction = car.attrs["CoF"]
+    car_mass = car.attrs["mass_car"]
+    driver_mass = car.attrs["mass_driver"]
+    coeff_lift = car.attrs["Cl"]
+    air_density = car.attrs["rho"]
+    frontal_area = car.attrs["A"]
 
     return coeff_friction * ((car_mass + driver_mass) * 9.81) + (coeff_lift * 0.5 * air_density * (initial_velocity**2) * frontal_area)
 
@@ -59,7 +59,7 @@ def calc_road_speed(gear: int, rpm: int, car, transmission_efficiency: int = 0.9
     """
     final_drive = car.attrs["final_drive"]
     tire_radius = car.attrs["tire_radius"]
-    gear_ratio = car.attrs["gear_ratio"][gear]
+    gear_ratio = car.attrs["gear_ratios"][gear - 1]
 
 <<<<<<< HEAD
     return math.radians(((rpm / (final_drive * gear_ratio * transmission_efficiency) * 6)))* tire_radius
@@ -74,7 +74,7 @@ def calc_rpm_given_speed(gear: int, velocity: float, car, transmission_efficienc
     """
     final_drive = car.attrs["final_drive"]
     tire_radius = car.attrs["tire_radius"]
-    gear_ratio = car.attrs["gear_ratio"][gear]
+    gear_ratio = car.attrs["gear_ratios"][gear - 1]
 
     return ((velocity / tire_radius) * 180 / math.pi) * (final_drive * gear_ratio * transmission_efficiency) / 6
 >>>>>>> 25a99f3cc8d29316751a70b152864e3e08351459
@@ -83,7 +83,7 @@ def calc_rpm_given_speed(gear: int, velocity: float, car, transmission_efficienc
 def calc_torque_at_wheels(gear: int, torque: float, car, transmission_efficiency: int = 0.9):
     """Finds torque at wheels given a gear and torque"""
     final_drive = car.attrs["final_drive"]
-    gear_ratio = car.attrs["gear_ratio"][gear]
+    gear_ratio = car.attrs["gear_ratios"][gear - 1]
 
     return torque * gear_ratio * final_drive * transmission_efficiency / 2
 
