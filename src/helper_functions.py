@@ -2,6 +2,15 @@ import math
 
 
 def calculate_velocity_new(engine_force, drag_force, car, step=1, initial_velocity=0.001):
+    """A function for calculating the velocity at the end of a time step.
+    
+    Given: engine_force, the engine force at the begining of the time step calculated from the calculate_engine_force function
+    drag_force, the drag force at the begining of the time step calculated from the calculate_drag_force function
+    car, the car object we are testing
+    step, the time step we are at, default is 1
+    initial velocity, the initial velocity at the time step, default is .001
+    
+    Returns: the velocity at the end of the time step"""
     car_mass = car.attrs["mass_car"]
     driver_mass = car.attrs["mass_driver"]
 
@@ -61,9 +70,6 @@ def calc_road_speed(gear: int, rpm: int, car, transmission_efficiency: int = 0.9
     tire_radius = car.attrs["tire_radius"]
     gear_ratio = car.attrs["gear_ratios"][gear - 1]
 
-<<<<<<< HEAD
-    return math.radians(((rpm / (final_drive * gear_ratio * transmission_efficiency) * 6)))* tire_radius
-=======
     return ((rpm / (final_drive * gear_ratio * transmission_efficiency) * 6) * math.pi) / 180 * tire_radius
 
 
@@ -77,7 +83,6 @@ def calc_rpm_given_speed(gear: int, velocity: float, car, transmission_efficienc
     gear_ratio = car.attrs["gear_ratios"][gear - 1]
 
     return ((velocity / tire_radius) * 180 / math.pi) * (final_drive * gear_ratio * transmission_efficiency) / 6
->>>>>>> 25a99f3cc8d29316751a70b152864e3e08351459
 
 
 def calc_torque_at_wheels(gear: int, torque: float, car, transmission_efficiency: int = 0.9):
