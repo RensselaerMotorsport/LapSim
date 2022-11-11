@@ -91,23 +91,23 @@ def plot_friction_circle(ax, ay, v, t_no):
 
     u=0    #x-position of the center
     v=0    #y-position of the center
-    total_Fn = calc_total_Fn(ax,ay,v,t_no)
+    Fn_tire = calc_total_Fn(ax,ay,v,t_no)
 
-    a = np.zeros(4)
+    a = np.zeros(3)
     for i in range(1,4):
-        a[i] = add_aero_loads(v,i)
-    total_aero_loads = np.sum(a)
+        a[i-1] = calc_total_Fn(ax,ay,v,i)
+    total_fn = np.sum(a)
     
     result_y = ay*m
     result_x = ax*m
-    smol_resultant_y = result_y*((total_Fn)/(total_aero_loads+np.sum(Steady_weight)))
-    smol_resultant_x = result_x*((total_Fn)/(total_aero_loads+np.sum(Steady_weight)))
+    smol_resultant_y = result_y*((Fn_tire)/(total_fn))
+    smol_resultant_x = result_x*((Fn_tire)/(total_fn))
 
 
     t = np.linspace(0, 2*pi, 100)
 
-    lat= mew*total_Fn   #radius on the x-axis
-    long= mew*total_Fn  #radius on the y-axis
+    lat= mew*Fn_tire   #radius on the x-axis
+    long= mew*Fn_tire #radius on the y-axis
     plt.title("Friction Circle of Tire {}".format(t_no))
     plt.xlabel("Lateral Force (N)")
     plt.ylabel("Longitudinal Force (N)")
@@ -115,7 +115,7 @@ def plot_friction_circle(ax, ay, v, t_no):
     plt.arrow(0,0,smol_resultant_x,smol_resultant_y, width=10)
     plt.grid(color='lightgray',linestyle='--')
     plt.show()
-    print(total_Fn,"Newtons")
+    print(Fn_tire,"Newtons")
 
 
 def plot_vehicle_friction_plot(ax, ay, v):
@@ -127,17 +127,32 @@ def plot_vehicle_friction_plot(ax, ay, v):
     ay - lateral acceleration
     v - velocity 
 
-
     Output:
     Plot of total vehicle friction circle
     """
 
+    u = 0
+    v = 0
+    a = np.zeros(3)
     
+    for i in range(1,4):
+        a[i-1] = calc_total_Fn(ax, ay, v,i)
+    total_Fn = np.sum(a)
+    print(total_Fn)
+    lat = mew*total_Fn
+    long = mew*total_Fn
+    t = np.linspace(0, 2*pi, 100)
+
+
+    result_y = (ay*m)
+    result_x = (ax*m)
+
     plt.title("Friction Circle of Vehicle")
     plt.xlabel("Lateral Force (N)")
     plt.ylabel("Longitudinal Force (N)")
     plt.plot(u+lat*np.cos(t) , v+long*np.sin(t) )
-    plt.arrow(0,0,smol_resultant_x,smol_resultant_y, width=10)
+    plt.arrow(0,0,result_x,result_y, width=70)
     plt.grid(color='lightgray',linestyle='--')
     plt.show()
     
+plot_vehicle_friction_plot(10,7,12)
