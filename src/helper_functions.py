@@ -18,6 +18,13 @@ def calculate_velocity_new(engine_force, drag_force, car, step=1, initial_veloci
 
 
 def calculate_drag_force(car, initial_velocity=0.001):
+    """A function for calculating the drag force of a provided car at a provided velocity.
+    
+    Given: car, the car object we are testing
+    initial_velocity, the velocity at the begining of the time step we are running, default is .001
+    
+    Returns: the drag froce of the car at the provided velocity
+    """
     coeff_drag = car.attrs["Cd"]
     air_density = car.attrs["rho"]
     frontal_area = car.attrs["A"]
