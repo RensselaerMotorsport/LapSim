@@ -65,6 +65,16 @@ def calculate_friction_force(car, initial_velocity=0):
 
 
 def find_torque_given_velocity(velocity: float, wheel_torque, rpm_v_road_speed, rpm_torque, gear: str = "1st"):
+    """A function for calculating the torque of the car given the velocity of the car.
+    
+    Given: velocity, a float value representing the velocity
+    wheel_torque, a wheel torque value from the calc_torque_at_wheels function
+    rpm_v_road_speed, ?
+    rpm_torque, ?
+    gear, a string representing the gear we are currently in, default is "1st"
+    
+    Returns: the overal torque of the car
+    """
     rpm = 0
     for _, row in rpm_v_road_speed.iterrows():
         if row[gear] < velocity:
