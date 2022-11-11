@@ -2,7 +2,8 @@ from helper_functions import calculate_drag_force,\
     calculate_engine_force, \
     calculate_velocity_new, \
     calculate_friction_force, \
-    find_torque_given_velocity
+    get_tangent_force_at_wheels, \
+    calc_rpm_given_speed
 
 from classes.car_simple import Car
 
@@ -28,34 +29,23 @@ while distance_travelled < total_distance:
     distance_travelled += step
     print("Distance travelled: ", distance_travelled)
 
-    wheel_torque = find_torque_given_velocity(velocity,
-                                              gear_torque,
-                                              rpm_v_road_speed,
-                                              rpm_torque, current_gear)
+    rpm = calc_rpm_given_speed(1, velocity, car)
+    torque = round(rpm, -2)
+
+    wheel_torque = get_tangent_force_at_wheels(1, torque, car) * 2
 
     # Calculate the drag force
-    drag_force = calculate_drag_force(car.attrs["Cd"],
-                                      car.attrs["rho"],
-                                      car.attrs["A"], velocity)
+    drag_force = calculate_drag_force(car, velocity)
 
     # Calculate the engine force
-    engine_force = calculate_engine_force(wheel_torque,
-                                          trans_efficiency,
-                                          car.attrs["tire_radius"])
+    engine_force = calculate_engine_force(car, wheel_torque, trans_efficiency)
 
     # Calculate the friction force
-    friction_force = calculate_friction_force(car.attrs['CoF'],
-                                              car.attrs['mass_car'],
-                                              car.attrs['mass_driver'],
-                                              car.attrs['Cl'],
-                                              car.attrs['rho'],
-                                              car.attrs['A'], velocity)
+    friction_force = calculate_friction_force(car, velocity)
 
     # Calculate the new velocity
     velocity = calculate_velocity_new(engine_force,
-                                      drag_force,
-                                      car.attrs['mass_car'],
-                                      car.attrs['mass_driver'],
+                                      drag_force, car,
                                       step, velocity)
 
     # Print the results
