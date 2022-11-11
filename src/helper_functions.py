@@ -1,15 +1,24 @@
 import math
 
 
-def calculate_velocity_new(engine_force, drag_force, car_mass, driver_mass, step = 1, initial_velocity = 0.001):
+def calculate_velocity_new(engine_force, drag_force, car, step=1, initial_velocity=0.001):
+    car_mass = car.attrs["mass_car"]
+    driver_mass = car.attrs["mass_driver"]
+
     return math.sqrt((initial_velocity**2) + 2 * step * ((engine_force - drag_force) / (car_mass + driver_mass)))
 
 
-def calculate_drag_force(coeff_drag, air_density, frontal_area, initial_velocity = 0.001):
+def calculate_drag_force(car, initial_velocity=0.001):
+    coeff_drag = car.attrs["Cd"]
+    air_density = car.attrs["rho"]
+    frontal_area = car.attrs["A"]
+
     return coeff_drag * 0.5 * air_density * (initial_velocity ** 2) * frontal_area
 
 
-def calculate_engine_force(wheel_torque, trans_efficiency, tire_radius):
+def calculate_engine_force(car, wheel_torque, trans_efficiency=0.95):
+    tire_radius = car.attrs["tire_radius"]
+
     return (wheel_torque * trans_efficiency) / tire_radius
 
 
