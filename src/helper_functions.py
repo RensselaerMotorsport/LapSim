@@ -33,6 +33,14 @@ def calculate_drag_force(car, initial_velocity=0.001):
 
 
 def calculate_engine_force(car, wheel_torque, trans_efficiency=0.9):
+    """A function for calculating engine force given wheel torque and transmission efficency.
+    
+    Given: car, the car object we are testing
+    wheel_torque, the wheel torque at a velocity found from the calc_torque_at_wheels function
+    trans_efficency, the efficency of the drivetrain of the car, default is .9
+    
+    Returns: the engine force at the initial conditions.
+    """
     tire_radius = car.attrs["tire_radius"]
 
     return (wheel_torque * trans_efficiency) / tire_radius
