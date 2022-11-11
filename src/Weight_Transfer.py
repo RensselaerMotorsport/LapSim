@@ -114,7 +114,7 @@ Kf = 30255.49782 #front roll rate in N-m/rad
 
 def add_aero_loads(v,t_no):
     """ 
-    Calculates aerodynamics load transfer 
+    Calculates aerodynamics load transfer for a certain tire
 
     Inputs:
     t_no - number of tire
