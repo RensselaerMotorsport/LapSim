@@ -1,4 +1,4 @@
-motor_speed,peak_motor_torque,continuous_motor_torque
+rpm,peak_motor_torque,torque
 0,240,95
 100,240,96.785
 200,240,98.57
