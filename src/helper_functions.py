@@ -47,6 +47,13 @@ def calculate_engine_force(car, wheel_torque, trans_efficiency=0.9):
 
 
 def calculate_friction_force(car, initial_velocity=0):
+    """A function for calculating the friction force of a car at an initial velocity.
+    
+    Given: car, the car object we are testing
+    initial_velocity, the initial velocoty of the car at a time step, default is 0
+    
+    Returns: the friction force at the provided conditions.
+    """
     coeff_friction = car.attrs["CoF"]
     car_mass = car.attrs["mass_car"]
     driver_mass = car.attrs["mass_driver"]
