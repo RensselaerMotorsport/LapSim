@@ -97,4 +97,3 @@ throttle = available_engine_force*throttle_pos
 # if slip occurs, decrease throttle by some factor and restart the segment
 
 
-
