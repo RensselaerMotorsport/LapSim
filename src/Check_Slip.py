@@ -67,4 +67,17 @@ tranny_efficiency = .9
 # if slip occurs, decrease throttle by some factor and restart the segment
 
 
+def check_torque_for_slipping(car, torque,d_step=.1, v1=0.001, gear=1, transmissionefficency=.9, tireschecked=np.matrix[3,4]):
+    wheeltorque=calc_torque_at_wheels(gear, torque, car, transmissionefficency)
+    engineforce=calculate_engine_force(car, wheeltorque,transmissionefficency)
+    dragforce=calculate_drag_force(car,v1)
+    v2=calculate_velocity_new(engineforce,dragforce,1,v1)
+    t=calc_t(v1,v2,d_step)
+    longaccel=calc_long_accel(v1,v2,t)
+    tangentialforceatwheel=get_tangent_force_at_wheels(gear,torque,car)
+    for i in range(shape(tireschecked)):
+        frictionforce=calc_friction_force(tireschecked[i],longaccel,v1)
+        if frictionforce<tangentialforceatwheel:
+            return True
+    return False
 
