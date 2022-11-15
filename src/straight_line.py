@@ -9,6 +9,8 @@ from classes.car_simple import Car
 
 import pandas as pd
 
+import matplotlib.pyplot as plt
+
 rpm_torque = pd.read_csv("./data/emrax_torque.csv")
 
 step = 0.1  # meters
@@ -17,12 +19,14 @@ initial_velocity = 0.01  # meters per second
 car = Car("data/rm26.json")
 
 distance_travelled = 0
-total_distance = 75  # meters
+total_distance = 5000  # meters
 
 velocity = initial_velocity
 current_gear = "1st"
 trans_efficiency = 0.9
 time = 0
+velocities = []
+steps = []
 while distance_travelled < total_distance:
     initial_velocity = velocity
     distance_travelled += step
@@ -48,8 +52,9 @@ while distance_travelled < total_distance:
                                       drag_force, car,
                                       step, velocity)
 
+    velocities.append(velocity)
+    steps.append(distance_travelled)
     time += 1 / (((initial_velocity + velocity) / 2) / step)
-
     # Print the results
     # print("Drag force: ", drag_force)
     # print("Engine force: ", engine_force)
@@ -59,3 +64,8 @@ while distance_travelled < total_distance:
     # print("")
 
 print("Time: ", time)
+
+plt.plot(steps, velocities)
+plt.xlabel("Distance travelled (m)")
+plt.ylabel("Velocity (m/s)")
+plt.show()
