@@ -1,7 +1,9 @@
 """A module to find if wheels slip"""
 
 import numpy as np
-from Weight_Transfer import calc_total_weight_transfer
+import Weight_Transfer as wt
+import helper_functions as h
+import Traction_Circle_Plot as tc
 
 g = 9.8 #m/s^2
 mass_car = 195 #kg
@@ -29,16 +31,16 @@ def calc_friction_force(t_no, ax, v, ay=0):
     """
 
     if t_no == 1:
-        return (Steady_weight[0]+calc_total_weight_transfer(ax, ay, v, t_no))*Cf
+        return (Steady_weight[0]+wt.calc_total_weight_transfer(ax, ay, v, t_no))*Cf
 
     elif t_no == 2:
-        return (Steady_weight[1]+calc_total_weight_transfer(ax, ay, v, t_no))*Cf
+        return (Steady_weight[1]+wt.calc_total_weight_transfer(ax, ay, v, t_no))*Cf
     
     elif t_no == 3:
-        return (Steady_weight[2]+calc_total_weight_transfer(ax, ay, v, t_no))*Cf
+        return (Steady_weight[2]+wt.calc_total_weight_transfer(ax, ay, v, t_no))*Cf
     
     elif t_no == 4:
-        return (Steady_weight[3]+calc_total_weight_transfer(ax, ay, v, t_no))*Cf
+        return (Steady_weight[3]+wt.calc_total_weight_transfer(ax, ay, v, t_no))*Cf
     else:
         raise ValueError; 't_no must be 1,2,3, or 4'
 
@@ -67,4 +69,17 @@ tranny_efficiency = .9
 # if slip occurs, decrease throttle by some factor and restart the segment
 
 
+def check_torque_for_slipping(car, torque,d_step=.1, v1=0.001, gear=1, transmissionefficency=.9, tireschecked=np.matrix[3,4]):
+    wheeltorque=h.calc_torque_at_wheels(gear, torque, car, transmissionefficency)
+    engineforce=h.calculate_engine_force(car, wheeltorque,transmissionefficency)
+    dragforce=h.calculate_drag_force(car,v1)
+    v2=h.calculate_velocity_new(engineforce,dragforce,1,v1)
+    t=tc.calc_t(v1,v2,d_step)
+    longaccel=tc.calc_long_accel(v1,v2,t)
+    tangentialforceatwheel=h.get_tangent_force_at_wheels(gear,torque,car)
+    for i in range(shape(tireschecked)):
+        frictionforce=calc_friction_force(tireschecked[i],longaccel,v1)
+        if frictionforce<tangentialforceatwheel:
+            return True
+    return False
 
