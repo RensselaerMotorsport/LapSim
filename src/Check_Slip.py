@@ -3,7 +3,6 @@
 import numpy as np
 import Weight_Transfer as wt
 import helper_functions as h
-import Longitudinal_Weight_Transfer as lwt
 import Traction_Circle_Plot as tc
 
 g = 9.8 #m/s^2
@@ -32,16 +31,16 @@ def calc_friction_force(t_no, ax, v, ay=0):
     """
 
     if t_no == 1:
-        return (Steady_weight[0]+calc_total_weight_transfer(ax, ay, v, t_no))*Cf
+        return (Steady_weight[0]+wt.calc_total_weight_transfer(ax, ay, v, t_no))*Cf
 
     elif t_no == 2:
-        return (Steady_weight[1]+calc_total_weight_transfer(ax, ay, v, t_no))*Cf
+        return (Steady_weight[1]+wt.calc_total_weight_transfer(ax, ay, v, t_no))*Cf
     
     elif t_no == 3:
-        return (Steady_weight[2]+calc_total_weight_transfer(ax, ay, v, t_no))*Cf
+        return (Steady_weight[2]+wt.calc_total_weight_transfer(ax, ay, v, t_no))*Cf
     
     elif t_no == 4:
-        return (Steady_weight[3]+calc_total_weight_transfer(ax, ay, v, t_no))*Cf
+        return (Steady_weight[3]+wt.calc_total_weight_transfer(ax, ay, v, t_no))*Cf
     else:
         raise ValueError; 't_no must be 1,2,3, or 4'
 
