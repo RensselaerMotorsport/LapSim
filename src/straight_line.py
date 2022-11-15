@@ -22,15 +22,17 @@ total_distance = 75  # meters
 velocity = initial_velocity
 current_gear = "1st"
 trans_efficiency = 0.9
-
+time = 0
 while distance_travelled < total_distance:
+    initial_velocity = velocity
     distance_travelled += step
-    print("Distance travelled: ", distance_travelled)
-
+    # print("Distance travelled: ", distance_travelled)
     rpm = calc_rpm_given_speed(1, velocity, car)
-    torque = round(rpm, -2)
+    # print("RPM: ", round(rpm, -2))
+    torque = rpm_torque.loc[rpm_torque.rpm == round(rpm, -2), "peak_motor_torque"].reset_index(drop=True)[0]
+    # print("Torque : ", torque)
 
-    wheel_torque = get_tangent_force_at_wheels(1, torque, car) * 2
+    wheel_torque = get_tangent_force_at_wheels(1, torque, car)
 
     # Calculate the drag force
     drag_force = calculate_drag_force(car, velocity)
@@ -46,10 +48,14 @@ while distance_travelled < total_distance:
                                       drag_force, car,
                                       step, velocity)
 
+    time += 1 / (((initial_velocity + velocity) / 2) / step)
+
     # Print the results
-    print("Drag force: ", drag_force)
-    print("Engine force: ", engine_force)
-    print("Friction force: ", friction_force)
-    print("New velocity: ", velocity)
-    print("Torque: ", wheel_torque)
-    print("")
+    # print("Drag force: ", drag_force)
+    # print("Engine force: ", engine_force)
+    # print("Friction force: ", friction_force)
+    # print("New velocity: ", velocity)
+    # print("Torque: ", wheel_torque)
+    # print("")
+
+print("Time: ", time)
