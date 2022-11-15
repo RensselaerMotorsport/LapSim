@@ -1,7 +1,10 @@
 """A module to find if wheels slip"""
 
 import numpy as np
-from Weight_Transfer import calc_total_weight_transfer
+import Weight_Transfer as wt
+import helper_functions as h
+import Longitudinal_Weight_Transfer as lwt
+import Traction_Circle_Plot as tc
 
 g = 9.8 #m/s^2
 mass_car = 195 #kg
@@ -68,13 +71,13 @@ tranny_efficiency = .9
 
 
 def check_torque_for_slipping(car, torque,d_step=.1, v1=0.001, gear=1, transmissionefficency=.9, tireschecked=np.matrix[3,4]):
-    wheeltorque=calc_torque_at_wheels(gear, torque, car, transmissionefficency)
-    engineforce=calculate_engine_force(car, wheeltorque,transmissionefficency)
-    dragforce=calculate_drag_force(car,v1)
-    v2=calculate_velocity_new(engineforce,dragforce,1,v1)
-    t=calc_t(v1,v2,d_step)
-    longaccel=calc_long_accel(v1,v2,t)
-    tangentialforceatwheel=get_tangent_force_at_wheels(gear,torque,car)
+    wheeltorque=h.calc_torque_at_wheels(gear, torque, car, transmissionefficency)
+    engineforce=h.calculate_engine_force(car, wheeltorque,transmissionefficency)
+    dragforce=h.calculate_drag_force(car,v1)
+    v2=h.calculate_velocity_new(engineforce,dragforce,1,v1)
+    t=tc.calc_t(v1,v2,d_step)
+    longaccel=tc.calc_long_accel(v1,v2,t)
+    tangentialforceatwheel=h.get_tangent_force_at_wheels(gear,torque,car)
     for i in range(shape(tireschecked)):
         frictionforce=calc_friction_force(tireschecked[i],longaccel,v1)
         if frictionforce<tangentialforceatwheel:
