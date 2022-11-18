@@ -71,6 +71,17 @@ tranny_efficiency = .9
 
 
 def check_torque_for_slipping(car, torque,d_step=.1, v1=0.001, gear=1, transmissionefficency=.9, tireschecked=np.matrix[3,4]):
+    """"Checks a provided torque to see if it causes the car to slip.
+    
+    Given: car, the car object we are testing
+    torque, the torque we are testing
+    d_step, the distance between each step, default is .1 m
+    v1, the initial velocity of the car while checking this torque, default is stationary .001
+    gear, the gear the car is in, default is 1
+    transmissionefficency, the efficency of the transmission in the car, default is .9
+    tires checked, a numpy matrix of the tire numbers we are checked, default is [3,4]
+    
+    Returns: True or False output, True if the car is slipping, False if it is not"""
     wheeltorque=h.calc_torque_at_wheels(gear, torque, car, transmissionefficency)
     engineforce=h.calculate_engine_force(car, wheeltorque,transmissionefficency)
     dragforce=h.calculate_drag_force(car,v1)
