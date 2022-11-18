@@ -46,13 +46,6 @@ def calc_friction_force(t_no, ax, v, ay=0):
 
 
 
-def calc_if_slip(t_no, ax, v, ay=0, torque):
-
-
-    if t_no == 3
-        if calc_friction_force > 
-
-
 wheel_effective_radius = .2032
 tranny_efficiency = .9
 
