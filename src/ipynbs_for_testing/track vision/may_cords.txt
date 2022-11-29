@@ -1,4 +1,3 @@
-Cords of may track, 82 contours:
 (array([[[712, 355]]], dtype=int32), array([[[560, 348]],
 
        [[560, 349]],

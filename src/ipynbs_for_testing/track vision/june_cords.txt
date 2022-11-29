@@ -1,4 +1,3 @@
-Cords of june track, 39 contours:
 (array([[[199,  74]]], dtype=int32), array([[[408,  70]],
 
        [[408,  71]],
