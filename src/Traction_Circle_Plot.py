@@ -6,57 +6,10 @@ from math import pi
 from Weight_Transfer import calc_total_weight_transfer
 from Weight_Transfer import add_aero_loads
 from matplotlib import pyplot as plt
+import helper_functions as h
 
 m = 295 #total mass of car+driver
-mew = 1.6 #coef of friction
-
-def calc_lat_accel(v, icr):
-    """
-    Calculates lateral acceleration
-
-    Imputs:
-    v - velocity in m/s
-    icr - inverse corner radius in rad
-
-    Output:
-    Lateral acceleration in m/s**2
-    """
-    return (m*(v**2))/icr
-
-
-def calc_t(v1, v2, d_step):
-    """
-    Calculates the time it takes to complete segment n
-
-    Inputs:
-    v1 - velocity at the begining of segment n
-    v2 - velocity at the end of segment n
-    d_step - distance step
-
-    Output:
-    t - time in s
-    """
-    return 1/(((v1+v2)/2)/d_step)
-
-
-#not sure how we should distinguish the difference between long and lat velocities
-#good thing is we know all long accel is caused by engine force and any lat accel is caused by curavture
-
-def calc_long_accel(v1, v2, t):
-    """
-    Calculates longitudinal acceleration
-
-    Inputs:
-    v1 - velocity at the begining of segment n
-    v2 - velocity at the end of segment n
-    t - the time it takes to complete segment n
-
-    Output:
-    Longitudinal acceleration
-    """
-
-    return (v1+v2)/t
-    #yes?
+mew = 1.6 #coef of 
 
 
 Steady_weight = np.array([353.63, 298.12, 591.61, 569.37]) #array of steady state tire loads with entry [0] equal to tire number 1
@@ -101,11 +54,12 @@ def calc_slip_angle(icr, b, a, v_long, v_lat):
     return t_no_slip_angle
 
 
-def plot_friction_circle(ax, ay, v_lat, v_long, icr, t_no):
+def plot_friction_circle(car, ax, ay, v_lat, v_long, icr, t_no):
     """
     Plots the tire friction circle (elipse)
 
     Inputs:
+    Car - car object
     ax - longitudinal acceleration
     ay - lateral acceleration
     v_lat - lateral velocity
@@ -119,7 +73,7 @@ def plot_friction_circle(ax, ay, v_lat, v_long, icr, t_no):
     
     v = math.sqrt(v_lat**2 + v_long**2)
 
-    slip_ang = calc_slip_angle(icr, v_long, v_lat, b=2, a=2) #####!!!!! need to use object car with this function and this application of it for b and a parameters
+    slip_ang = calc_slip_angle(car, icr, v_long, v_lat, h.b, a=2) #####!!!!! need to use object car with this function and this application of it for b and a parameters
 
     x=0    #x-position of the center
     y=0    #y-position of the center
