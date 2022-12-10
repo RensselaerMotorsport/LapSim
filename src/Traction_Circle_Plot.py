@@ -7,6 +7,8 @@ from Weight_Transfer import calc_total_weight_transfer
 from Weight_Transfer import add_aero_loads
 from matplotlib import pyplot as plt
 import helper_functions as h
+# from classes.car_simple import Car
+# car = Car("data/rm26.json")
 
 m = 295 #total mass of car+driver
 mew = 1.6 #coef of 
@@ -27,7 +29,7 @@ def calc_total_Fn(ax, ay, v, t_no):
     """
     return Steady_weight[t_no]+calc_total_weight_transfer(ax, ay, v, t_no)
 
-def calc_slip_angle(icr, b, a, v_long, v_lat):
+def calc_slip_angle(icr, v_long, v_lat, b, a):
     """
     Caclulates the slip angles of all tires and ouputs them in an array with our tire number convention. 
     We can use coordinates and trig to find the angle between two sectors instead of the icr if needed.
@@ -45,7 +47,7 @@ def calc_slip_angle(icr, b, a, v_long, v_lat):
     """
     A= 1/icr
 
-    t_no_slip_angle = np.zeros(3)
+    t_no_slip_angle = np.zeros(4)
     t_no_slip_angle[0] = (180-A) - (a/A) - (v_long/v_lat)
     t_no_slip_angle[1] = (180-A) - (a/A) - (v_long/v_lat)
     t_no_slip_angle[2] = (b/A) - (v_long/v_lat)
@@ -73,7 +75,8 @@ def plot_friction_circle(car, ax, ay, v_lat, v_long, icr, t_no):
     
     v = math.sqrt(v_lat**2 + v_long**2)
 
-    slip_ang = calc_slip_angle(car, icr, v_long, v_lat, h.b, a=2) #####!!!!! need to use object car with this function and this application of it for b and a parameters
+    slip_ang_r = calc_slip_angle(car, icr, v_long, v_lat, b=3, a=2) #####!!!!! need to use object car with this function and this application of it for b and a parameters
+    slip_ang = np.round(slip_ang_r,5)
 
     x=0    #x-position of the center
     y=0    #y-position of the center
@@ -100,13 +103,13 @@ def plot_friction_circle(car, ax, ay, v_lat, v_long, icr, t_no):
     plt.plot(x+lat*np.cos(t) , y+long*np.sin(t) )
     plt.arrow(0,0,smol_resultant_x,smol_resultant_y, width=10)
     plt.grid(color='lightgray',linestyle='--')
-    plt.text(2700, 5000, "Wheel slip angle=")
-    plt.text(5000,5000, slip_ang[t_no])
+    plt.text(200, 1200, "Wheel slip angle=")
+    plt.text(900,1200, slip_ang[t_no])
     plt.show()
     print(Fn_tire,"Newtons")
 
 
-def plot_vehicle_friction_plot(ax, ay, v_lat, v_long):
+def plot_vehicle_friction(ax, ay, v_lat, v_long):
     """
     Plots the vehicle friction circle 
     
@@ -137,16 +140,15 @@ def plot_vehicle_friction_plot(ax, ay, v_lat, v_long):
 
     result_y = (ay*m)
     result_x = (ax*m)
-    wheel= math.atan(v_lat/v_long)
+    wheel= round(math.atan(v_lat/v_long), 5)
 
     plt.title("Friction Circle of Vehicle")
     plt.xlabel("Lateral Force (N)")
     plt.ylabel("Longitudinal Force (N)")
     plt.plot(x+lat*np.cos(t) , y+long*np.sin(t) )
     plt.arrow(0,0,result_x,result_y, width=70)
-    plt.text(2700, 5000, "Vehicle slip angle=")
-    plt.text(5000,5000, wheel)
+    plt.text(1300, 5500, "Vehicle slip angle=")
+    plt.text(4500,5500, wheel)
     plt.grid(color='lightgray',linestyle='--')
     plt.show()
     
-plot_vehicle_friction_plot(10,7,12)
