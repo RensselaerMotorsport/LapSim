@@ -37,7 +37,7 @@ steady_weights = [353.63, 298.12, 591.61, 569.37]
 Cf = car.attrs["CoF"]
 
 
-def calc_friction_force(t_no, ax, v, ay=0):
+def calc_friction_force(t_no, v, ay=0):
     """
     Calculates friction force given the number tire and longitudinal acceleration
 
@@ -51,18 +51,25 @@ def calc_friction_force(t_no, ax, v, ay=0):
 
     friction_force
     """
+    dyn_p = wt.calc_dyn_p(v)
+    A = 1
+    Cl = 3
+    downforce = Cl*dyn_p*A
+
+    add_aero = downforce/4
+
 
     if t_no == 1:
-        return (steady_weights[0] + wt.calc_total_weight_transfer(ax, ay, v, t_no)) * Cf
+        return (steady_weights[0] + add_aero) * Cf
 
     elif t_no == 2:
-        return (steady_weights[1] + wt.calc_total_weight_transfer(ax, ay, v, t_no)) * Cf
+        return (steady_weights[1] + add_aero) * Cf
 
     elif t_no == 3:
-        return (steady_weights[2] + wt.calc_total_weight_transfer(ax, ay, v, t_no)) * Cf
+        return (steady_weights[2] + add_aero) * Cf
 
     elif t_no == 4:
-        return (steady_weights[3] + wt.calc_total_weight_transfer(ax, ay, v, t_no)) * Cf
+        return (steady_weights[3] +add_aero) * Cf
 
 
 while distance_travelled < total_distance:

@@ -139,7 +139,7 @@ def add_aero_loads(v,t_no):
         return (-LR*.5) + Kf/(Kf+Kr)*(RM/Tr)
     else:
         raise ValueError  # 't_no must be 1,2,3, or 4 (denotes tire number)'
-
+    
 
 def calc_total_weight_transfer(ax, ay, v, t_no):
     """
