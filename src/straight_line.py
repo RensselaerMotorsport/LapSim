@@ -5,7 +5,10 @@ from helper_functions import calculate_drag_force,\
     get_tangent_force_at_wheels, \
     calc_rpm_given_speed
 
+# from Check_Slip import calc_friction_force
+
 from classes.car_simple import Car
+import Weight_Transfer as wt
 
 import pandas as pd
 
@@ -28,49 +31,92 @@ total_time = 0
 velocities = []
 steps = []
 accels = []
+
+# array of steady state tire loads with entry [0] equal to tire number 1
+steady_weights = [353.63, 298.12, 591.61, 569.37]
+Cf = car.attrs["CoF"]
+
+
+def calc_friction_force(t_no, ax, v, ay=0):
+    """
+    Calculates friction force given the number tire and longitudinal acceleration
+
+    Inputs:
+    t_no - number tire
+    ax - longitudinal acceleration
+    v - velocity
+    ay - lateral acceleration (defualt=0)
+
+    Outputs:
+
+    friction_force
+    """
+
+    if t_no == 1:
+        return (steady_weights[0] + wt.calc_total_weight_transfer(ax, ay, v, t_no)) * Cf
+
+    elif t_no == 2:
+        return (steady_weights[1] + wt.calc_total_weight_transfer(ax, ay, v, t_no)) * Cf
+
+    elif t_no == 3:
+        return (steady_weights[2] + wt.calc_total_weight_transfer(ax, ay, v, t_no)) * Cf
+
+    elif t_no == 4:
+        return (steady_weights[3] + wt.calc_total_weight_transfer(ax, ay, v, t_no)) * Cf
+
+
 while distance_travelled < total_distance:
     initial_velocity = velocity
     distance_travelled += step
-    # print("Distance travelled: ", distance_travelled)
+
     rpm = calc_rpm_given_speed(1, velocity, car)
-    # print("RPM: ", round(rpm, -2))
-    torque = rpm_torque.loc[rpm_torque.rpm == round(rpm, -2), "peak_motor_torque"].reset_index(drop=True)[0]
-    # print("Torque : ", torque)
+    max_torque = rpm_torque.loc[rpm_torque.rpm == round(rpm, -2), "torque"].reset_index(drop=True)[0]
+    torque = max_torque
 
     wheel_torque = get_tangent_force_at_wheels(1, torque, car)
-
-    # Calculate the drag force
     drag_force = calculate_drag_force(car, velocity)
-
-    # Calculate the engine force
     engine_force = calculate_engine_force(car, wheel_torque, trans_efficiency)
-
-    # Calculate the friction force
     friction_force = calculate_friction_force(car, velocity)
-
-    # Calculate the new velocity
     velocity = calculate_velocity_new(engine_force,
                                       drag_force, car,
                                       step, velocity)
 
+    time = 1 / (((initial_velocity + velocity) / 2) / step)
+    accel = (velocity - initial_velocity) / time
+
+    rr = calc_friction_force(3, accel, velocity)
+    rl = calc_friction_force(4, accel, velocity)
+
+    # while rr < wheel_torque or rl < wheel_torque:
+    #     torque -= 1
+    #     # print(rr, rl, wheel_torque)
+    #
+    #     wheel_torque = get_tangent_force_at_wheels(1, torque, car)
+    #     drag_force = calculate_drag_force(car, velocity)
+    #     engine_force = calculate_engine_force(car, wheel_torque, trans_efficiency)
+    #     friction_force = calculate_friction_force(car, velocity)
+    #     velocity = calculate_velocity_new(engine_force,
+    #                                       drag_force, car,
+    #                                       step, velocity)
+    #
+    #     time = 1 / (((initial_velocity + velocity) / 2) / step)
+    #     accel = (velocity - initial_velocity) / time
+    #
+    #     rr = calc_friction_force(3, accel, velocity)
+    #     rl = calc_friction_force(4, accel, velocity)
+    #
+    # print("Torque: ", torque)
+    # print("Velocity: ", velocity)
+    total_time += time
+
     velocities.append(velocity)
     steps.append(distance_travelled)
-    time = 1 / (((initial_velocity + velocity) / 2) / step)
-    total_time += time
-    # Print the results
-    # print("Drag force: ", drag_force)
-    # print("Engine force: ", engine_force)
-    # print("Friction force: ", friction_force)
-    # print("New velocity: ", velocity)
-    # print("Torque: ", wheel_torque)
-    # print("")
-
-    accel = (velocity - initial_velocity) / time
     accels.append(accel)
 
 print("Time: ", total_time)
 
-plt.plot(steps, accels)
+plt.plot(steps, velocities, label="velocity (m/s")
+plt.plot(steps, accels, label="acceleration (m/s^2)")
 plt.xlabel("Distance travelled (m)")
-plt.ylabel("acceleration (m/s^2)")
+plt.legend()
 plt.show()

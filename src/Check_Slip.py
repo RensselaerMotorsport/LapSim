@@ -45,17 +45,15 @@ def calc_friction_force(t_no, ax, v, ay=0):
         raise ValueError; 't_no must be 1,2,3, or 4'
 
 
-
-def calc_if_slip(t_no, ax, v, ay=0, torque):
-
-
-    if t_no == 3
-        if calc_friction_force > 
-
-
-wheel_effective_radius = .2032
-tranny_efficiency = .9
-
+# def calc_if_slip(t_no, ax, v, ay=0, torque):
+#
+#
+#     if t_no == 3
+#         if calc_friction_force >
+#
+#
+# wheel_effective_radius = .2032
+# tranny_efficiency = .9
 
 
 # available_engine_force = (torque_at_wheels * tranny_efficiency)/wheel_effective_radius
@@ -69,16 +67,16 @@ tranny_efficiency = .9
 # if slip occurs, decrease throttle by some factor and restart the segment
 
 
-def check_torque_for_slipping(car, torque,d_step=.1, v1=0.001, gear=1, transmissionefficency=.9, tireschecked=np.matrix[3,4]):
+def check_torque_for_slipping(car, torque, d_step=.1, v1=0.001, gear=1, transmissionefficency=.9, tireschecked=np.matrix[3,4]):
     wheeltorque=h.calc_torque_at_wheels(gear, torque, car, transmissionefficency)
-    engineforce=h.calculate_engine_force(car, wheeltorque,transmissionefficency)
-    dragforce=h.calculate_drag_force(car,v1)
-    v2=h.calculate_velocity_new(engineforce,dragforce,1,v1)
-    t=tc.calc_t(v1,v2,d_step)
-    longaccel=tc.calc_long_accel(v1,v2,t)
-    tangentialforceatwheel=h.get_tangent_force_at_wheels(gear,torque,car)
-    for i in range(shape(tireschecked)):
-        frictionforce=calc_friction_force(tireschecked[i],longaccel,v1)
+    engineforce=h.calculate_engine_force(car, wheeltorque, transmissionefficency)
+    dragforce=h.calculate_drag_force(car, v1)
+    v2=h.calculate_velocity_new(engineforce, dragforce, 1, v1)
+    t=tc.calc_t(v1, v2, d_step)
+    longaccel=tc.calc_long_accel(v1, v2, t)
+    tangentialforceatwheel=h.get_tangent_force_at_wheels(gear, torque, car)
+    for i in range(tireschecked):
+        frictionforce=calc_friction_force(tireschecked[i], longaccel, v1)
         if frictionforce<tangentialforceatwheel:
             return True
     return False
