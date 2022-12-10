@@ -1,0 +1,14 @@
+List of the physics model's assumptions
+
+Note: This list is a forever living document and as the simulation is refined there will be assumptions added or removed
+
+1. Perfect driver (car always operates at its limits without slipping)
+2. Rear and front tire size are equal
+3. Lateral acceleration is equal to centripital force (in reality it is equal to centripital force multiplied by the cosine of the sideslip angle)
+4. Each turn is of constant radius
+5. The car is a point mass rather than a rigid body
+6. Neglects suspension effects
+7. Tire models do not exist (will change)
+8. Tires spin at the same speed (limited slip differential does not exist)
+9. All angles are small and thus follow small angle aproximations 
+10. RH turns are positive (i.e. lateral acceleration to the left of the vehicle axis is negative, this follows SAE convention)

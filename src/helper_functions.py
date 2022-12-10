@@ -160,3 +160,51 @@ def calc_corner_radius(coord1, coord2, coord3):
     return math.acos((b**2+c**2-a**2)/2*b*c)
 
 
+def calc_lat_accel(car, v, icr):
+    """
+    Calculates lateral acceleration
+
+    Imputs:
+    car - object car
+    v - velocity in m/s
+    icr - inverse corner radius in rad
+
+    Output:
+    Lateral acceleration in m/s**2
+    """
+    return ((car.attrs["mass_car"])*(v**2))/icr
+
+def calc_t(v1, v2, d_step):
+    """
+    Calculates the time it takes to complete segment n
+
+    Inputs:
+    v1 - velocity at the begining of segment n
+    v2 - velocity at the end of segment n
+    d_step - distance step
+
+    Output:
+    t - time in s
+    """
+    return 1/(((v1+v2)/2)/d_step)
+
+
+#not sure how we should distinguish the difference between long and lat velocities
+#good thing is we know all long accel is caused by engine force and any lat accel is caused by curavture
+
+def calc_long_accel(v1, v2, t):
+    """
+    Calculates longitudinal acceleration
+
+    Inputs:
+    v1 - velocity at the begining of segment n
+    v2 - velocity at the end of segment n
+    t - the time it takes to complete segment n
+
+    Output:
+    Longitudinal acceleration
+    """
+
+    return (v1+v2)/t
+
+
