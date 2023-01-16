@@ -8,7 +8,7 @@ from helper_functions import calculate_drag_force,\
 # from Check_Slip import calc_friction_force
 
 from classes.car_simple import Car
-import Weight_Transfer as wt
+import weight_transfer as wt
 
 import pandas as pd
 

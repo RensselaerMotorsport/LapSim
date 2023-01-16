@@ -1,9 +1,9 @@
 """A module to find if wheels slip"""
 
 import numpy as np
-import Weight_Transfer as wt
+import weight_transfer as wt
 import helper_functions as h
-import Traction_Circle_Plot as tc
+import traction_circle_plot as tc
 
 g = 9.8 #m/s^2
 mass_car = 195 #kg
