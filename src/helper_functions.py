@@ -141,11 +141,6 @@ def get_drag_force(velocity: float, car):
     return velocity**2 * coeff_drag * .5 * rho * frontal_area
 
 
-# def solve_v_f(v_i, seg_L, gr):
-#     """Solves for final velocity of segment given in an initial velocity and segment length"""
-#     x = get_engine_force()
-
-
 def calc_corner_radius(coord1, coord2, coord3):
     """
     Calculates radius of corner at any given sector
