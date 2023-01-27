@@ -1,1 +1,3 @@
 list of common FSAE master calipers, their piston area, and number of pistons
+
+A_22_049 = (((0.984252/2)**2)*pi) #ISR 22-049 piston area (in^2)
