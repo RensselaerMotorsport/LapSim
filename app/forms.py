@@ -3,8 +3,8 @@ from wtforms import StringField, SubmitField
 import json
 
 #CHANGE THIS TO PROPER DIRECTORY BEFORE DEPLOYMENT
-rm25_data = json.loads(open('C:\\Users\\fornem\\Dropbox\\lapsim\\lapsim_final\\rm25.json').read())
-rm26_data = json.loads(open('C:\\Users\\fornem\\Dropbox\\lapsim\\lapsim_final\\rm26.json').read())
+rm25_data = json.loads(open('C:\\Users\\barbot\\Dropbox\\PC\\Documents\\Projects\\LapSim\\app\\rm25.json').read())
+rm26_data = json.loads(open('C:\\Users\\barbot\\Dropbox\\PC\\Documents\\Projects\\LapSim\\app\\rm26.json').read())
 
 #each perimeter from the json file if the user wants to change them
 #no data is required
