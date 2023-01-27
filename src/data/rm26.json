@@ -4,8 +4,8 @@
   "proportion_front": 0.5,
   "front_track_width": 1.2319,
   "rear_track_width": 1.19888,
-  "wheelbase": 1.5367,
-  "CG_height": 0.332486,
+  "wheelbase": 1.6256,
+  "CG_height": 0.247556712,
   "yaw_inertia": 100,
   "CoF": 1.6,
   "load_sensitivity": 0.0004077471967,
@@ -22,4 +22,6 @@
   "tire_radius": 0.2032,
   "gear_ratios": [1],
   "final_drive": 3.2
+  "max_current": 250
+  "max_voltage": 399
 }
