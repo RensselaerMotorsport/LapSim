@@ -11,3 +11,7 @@ Progress History
 - created brakeCalcs.py (to hold rotor - caliper calculations)
     - added constants to file
 - created calipers.txt (to hold master cylinder information)
+
+1/27/23
+- replaced calipers.txt with database.csv
+- started to source and enter data for 4 calipers and 7 pad compounds
