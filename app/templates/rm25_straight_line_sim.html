@@ -1,0 +1,125 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="content-section">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Input values (blank values will use json data)</legend>
+                <!--rather meaty input box code-->
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-outline-danger") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.mass_car.label(class="form+control-label") }}
+                    {{ form.mass_car(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.mass_driver.label(class="form+control-label") }}
+                    {{ form.mass_driver(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.proportion_front.label(class="form+control-label") }}
+                    {{ form.proportion_front(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.front_track_width.label(class="form+control-label") }}
+                    {{ form.front_track_width(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.rear_track_width.label(class="form+control-label") }}
+                    {{ form.rear_track_width(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.wheelbase.label(class="form+control-label") }}
+                    {{ form.wheelbase(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.CG_height.label(class="form+control-label") }}
+                    {{ form.CG_height(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.yaw_inertia.label(class="form+control-label") }}
+                    {{ form.yaw_inertia(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.CoF.label(class="form+control-label") }}
+                    {{ form.CoF(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.load_sensitivity.label(class="form+control-label") }}
+                    {{ form.load_sensitivity(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.Cd.label(class="form+control-label") }}
+                    {{ form.Cd(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.Cl.label(class="form+control-label") }}
+                    {{ form.Cl(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.A.label(class="form+control-label") }}
+                    {{ form.A(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.rho.label(class="form+control-label") }}
+                    {{ form.rho(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.front_downforce.label(class="form+control-label") }}
+                    {{ form.front_downforce(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.cp_height.label(class="form+control-label") }}
+                    {{ form.cp_height(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.brake_bias.label(class="form+control-label") }}
+                    {{ form.brake_bias(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.primary_drive.label(class="form+control-label") }}
+                    {{ form.primary_drive(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.engine_sprocket_teeth.label(class="form+control-label") }}
+                    {{ form.engine_sprocket_teeth(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.diff_sprocket_teeth.label(class="form+control-label") }}
+                    {{ form.diff_sprocket_teeth(class="form-control form-control-sm") }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.tire_radius.label(class="form+control-label") }}
+                    {{ form.tire_radius(class="form-control form-control-sm") }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.gear_ratios.label(class="form+control-label") }}
+                    {{ form.gear_ratios(class="form-control form-control-sm") }}
+                </div>
+            </fieldset>
+        </form>
+    </div>
+{% endblock content %}

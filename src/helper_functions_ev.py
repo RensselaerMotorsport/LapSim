@@ -1,8 +1,11 @@
+"""A module to calculate intermediate steps in the lapsim for an ev car"""
+
 import math
 
 
 def calculate_velocity_new(engine_force, drag_force, car, step=1, initial_velocity=0.001):
-    """A function for calculating the velocity at the end of a time step.
+    """
+    A function for calculating the velocity at the end of a time step.
     
     Given: engine_force, the engine force at the begining of the time step calculated from the calculate_engine_force function
     drag_force, the drag force at the begining of the time step calculated from the calculate_drag_force function
@@ -10,7 +13,8 @@ def calculate_velocity_new(engine_force, drag_force, car, step=1, initial_veloci
     step, the time step we are at, default is 1
     initial velocity, the initial velocity at the time step, default is .001
     
-    Returns: the velocity at the end of the time step"""
+    Returns: the velocity at the end of the time step
+    """
     car_mass = car.attrs["mass_car"]
     driver_mass = car.attrs["mass_driver"]
 
@@ -18,7 +22,8 @@ def calculate_velocity_new(engine_force, drag_force, car, step=1, initial_veloci
 
 
 def calculate_drag_force(car, initial_velocity=0.001):
-    """A function for calculating the drag force of a provided car at a provided velocity.
+    """
+    A function for calculating the drag force of a provided car at a provided velocity.
     
     Given: car, the car object we are testing
     initial_velocity, the velocity at the begining of the time step we are running, default is .001
@@ -32,22 +37,9 @@ def calculate_drag_force(car, initial_velocity=0.001):
     return coeff_drag * 0.5 * air_density * (initial_velocity ** 2) * frontal_area
 
 
-def calculate_engine_force(car, wheel_torque, trans_efficiency=0.9):
-    """A function for calculating engine force given wheel torque and transmission efficency.
-    
-    Given: car, the car object we are testing
-    wheel_torque, the wheel torque at a velocity found from the calc_torque_at_wheels function
-    trans_efficency, the efficency of the drivetrain of the car, default is .9
-    
-    Returns: the engine force at the initial conditions.
-    """
-    tire_radius = car.attrs["tire_radius"]
-
-    return (wheel_torque * trans_efficiency) / tire_radius
-
-
 def calculate_friction_force(car, initial_velocity=0):
-    """A function for calculating the friction force of a car at an initial velocity.
+    """
+    A function for calculating the friction force of a car at an initial velocity.
     
     Given: car, the car object we are testing
     initial_velocity, the initial velocoty of the car at a time step, default is 0
@@ -63,75 +55,7 @@ def calculate_friction_force(car, initial_velocity=0):
 
     return coeff_friction * ((car_mass + driver_mass) * 9.81) + (coeff_lift * 0.5 * air_density * (initial_velocity**2) * frontal_area)
 
-
-def find_torque_given_velocity(velocity: float, wheel_torque, rpm_v_road_speed, rpm_torque, gear: str = "1st"):
-    """A function for calculating the torque of the car given the velocity of the car.
     
-    Given: velocity, a float value representing the velocity
-    wheel_torque, a wheel torque value from the calc_torque_at_wheels function
-    rpm_v_road_speed, ?
-    rpm_torque, ?
-    gear, a string representing the gear we are currently in, default is "1st"
-    
-    Returns: the overal torque of the car
-    """
-    rpm = 0
-    for _, row in rpm_v_road_speed.iterrows():
-        if row[gear] < velocity:
-            rpm = row["RPM"]
-        else:
-            break
-    engine_torque = rpm_torque.loc[rpm_torque.rpm == rpm, 'torque'].reset_index(drop=True)[0]
-
-    torque = 0
-    for _, row in wheel_torque.iterrows():
-        if row["T"] < engine_torque:
-            torque = row[gear]
-        else:
-            break
-
-    return torque
-
-
-def calc_road_speed(gear: int, rpm: int, car, transmission_efficiency: int = 0.9):
-    """
-    Finds road speed at a given RPM in a given gear as an integer
-    Gears- 0,1,2,3
-    """
-    final_drive = car.attrs["final_drive"]
-    tire_radius = car.attrs["tire_radius"]
-    gear_ratio = car.attrs["gear_ratios"][gear - 1]
-
-    return ((rpm / (final_drive * gear_ratio * transmission_efficiency) * 1/60) * 2*math.pi) * tire_radius
-
-
-def calc_rpm_given_speed(gear: int, velocity: float, car, transmission_efficiency: int = 0.9):
-    """
-    Finds road speed at a given RPM in a given gear as an integer
-    Gears- 0,1,2,3
-    """
-    final_drive = car.attrs["final_drive"]
-    tire_radius = car.attrs["tire_radius"]
-    gear_ratio = car.attrs["gear_ratios"][gear - 1]
-
-    return (((velocity / tire_radius) * 2 * math.pi/180) * 60) * (final_drive * gear_ratio * transmission_efficiency)
-
-
-def calc_torque_at_wheels(gear: int, torque: float, car, transmission_efficiency: int = 0.9):
-    """Finds torque at wheels given a gear and torque"""
-    final_drive = car.attrs["final_drive"]
-    gear_ratio = car.attrs["gear_ratios"][gear - 1]
-
-    return torque * gear_ratio * final_drive * transmission_efficiency / 2
-
-
-def get_tangent_force_at_wheels(gear: int, torque: float, car):
-    """Finds engine force"""
-    tire_radius = car.attrs["tire_radius"]
-
-    return (calc_torque_at_wheels(gear, torque, car)) / tire_radius
-
-
 def get_drag_force(velocity: float, car):
     """Calculates drag force given a velocity"""
     coeff_drag = car.attrs["Cd"]
@@ -201,5 +125,3 @@ def calc_long_accel(v1, v2, t):
     """
 
     return (v1+v2)/t
-
-
