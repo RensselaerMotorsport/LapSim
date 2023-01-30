@@ -1,0 +1,9 @@
+body {
+    background-blend-mode: lighten;
+    background-image: url(RM-LOGO-3-blk-08.jpg);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-color: rgb(44, 41, 41);
+    
+    color: rgb(211, 191, 191);
+}

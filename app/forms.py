@@ -39,6 +39,7 @@ class straightLineForm25(FlaskForm):
     diff_sprocket_teeth = StringField('Diff Sprocket Teeth ('+str(rm25_data['diff_sprocket_teeth'])+')')
     tire_radius = StringField('Tire Radius ('+str(rm25_data['tire_radius'])+')')
     gear_ratios = StringField('Gear Ratios ('+str(rm25_data['gear_ratios'])+')')
+
     submit = SubmitField('Calculate')
 
 '''class straightLineForm26(FlaskForm):
