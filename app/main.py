@@ -1,5 +1,5 @@
-from flask import Flask, redirect, render_template, url_for
-from forms import straightLineForm25#, straightLineForm26
+from flask import Flask, redirect, render_template, url_for #basic flask modules
+from forms import straightLineForm25#, straightLineForm26 #classes from forms.py
 
 app = Flask(__name__)
 

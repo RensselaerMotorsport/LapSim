@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
-import json
-import os
+import json #car data
+import os #get current working directory for json file
 
 #CHANGE THIS TO PROPER DIRECTORY BEFORE DEPLOYMENT
 #rm26_data = json.loads(open('C:\\Users\\fornem\\Dropbox\\lapsim\\lapsim_final\\rm26.json').read())
@@ -10,10 +10,7 @@ import os
 #no data is required
 class straightLineForm25(FlaskForm):
 
-    #getting current directory
     directory = os.getcwd()
-
-    #opening json file from targeted directory
     rm25_data = json.loads(open(directory+"\\app\\rm25.json").read())
 
     #each field for data to be entered
@@ -40,28 +37,3 @@ class straightLineForm25(FlaskForm):
     tire_radius = StringField('Tire Radius ('+str(rm25_data['tire_radius'])+')')
     gear_ratios = StringField('Gear Ratios ('+str(rm25_data['gear_ratios'])+')')
     submit = SubmitField('Calculate')
-
-'''class straightLineForm26(FlaskForm):
-    submit = SubmitField('Calculate')
-    mass_car = StringField('Car Mass (',rm26_data['mass_car'],')')
-    mass_driver = StringField('Driver Mass (',rm26_data['mass_driver'],')')
-    proportion_front = StringField('Proportion Front (',rm26_data['proportion_front'],')')
-    front_track_width = StringField('Front Track Width (',rm26_data['front_track_width'],')')
-    rear_track_width = StringField('Rear Track Width (',rm26_data['rear_track_width'],')')
-    wheelbase = StringField('Wheelbase (',rm26_data['wheelbase'],')')
-    CG_height = StringField('Center of Gravity Height (',rm26_data['CG_height'],')')
-    yaw_inertia = StringField('Yaw Inertia (',rm26_data['yaw_inertia'],')')
-    CoF = StringField('Coefficient of Friction (',rm26_data['CoF'],')')
-    load_sensitivity = StringField('Load Sensitivity (',rm26_data['load_sensitivity'],')')
-    Cd = StringField('Coefficient of Drag (',rm26_data['Cd'],')')
-    Cl = StringField('Coefficient of Lift (',rm26_data['Cl'],')')
-    A = StringField('Frontal Area (',rm26_data['A'],')')
-    rho = StringField('Rho (',rm26_data['rho'],')')
-    front_downforce = StringField('Front Downforce (',rm26_data['front_downforce'],')')
-    cp_height = StringField('Center of Pressure Height (',rm26_data['cp_height'],')')
-    brake_bias = StringField('Brake Bias (',rm26_data['brake_bias'],')')
-    primary_drive = StringField('Primary Drive (',rm26_data['primary_drive'],')')
-    engine_sprocket_teeth = StringField('Engine Sprocket Teeth (',rm26_data['engine_sprocket_teeth'],')')
-    diff_sprocket_teeth = StringField('Diff Sprocket Teeth (',rm26_data['diff_sprocket_teeth'],')')
-    tire_radius = StringField('Tire Radius (',rm26_data['tire_radius'],')')
-    gear_ratios = StringField('Gear Ratios (',rm26_data['gear_ratios'],')')'''
