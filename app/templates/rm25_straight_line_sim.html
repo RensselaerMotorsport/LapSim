@@ -1,4 +1,9 @@
 {% extends "layout.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/rm25_SLS.css') }}">
+{% endblock head %}
+
 {% block content %}
     <div class="content-section">
         <form method="POST" action="">
