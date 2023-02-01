@@ -13,7 +13,7 @@ import os #get current working directory for json file
 class straightLineForm25(FlaskForm):
 
     directory = os.getcwd()
-    rm25_data = json.loads(open(directory+"\\app\\rm25.json").read())
+    rm25_data = json.loads(open(directory+"\\rm25.json").read())
 
     #each field for data to be entered
     mass_car = StringField('Car Mass ('+str(rm25_data['mass_car'])+')')
@@ -43,7 +43,7 @@ class straightLineForm25(FlaskForm):
 class straightLineForm26(FlaskForm):
 
     directory = os.getcwd()
-    rm26_data = json.loads(open(directory+"\\app\\rm26.json").read())
+    rm26_data = json.loads(open(directory+"\\rm26.json").read())
 
     #each field for data to be entered
     mass_car = StringField('Car Mass ('+str(rm26_data['mass_car'])+')')
