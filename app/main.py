@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, url_for #basic flask modules
+from flask import Flask, render_template, request, url_for #basic flask modules
 from forms import straightLineForm25#, straightLineForm26 #classes from forms.py
 
 app = Flask(__name__)
@@ -20,29 +20,29 @@ def rm25_straight_line_sim():
     if form.is_submitted():
 
         #retreiving data (need to do tests on what empty fields return)
-        mass_car = form.mass_car.data # Taking in data
-        mass_driver = form.mass_driver.data
-        proportion_front = form.proportion_front.data
-        front_track_width = form.front_track_width.data
-        rear_track_width = form.rear_track_width.data
-        wheelbase = form.wheelbase.data
-        CG_height = form.CG_height.data
-        yaw_inertia = form.yaw_inertia.data
-        CoF = form.CoF.data
-        load_sensitivity = form.load_sensitivity.data
-        Cd = form.Cd.data
-        Cl = form.Cl.data
-        A = form.A.data
-        rho = form.rho.data
-        front_downforce = form.front_downforce.data
-        cp_height = form.cp_height.data
-        brake_bias = form.brake_bias.data
-        primary_drive = form.primary_drive.data
-        engine_sprocket_teeth = form.engine_sprocket_teeth.data
-        diff_sprocket_teeth = form.diff_sprocket_teeth.data
-        tire_radius = form.tire_radius.data
-        gear_ratios = form.gear_ratios.data
-
+        mass_car = request.form['mass_car'] # Taking in data
+        mass_driver = request.form['mass_driver']
+        proportion_front = request.form['proportion_front']
+        front_track_width = request.form['front_track_width']
+        rear_track_width = request.form['rear_track_width']
+        wheelbase = request.form['wheelbase']
+        CG_height = request.form['CG_height']
+        yaw_inertia = request.form['yaw_inertia']
+        CoF = request.form['CoF']
+        load_sensitivity = request.form['load_sensitivity']
+        Cd = request.form['Cd']
+        Cl = request.form['Cl']
+        A = request.form['A']
+        rho = request.form['rho']
+        front_downforce = request.form['front_downforce']
+        cp_height = request.form['cp_height']
+        brake_bias = request.form['brake_bias']
+        primary_drive = request.form['primary_drive']
+        engine_sprocket_teeth = request.form['engine_sprocket_teeth']
+        diff_sprocket_teeth = request.form['diff_sprocket_teeth']
+        tire_radius = request.form['tire_radius']
+        gear_ratios = request.form['gear_ratios']
+        
         return render_template('output.html') # Redirect to a different page if needed
 
     return render_template('rm25_straight_line_sim.html', title="RM25 Staight Line Sim", form=form)
