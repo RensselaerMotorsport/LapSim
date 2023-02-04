@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request #basic flask modules
 from forms import straightLineForm25#, straightLineForm26 #classes from forms.py
 import json
+import os
 
 app = Flask(__name__)
 
@@ -21,30 +22,31 @@ def rm25_straight_line_sim():
     if form.is_submitted():
 
         #writing data to a dictionary
-        data_out = dict()
+        car = dict()
         #we need to slice out the first 2 values of the form data since those are a secret key, and the submit button
         #hence list(request.form.keys())[2:]
         for i in list(request.form.keys())[2:]:
-            data_out[i] = request.form[i]
+            car[i] = request.form[i]
 
         #formatting data
-        for i in data_out.keys():
+        for i in car.keys():
             #input dictionary and form dictionary should have same keys, so we can use i as an index for both
             #starts by replacing empty values with the default values
-            if data_out[i] == '':
-                data_out[i] = straightLineForm25.rm25_data[i]
+            if car[i] == '':
+                car[i] = straightLineForm25.rm25_data[i]
             #gear ratios requires special formatting due to it being a list
             elif i == 'gear_ratios':
-                data_out['gear_ratios'] = data_out['gear_ratios'].replace(' ','').split(',')
-                for j in range(len(data_out['gear_ratios'])):
-                    data_out['gear_ratios'][j] = float(data_out['gear_ratios'][j])
+                car['gear_ratios'] = car['gear_ratios'].replace(' ','').split(',')
+                for j in range(len(car['gear_ratios'])):
+                    car['gear_ratios'][j] = float(car['gear_ratios'][j])
             #lastly, if the user does provide a value, just convert it to a float
             else:
-                data_out[i] = float(data_out[i])
+                car[i] = float(car[i])
 
         #writing the dictionary to a json file (simulation program takes a json input)
-        json_obj = json.dumps(data_out, indent=4)
-        with open('data.json', 'w') as outfile:
+        directory = os.getcwd()
+        json_obj = json.dumps(car, indent=2)
+        with open(directory+'\\src\\data\\data.json', 'w') as outfile:
             outfile.write(json_obj)
         
         return render_template('output.html') # Redirect to a different page if needed
