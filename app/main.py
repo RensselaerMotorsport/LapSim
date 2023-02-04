@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for #basic flask modules
+from flask import Flask, render_template, request #basic flask modules
 from forms import straightLineForm25#, straightLineForm26 #classes from forms.py
 import json
 
@@ -20,57 +20,48 @@ def rm25_straight_line_sim():
     # Submit Form
     if form.is_submitted():
 
-        #retreiving data (need to do tests on what empty fields return)
-        mass_car = request.form['mass_car'] # Taking in data
-        mass_driver = request.form['mass_driver']
-        proportion_front = request.form['proportion_front']
-        front_track_width = request.form['front_track_width']
-        rear_track_width = request.form['rear_track_width']
-        wheelbase = request.form['wheelbase']
-        CG_height = request.form['CG_height']
-        yaw_inertia = request.form['yaw_inertia']
-        CoF = request.form['CoF']
-        load_sensitivity = request.form['load_sensitivity']
-        Cd = request.form['Cd']
-        Cl = request.form['Cl']
-        A = request.form['A']
-        rho = request.form['rho']
-        front_downforce = request.form['front_downforce']
-        cp_height = request.form['cp_height']
-        brake_bias = request.form['brake_bias']
-        primary_drive = request.form['primary_drive']
-        engine_sprocket_teeth = request.form['engine_sprocket_teeth']
-        diff_sprocket_teeth = request.form['diff_sprocket_teeth']
-        tire_radius = request.form['tire_radius']
-        gear_ratios = request.form['gear_ratios']
+        #writing data to a dictionary
+        data_out = dict()
+        data_out['mass_car'] = request.form['mass_car'] # Taking in data
+        data_out['mass_driver'] = request.form['mass_driver']
+        data_out['proportion_front'] = request.form['proportion_front']
+        data_out['front_track_width'] = request.form['front_track_width']
+        data_out['rear_track_width'] = request.form['rear_track_width']
+        data_out['wheelbase'] = request.form['wheelbase']
+        data_out['CG_height'] = request.form['CG_height']
+        data_out['yaw_inertia'] = request.form['yaw_inertia']
+        data_out['CoF'] = request.form['CoF']
+        data_out['load_sensitivity'] = request.form['load_sensitivity']
+        data_out['Cd'] = request.form['Cd']
+        data_out['Cl'] = request.form['Cl']
+        data_out['A'] = request.form['A']
+        data_out['rho'] = request.form['rho']
+        data_out['front_downforce'] = request.form['front_downforce']
+        data_out['cp_height'] = request.form['cp_height']
+        data_out['brake_bias'] = request.form['brake_bias']
+        data_out['primary_drive'] = request.form['primary_drive']
+        data_out['engine_sprocket_teeth'] = request.form['engine_sprocket_teeth']
+        data_out['diff_sprocket_teeth'] = request.form['diff_sprocket_teeth']
+        data_out['tire_radius'] = request.form['tire_radius']
+        data_out['gear_ratios'] = request.form['gear_ratios']
 
-        dict = {
-            'mass_car': mass_car, 
-            'mass_driver': mass_driver,
-            'proportion_front': proportion_front,
-            'front_track_width': front_track_width,
-            'rear_track_width': rear_track_width,
-            'wheelbase': wheelbase,
-            'CG_height': CG_height,
-            'yaw_inertia': yaw_inertia,
-            'CoF': CoF,
-            'load_sensitivity': load_sensitivity,
-            'Cd': Cd,
-            'Cl': Cl,
-            'A': A,
-            'rho': rho,
-            'front_downforce': front_downforce,
-            'cp_height': cp_height,
-            'brake_bias': brake_bias,
-            'primary_drive': primary_drive,
-            'engine_sprocket_teeth': engine_sprocket_teeth,
-            'diff_sprocket_teeth': diff_sprocket_teeth,
-            'tire_radius': tire_radius,
-            'gear_ratios': gear_ratios
-        }
+        #formatting data
+        for i in data_out.keys():
+            #input dictionary and form dictionary should have same keys, so we can use i as an index for both
+            #starts by replacing empty values with the default values
+            if data_out[i] == '':
+                data_out[i] = straightLineForm25.rm25_data[i]
+            #gear ratios requires special formatting due to it being a list
+            elif i == 'gear_ratios':
+                data_out['gear_ratios'] = data_out['gear_ratios'].replace(' ','').split(',')
+                for j in range(len(data_out['gear_ratios'])):
+                    data_out['gear_ratios'][j] = float(data_out['gear_ratios'][j])
+            #lastly, if the user does provide a value, just convert it to a float
+            else:
+                data_out[i] = float(straightLineForm25.rm25_data[i])
 
-        json_obj = json.dumps(dict, indent=4)
-
+        #writing the dictionary to a json file (simulation program takes a json input)
+        json_obj = json.dumps(data_out, indent=4)
         with open('data.json', 'w') as outfile:
             outfile.write(json_obj)
         
