@@ -21,27 +21,25 @@ def rm25_straight_line_sim():
     # Submit Form
     if form.is_submitted():
 
-        #writing data to a dictionary
-        car = dict()
-        #we need to slice out the first 2 values of the form data since those are a secret key, and the submit button
-        #hence list(request.form.keys())[2:]
+        #begins with default json data
+        car = straightLineForm25.rm25_data
+        #loops through returned form data
+        #we need to slice from element 2 onward because [0] is a csrf token and [1] is the submit button
         for i in list(request.form.keys())[2:]:
-            car[i] = request.form[i]
-
-        #formatting data
-        for i in car.keys():
-            #input dictionary and form dictionary should have same keys, so we can use i as an index for both
-            #starts by replacing empty values with the default values
-            if car[i] == '':
-                car[i] = straightLineForm25.rm25_data[i]
-            #gear ratios requires special formatting due to it being a list
-            elif i == 'gear_ratios':
-                car['gear_ratios'] = car['gear_ratios'].replace(' ','').split(',')
-                for j in range(len(car['gear_ratios'])):
-                    car['gear_ratios'][j] = float(car['gear_ratios'][j])
-            #lastly, if the user does provide a value, just convert it to a float
-            else:
-                car[i] = float(car[i])
+            if request.form[i] != '':
+                #because gear_ratios are stored as a list in the json file, we need a special case to split it by commas
+                if i == 'gear_ratios':
+                    car[i] = request.form[i].replace(' ','').split(',')
+                    #removing any blank values (in case multiple commas in a row: 1, 2, 3,,,, 4)
+                    #goes backwards through list so we don't get insex out of range
+                    for j in range(len(car[i])-1,-1,-1):
+                        if car[i][j] == '':
+                            car[i].remove('')
+                        else:
+                            car[i][j] = float(car[i][j])
+                #otherwise, we can just convert to float
+                else:
+                    car[i] = float(request.form[i])
 
         #writing the dictionary to a json file (simulation program takes a json input)
         directory = os.getcwd()
