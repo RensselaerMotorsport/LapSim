@@ -22,28 +22,10 @@ def rm25_straight_line_sim():
 
         #writing data to a dictionary
         data_out = dict()
-        data_out['mass_car'] = request.form['mass_car'] # Taking in data
-        data_out['mass_driver'] = request.form['mass_driver']
-        data_out['proportion_front'] = request.form['proportion_front']
-        data_out['front_track_width'] = request.form['front_track_width']
-        data_out['rear_track_width'] = request.form['rear_track_width']
-        data_out['wheelbase'] = request.form['wheelbase']
-        data_out['CG_height'] = request.form['CG_height']
-        data_out['yaw_inertia'] = request.form['yaw_inertia']
-        data_out['CoF'] = request.form['CoF']
-        data_out['load_sensitivity'] = request.form['load_sensitivity']
-        data_out['Cd'] = request.form['Cd']
-        data_out['Cl'] = request.form['Cl']
-        data_out['A'] = request.form['A']
-        data_out['rho'] = request.form['rho']
-        data_out['front_downforce'] = request.form['front_downforce']
-        data_out['cp_height'] = request.form['cp_height']
-        data_out['brake_bias'] = request.form['brake_bias']
-        data_out['primary_drive'] = request.form['primary_drive']
-        data_out['engine_sprocket_teeth'] = request.form['engine_sprocket_teeth']
-        data_out['diff_sprocket_teeth'] = request.form['diff_sprocket_teeth']
-        data_out['tire_radius'] = request.form['tire_radius']
-        data_out['gear_ratios'] = request.form['gear_ratios']
+        #we need to slice out the first 2 values of the form data since those are a secret key, and the submit button
+        #hence list(request.form.keys())[2:]
+        for i in list(request.form.keys())[2:]:
+            data_out[i] = request.form[i]
 
         #formatting data
         for i in data_out.keys():
@@ -58,7 +40,7 @@ def rm25_straight_line_sim():
                     data_out['gear_ratios'][j] = float(data_out['gear_ratios'][j])
             #lastly, if the user does provide a value, just convert it to a float
             else:
-                data_out[i] = float(straightLineForm25.rm25_data[i])
+                data_out[i] = float(data_out[i])
 
         #writing the dictionary to a json file (simulation program takes a json input)
         json_obj = json.dumps(data_out, indent=4)

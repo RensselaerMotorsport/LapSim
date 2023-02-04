@@ -1,7 +1,7 @@
 {
-    "mass_car": 195,
-    "mass_driver": 100,
-    "proportion_front": 0.47,
+    "mass_car": 1.1,
+    "mass_driver": 2.2,
+    "proportion_front": 3.3,
     "front_track_width": 1.2319,
     "rear_track_width": 1.19888,
     "wheelbase": 1.5367,
