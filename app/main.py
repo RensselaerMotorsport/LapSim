@@ -47,13 +47,18 @@ def rm25_straight_line_sim():
         with open(directory+'\\src\\data\\data.json', 'w') as outfile:
             outfile.write(json_obj)
 
-        resp = make_response(render_template('output.html'))
+        resp = make_response(output())
         resp.set_cookie('data', json_obj)
         
         return resp
         # return render_template('output.html') # Redirect to a different page if needed
 
     return render_template('rm25_straight_line_sim.html', title="RM25 Staight Line Sim", form=form)
+
+@app.route('/output', methods=['GET', 'POST'])
+def output():
+    data = request.cookies.get('data')
+    return render_template('output.html', data=data)
 
 if __name__ == "__main__":
     app.run(debug=False)
