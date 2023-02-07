@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request #basic flask modules
+from flask import Flask, render_template, request, make_response #basic flask modules
 from forms import straightLineForm25#, straightLineForm26 #classes from forms.py
 import json
 import os
@@ -46,8 +46,12 @@ def rm25_straight_line_sim():
         json_obj = json.dumps(car, indent=2)
         with open(directory+'\\src\\data\\data.json', 'w') as outfile:
             outfile.write(json_obj)
+
+        resp = make_response(render_template('output.html'))
+        resp.set_cookie('data', json_obj)
         
-        return render_template('output.html') # Redirect to a different page if needed
+        return resp
+        # return render_template('output.html') # Redirect to a different page if needed
 
     return render_template('rm25_straight_line_sim.html', title="RM25 Staight Line Sim", form=form)
 
