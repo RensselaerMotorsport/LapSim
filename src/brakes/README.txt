@@ -15,3 +15,7 @@ Progress History
 1/27/23
 - replaced calipers.txt with database.csv
 - started to source and enter data for 4 calipers and 7 pad compounds
+
+2/7/23
+- added pad database to folder
+- wrote code to convert cvs to numpy arrays
