@@ -42,10 +42,10 @@ def rm25_straight_line_sim():
                     car[i] = float(request.form[i])
 
         #writing the dictionary to a json file (simulation program takes a json input)
-        directory = os.getcwd()
+        # directory = os.getcwd()
         json_obj = json.dumps(car, indent=2)
-        with open(directory+'\\src\\data\\data.json', 'w') as outfile:
-            outfile.write(json_obj)
+        # with open(directory+'\\src\\data\\data.json', 'w') as outfile:
+        #     outfile.write(json_obj)
 
         resp = make_response(output())
         resp.set_cookie('data', json_obj)
