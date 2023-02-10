@@ -24,7 +24,7 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
         <div class="container">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-          <a class="navbar-brand" href="{{ url_for('homepage') }}">RM Lapsim</a>
+          <a class="navbar-brand" href="{{ url_for('homepage') }}"><FONT COLOR="#FF0000">RM Lapsim</FONT></a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -34,24 +34,17 @@
               <!-- <li class="nav-item">
                 <a class="nav-link" href="#">Something </a>
               </li> -->
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
-                  Sims
-                </a>
-                <div class="dropdown-menu">
-                  <a class="dropdown-item" href="{{ url_for('rm25_straight_line_sim') }}">RM25 Straight Line Simulation</a>
-                  <a class="dropdown-item" href="">RM26 Straight Line Simulation (WIP)</a>
-                  <!-- <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="#">Something else here</a> -->
-                </div>
+              <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('rm25_straight_line_sim') }}"><FONT COLOR="#ffffff">RM25 Straight Line Simulation</FONT></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href=""><FONT COLOR="#ffffff">RM26 Straight Line Simulation (WIP)</FONT></a>
               </li>
               <!-- <li class="nav-item">
                 <a class="nav-link disabled">Disabled</a>
               </li> -->
             </ul>
             <form class="form-inline my-2 my-lg-0">
-              <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-              <button class="btn btn-outline-danger" type="submit">Search</button>
             </form>
           </div>
         </nav>
