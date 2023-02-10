@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, make_response #basic flask modules
 from forms import straightLineForm25#, straightLineForm26 #classes from forms.py
 from subprocess import call
+from test import test_func
 import json
 
 app = Flask(__name__)
@@ -58,7 +59,7 @@ def rm25_straight_line_sim():
 @app.route('/output', methods=['GET', 'POST'])
 def output():
     data = request.cookies.get('data')
-    call(["python", "./src/straight_line.py"])
+    test_func()
     return render_template('output.html', data=data)
 
 if __name__ == "__main__":
