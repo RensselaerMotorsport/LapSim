@@ -93,10 +93,12 @@ def straightlinesegmenttime(car, distance, vinitial=0.001, torque=120, timestep=
     Outputs:
     t- the amount of time it takes to complete the segment."""
     d=0
+    v=vinitial
     time=0
-    accleration=torque*car.attrs["gear_ratios"]/(car.attrs["tire_radius"]*(car.attrs["mass_car"]+car.attrs["mass_driver"]))
+    acceleration=torque*car.attrs["gear_ratios"]/(car.attrs["tire_radius"]*(car.attrs["mass_car"]+car.attrs["mass_driver"]))
     while d<distance:
         time+=timestep
-        d=d+vinitial*time+accleration*time**2
-    return time
+        d+=v*timestep
+        v+=acceleration*timestep
+    return time, distance
 
