@@ -8,7 +8,7 @@
     <div class="content-section">
         <form method="POST" action="">
             {{ form.hidden_tag() }}
-            <fieldset class="form-group">
+            <fieldset class="form-group" style="width: 500px">
                 <legend class="mb-4">Input values (blank values will use json data)</legend>
                 <!--rather meaty input box code-->
                 <div class="form-group">
@@ -94,6 +94,14 @@
                     {{ form.cp_height.label(class="form+control-label") }}
                     {{ form.cp_height(class="form-control form-control-sm") }}
                 </div>
+            </fieldset>
+        </form>
+    </div>
+
+    <div class="content-section">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group" style="width: 500px">
 
                 <div class="form-group">
                     {{ form.brake_bias.label(class="form+control-label") }}
