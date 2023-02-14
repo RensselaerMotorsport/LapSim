@@ -81,7 +81,7 @@ def calc_t(v1, v2, d_step):
 
 
 
-def straightlinesegmenttime(car, vinitial=.001, distance, torque=120, timestep=.001):
+def straightlinesegmenttime(car, distance, vinitial=0.001 torque=120, timestep=.001):
     """
     Calculates the amount of time it takes to travel a straight line distance.
     
