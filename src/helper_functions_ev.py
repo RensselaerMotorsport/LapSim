@@ -100,5 +100,5 @@ def straightlinesegmenttime(car, distance, vinitial=0.001, torque=120, timestep=
         time+=timestep
         d+=v*timestep
         v+=acceleration*timestep
-    return time, distance
+    return time, v
 
