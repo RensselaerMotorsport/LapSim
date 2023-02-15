@@ -49,3 +49,37 @@ padCoefficientOfFrictionMax = np.asarray(padData[:, [6]], dtype = float)
 padIdealTemperature = np.asarray(padData[:, [7]], dtype = float)
 padPricePer = padData[:, [8]]
 padCompatableMaterial = padData[:, [9]]
+
+#User Input
+def UserInput():
+    frontCaliper = SelectCalipers(frontOrRear="front") #selects front calipers
+    rearCaliper = SelectCalipers(frontOrRear="rear") #selects rear calipers
+    #ask if user already has front calipers selected
+
+def SelectCalipers(frontOrRear):
+    """
+    INPUTS: 
+        frontOrRear: string, either "front" or "rear"
+    OUTPUTS:
+        caliperNumber: int, the number of the caliper selected (can be used to refrence caliper data arrays). = -1 if no caliper is selected
+    """
+    #ask if user already has calipers selected
+    print("Please select your", frontOrRear, "calipers")
+    haveCalipers = input("Do you already have calipers selected? (y/n)")
+    if haveCalipers == "y":
+        print("Please enter the number correytspoding to your front calipers")
+        size = caliperBrands.size
+        for n in range(size):
+            print(n+1, ". Brand:",caliperBrands[n]," Model:", caliperModel[n], "Part Number:", caliperPartNumber[n])
+        caliperNumber = int(input("if none of these match, please enter 0 \n"))
+        if (caliperNumber > 0):
+            caliperNumber = caliperNumber - 1
+            print("You have selected", caliperBrands[caliperNumber], caliperModel[caliperNumber])
+        elif (caliperNumber==0):
+            print("Sorry, you can not continue without a front caliper selection")
+    else:
+        print("Understood, a",frontOrRear,"caliper selection will be made for you")
+        caliperNumber = -1
+    return caliperNumber
+
+UserInput()
