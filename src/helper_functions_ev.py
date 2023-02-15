@@ -102,7 +102,7 @@ def line_segment_time(car, distance, vinitial=0.001, timestep=.001):
     time=0
     while d<distance:
         RPM = 60 * v / (2 * math.pi * car.attrs["tire_radius"]) * car.attrs["gear_ratios"]
-        acceleration = motor_torque(car, RPM) * car.attrs["gear_ratios"] / (car.attrs["tire_radius"] * (car.attrs["mass_car"] + car.attrs["mass_driver"]))
+        acceleration = motor_torque(car, RPM, peak=True) * car.attrs["gear_ratios"] / (car.attrs["tire_radius"] * (car.attrs["mass_car"] + car.attrs["mass_driver"]))
         time+=timestep
         d+=v*timestep
         v+=acceleration*timestep
@@ -124,8 +124,8 @@ def motor_torque(car, RPM, peak=False, voltage=0, current=0):
     maxPTorque = 230 # Emrax 228 HV
     if RPM < voltage / 0.07348: # Only works for Emrax 228
         if peak:
-            return min(current * voltage / RPM, maxPTorque)
+            return min(60 / (2*math.pi) * current * voltage / RPM, maxPTorque) # Converts RPM -> angular velocity
         else:
-            return min(current * voltage / RPM, maxCTorque)
+            return min(60 / (2*math.pi) * current * voltage / RPM, maxCTorque)
     else: return 0
 
