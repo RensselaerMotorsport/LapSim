@@ -19,5 +19,6 @@
   "tire_radius": 0.2032,
   "gear_ratios": 2.9,
   "max_current": 250,
-  "max_voltage": 399 
+  "max_voltage": 399,
+  "final_drive": 2.9
 }

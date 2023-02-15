@@ -2,6 +2,31 @@
 
 import math
 
+def calc_vmax(r, car):
+    """
+    Calculates the maximum velocity for a corner given it's radius. 
+    """
+    mew = car.attrs["CoF"]
+    m = car.attrs["mass_car"] + car.attrs["mass_driver"]
+    Cd = car.attrs["Cd"]
+    rho = car.attrs["rho"]
+    A = car.attrs["A"]
+    Cl = car.attrs["Cl"]
+
+    g = 9.8 
+
+
+    num = (-m*g*Cl*A*(mew**2)*rho*r) - (g*m*mew*(math.sqrt((Cd**2)*(rho**2)*(A**2)*(r**2)+(4*(m**2)))))
+    dem = (2*r)*(.25*(rho**2)*(Cl**2)*(A**2)*(mew**2) - .25*(Cd**2)*(rho**2)*(A**2)-((m**2)/(r**2)))
+
+    return (math.sqrt(abs(num/dem)))
+    #There are 4 possible solutions to this problem. Two have been selected (through abs) as possible real solutions as the others are negative. 
+    #The other two solutions differ by the minus or plus sign in the numerator between both large terms.
+    #The negative sign was chosen as the only real solution because this yields real results when changing Cl on skidpad. 
+    #It is possible that this solution does not always yield a real result and the other solutions are real but this will be something we come back to. 
+    
+    #This model includes 
+
 
 def calculate_velocity_new(engine_force, drag_force, car, step=1, initial_velocity=0.001):
     """
@@ -20,41 +45,6 @@ def calculate_velocity_new(engine_force, drag_force, car, step=1, initial_veloci
 
     return math.sqrt((initial_velocity**2) + 2 * step * ((engine_force - drag_force) / (car_mass + driver_mass)))
 
-
-def calculate_drag_force(car, initial_velocity=0.001):
-    """
-    A function for calculating the drag force of a provided car at a provided velocity.
-    
-    Given: car, the car object we are testing
-    initial_velocity, the velocity at the begining of the time step we are running, default is .001
-    
-    Returns: the drag froce of the car at the provided velocity
-    """
-    coeff_drag = car.attrs["Cd"]
-    air_density = car.attrs["rho"]
-    frontal_area = car.attrs["A"]
-
-    return coeff_drag * 0.5 * air_density * (initial_velocity ** 2) * frontal_area
-
-
-def calculate_friction_force(car, initial_velocity=0):
-    """
-    A function for calculating the friction force of a car at an initial velocity.
-    
-    Given: car, the car object we are testing
-    initial_velocity, the initial velocoty of the car at a time step, default is 0
-    
-    Returns: the friction force at the provided conditions.
-    """
-    coeff_friction = car.attrs["CoF"]
-    car_mass = car.attrs["mass_car"]
-    driver_mass = car.attrs["mass_driver"]
-    coeff_lift = car.attrs["Cl"]
-    air_density = car.attrs["rho"]
-    frontal_area = car.attrs["A"]
-
-    return coeff_friction * ((car_mass + driver_mass) * 9.81) + (coeff_lift * 0.5 * air_density * (initial_velocity**2) * frontal_area)
-
     
 def get_drag_force(velocity: float, car):
     """Calculates drag force given a velocity"""
@@ -63,21 +53,6 @@ def get_drag_force(velocity: float, car):
     frontal_area = car.attrs["A"]
 
     return velocity**2 * coeff_drag * .5 * rho * frontal_area
-
-
-def calc_corner_radius(coord1, coord2, coord3):
-    """
-    Calculates radius of corner at any given sector
-    Coord1:Starting point of previous sector
-    Coord2:Starting point of current sector
-    Coord3:Starting point of next sector
-    All inputs are in 1D two element numpy arrays
-    """
-    a = math.sqrt((coord3[1]-coord1[1])**2 + (coord3[2]-coord1[2])**2)
-    b = math.sqrt((coord3[1]-coord2[1])**2 + (coord3[2]-coord2[2])**2)
-    c = math.sqrt((coord2[1]-coord1[1])**2 + (coord2[2]-coord1[2])**2)
-    return math.acos((b**2+c**2-a**2)/2*b*c)
-
 
 def calc_lat_accel(car, v, icr):
     """
@@ -111,17 +86,26 @@ def calc_t(v1, v2, d_step):
 #not sure how we should distinguish the difference between long and lat velocities
 #good thing is we know all long accel is caused by engine force and any lat accel is caused by curavture
 
-def calc_long_accel(v1, v2, t):
-    """
-    Calculates longitudinal acceleration
 
+
+def straightlinesegmenttime(car, distance, vinitial=0.001, torque=120, timestep=.001):
+    """
+    Calculates the amount of time it takes to travel a straight line distance.
+    
     Inputs:
-    v1 - velocity at the begining of segment n
-    v2 - velocity at the end of segment n
-    t - the time it takes to complete segment n
+    car- the car object with attributes
+    vinitial- the initial velocity into the segment
+    distance- how long the segment is
+    
+    Outputs:
+    t- the amount of time it takes to complete the segment."""
+    d=0
+    v=vinitial
+    time=0
+    acceleration=torque*car.attrs["gear_ratios"]/(car.attrs["tire_radius"]*(car.attrs["mass_car"]+car.attrs["mass_driver"]))
+    while d<distance:
+        time+=timestep
+        d+=v*timestep
+        v+=acceleration*timestep
+    return time, v
 
-    Output:
-    Longitudinal acceleration
-    """
-
-    return (v1+v2)/t
