@@ -87,3 +87,25 @@ def calc_t(v1, v2, d_step):
 #good thing is we know all long accel is caused by engine force and any lat accel is caused by curavture
 
 
+
+def straightlinesegmenttime(car, distance, vinitial=0.001, torque=120, timestep=.001):
+    """
+    Calculates the amount of time it takes to travel a straight line distance.
+    
+    Inputs:
+    car- the car object with attributes
+    vinitial- the initial velocity into the segment
+    distance- how long the segment is
+    
+    Outputs:
+    t- the amount of time it takes to complete the segment."""
+    d=0
+    v=vinitial
+    time=0
+    acceleration=torque*car.attrs["gear_ratios"]/(car.attrs["tire_radius"]*(car.attrs["mass_car"]+car.attrs["mass_driver"]))
+    while d<distance:
+        time+=timestep
+        d+=v*timestep
+        v+=acceleration*timestep
+    return time, v
+
