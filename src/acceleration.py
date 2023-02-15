@@ -25,5 +25,3 @@ def test_accel(car, LG, UG, n=100):
     plt.ylabel("Time elapsed (s)", fontsize=12)
     plt.plot(x, y, '-g')
     plt.show()
-
-test_accel(car, 5.8, 6.2, n=100)
