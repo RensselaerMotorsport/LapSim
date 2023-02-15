@@ -86,26 +86,46 @@ def calc_t(v1, v2, d_step):
 #not sure how we should distinguish the difference between long and lat velocities
 #good thing is we know all long accel is caused by engine force and any lat accel is caused by curavture
 
-
-
-def straightlinesegmenttime(car, distance, vinitial=0.001, torque=120, timestep=.001):
+def line_segment_time(car, distance, vinitial=0.001, timestep=.001):
     """
     Calculates the amount of time it takes to travel a straight line distance.
-    
+
     Inputs:
     car- the car object with attributes
     vinitial- the initial velocity into the segment
     distance- how long the segment is
-    
+
     Outputs:
     t- the amount of time it takes to complete the segment."""
     d=0
     v=vinitial
     time=0
-    acceleration=torque*car.attrs["gear_ratios"]/(car.attrs["tire_radius"]*(car.attrs["mass_car"]+car.attrs["mass_driver"]))
     while d<distance:
+        RPM = 60 * v / (2 * math.pi * car.attrs["tire_radius"]) * car.attrs["gear_ratios"]
+        acceleration = motor_torque(car, RPM) * car.attrs["gear_ratios"] / (car.attrs["tire_radius"] * (car.attrs["mass_car"] + car.attrs["mass_driver"]))
         time+=timestep
         d+=v*timestep
         v+=acceleration*timestep
     return time, v
+
+def motor_torque(car, RPM, peak=False, voltage=0, current=0):
+    """do docstring here at some point. Torque = Current * Voltage / RPM.
+
+    :param car:
+    :param RPM: motor RPM
+    :param peak:
+    :param voltage:
+    :param current:
+    :return:
+    """
+    if voltage == 0 : voltage = car.attrs["max_voltage"]
+    if current == 0 : current = car.attrs["max_current"]
+    maxCTorque = 130 # Emrax 228 HV
+    maxPTorque = 230 # Emrax 228 HV
+    if RPM < voltage / 0.07348: # Only works for Emrax 228
+        if peak:
+            return min(current * voltage / RPM, maxPTorque)
+        else:
+            return min(current * voltage / RPM, maxCTorque)
+    else: return 0
 
