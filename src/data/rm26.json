@@ -20,5 +20,9 @@
   "gear_ratios": 2.9,
   "max_current": 250,
   "max_voltage": 399,
-  "final_drive": 2.9
+  "max_cont_torque": 130,
+  "max_peak_torque": 240,
+  "final_drive": 2.9,
+  "tractive_efficiency": 0.8,
+  "drivetrain_efficiency": 0.9
 }
