@@ -12,22 +12,22 @@ OR = 18.25   #Outer radius
 IR = 15.25   #Inner radius
 Mid = 16.75  #Middle radius
 
-V_O = calc_vmax(OR, car)
-V_I = calc_vmax(IR, car)
-V_M = calc_vmax(Mid,car)
+V_O = calc_vmax(OR, car) #Calculate maximum possible velocity traveling the outer corner radius
+V_I = calc_vmax(IR, car) #Calculate the maxiumium possible velocity traveling the inner corner radius
+V_M = calc_vmax(Mid,car) #Calculate the maxiumum possible velocity while traveling the middle corner radius
 
-circum_O = 2*3.14*OR
-circum_I = 2*3.14*IR
-circum_M = 2*3.14*Mid
+circum_O = 2*3.14*OR #Circumference of the circle with the outer radius
+circum_I = 2*3.14*IR #Circumference of the circle with the inner radius
+circum_M = 2*3.14*Mid   #Circumference of the circle with a middle radius
 
 print("Velocity Outer =", V_O)
 print("Velocity Inner =", V_I)
 print("Velocity Middle =", V_M)
 
 
-t_O = circum_O/V_O
-t_I = circum_I/V_I
-t_M = circum_M/V_M
+t_O = circum_O/V_O #Time taken to traverse the outer radius
+t_I = circum_I/V_I #Time taken to traverse the inner radius
+t_M = circum_M/V_M #Time taken to traverse the middle radius
 
 print("Time Outer =",t_O)
 print("Time_Inner =",t_I)
@@ -39,7 +39,12 @@ print("Time_Middle =",t_M)
 
 def skidpad(r, car):
     """
-    A function that inputs a json (eventually) and outputs time and other things maybe
+    A function that takes the radius of the skidpad course and a car object to calculate the amount of time it will take to complete a skipad run.
+
+    Inputs: r, the radius of the skipad circle
+    car, the car object with the json values
+
+    Output: t, the amount of time skipad takes
     """
     v = calc_vmax(r,car)
     circum = 2*3.24*r
