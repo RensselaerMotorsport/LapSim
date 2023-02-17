@@ -14,6 +14,8 @@ import pandas as pd
 
 import matplotlib.pyplot as plt
 
+import os
+
 rpm_torque = pd.read_csv(r'C:\Users\barbot\Dropbox\PC\Documents\Projects\LapSim\src\data\emrax_torque.csv')
 
 step = 0.1  # meters

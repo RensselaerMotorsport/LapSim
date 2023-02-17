@@ -1,10 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, FloatField, DecimalField, SubmitField
+from wtforms import StringField, DecimalField, SubmitField
 import json #car data
 import os #get current working directory for json file
-
-#CHANGE THIS TO PROPER DIRECTORY BEFORE DEPLOYMENT
-#rm26_data = json.loads(open('C:\\Users\\fornem\\Dropbox\\lapsim\\lapsim_final\\rm26.json').read())
 
 #each perimeter from the json file if the user wants to change them
 #no data is required, a blank field should use the json data

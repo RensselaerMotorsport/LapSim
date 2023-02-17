@@ -47,17 +47,12 @@ def rm25_straight_line_sim():
                 else:
                     car[i] = float(request.form[i])
 
-        #writing the dictionary to a json file (simulation program takes a json input)
-        # directory = os.getcwd()
         json_obj = json.dumps(car, indent=2)
-        # with open(directory+'\\src\\data\\data.json', 'w') as outfile:
-        #     outfile.write(json_obj)
 
         resp = make_response(output())
         resp.set_cookie('data', json_obj)
-        
+
         return resp
-        # return render_template('output.html') # Redirect to a different page if needed
 
     return render_template('rm25_straight_line_sim.html', title="RM25 Staight Line Sim", form=form)
 

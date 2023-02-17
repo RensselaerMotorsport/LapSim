@@ -5,5 +5,4 @@ def test_func(data):
     if not data:
         print("No data")
     else:
-        # json_data = json.loads(data)
         car = Car(data)
