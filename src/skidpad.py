@@ -20,18 +20,18 @@ circum_O = 2*3.14*OR #Circumference of the circle with the outer radius
 circum_I = 2*3.14*IR #Circumference of the circle with the inner radius
 circum_M = 2*3.14*Mid   #Circumference of the circle with a middle radius
 
-print("Velocity Outer =", V_O)
-print("Velocity Inner =", V_I)
-print("Velocity Middle =", V_M)
+# print("Velocity Outer =", V_O)
+# print("Velocity Inner =", V_I)
+# print("Velocity Middle =", V_M)
 
 
 t_O = circum_O/V_O #Time taken to traverse the outer radius
 t_I = circum_I/V_I #Time taken to traverse the inner radius
 t_M = circum_M/V_M #Time taken to traverse the middle radius
 
-print("Time Outer =",t_O)
-print("Time_Inner =",t_I)
-print("Time_Middle =",t_M)
+# print("Time Outer =",t_O)
+# print("Time_Inner =",t_I)
+# print("Time_Middle =",t_M)
 
 #This model will likely predict a slower skidpad time than in real life because the tire model is basically non existent.
 
