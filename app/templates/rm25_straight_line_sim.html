@@ -2,6 +2,22 @@
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/rm25_SLS.css') }}">
+
+<!-- Make file for this -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleButton = document.querySelector('#button-addon2');
+        const splitInputFields = document.querySelector('#split-input-fields');
+
+        toggleButton.addEventListener('click', function() {
+            if (splitInputFields.style.display === 'none') {
+                splitInputFields.style.display = 'block';
+            } else {
+                splitInputFields.style.display = 'none';
+            }
+        });
+    });
+</script>
 {% endblock head %}
 
 {% block content %}
@@ -15,37 +31,37 @@
                     {{ form.submit(class="btn btn-outline-danger") }}
                 </div>
 
-                <!-- Demo HTML Code -- Delete at some point -->
-                <!-- Option 1 -->
-                <div class="form-group">
-                    <div class="input-group">
-                        <input type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
-                        <button class="btn btn-outline-secondary" type="button" id="button-addon2">Sweep</button>
-                    </div>
-                </div>
-
-                <!-- Option 2 -->
-                <div class="form-group">
-                    <div class="input-group">
-                        <input type="text" class="form-control" aria-label="Dollar amount (with dot and two decimal places)">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                          <li><a class="dropdown-item" href="#">Sweep</a></li>
-                        </ul>
-                    </div>
-                </div>
-
                 <div class="grid">
                     <div class="g-col-6">
                         <div class="form-group">
                             {{ form.mass_car.label(class="form+control-label") }}
-                            {{ form.mass_car(class="form-control form-control-sm") }}
-                            <!-- {{ form.mass_car(class="form-check-input mt-0", type="checkbox", value="")}} -->
+                            <div class="input-group">
+                                {{ form.mass_car(class="form-control form-control-sm") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-addon2">Toggle Sweep</button>
+                            </div>
+                        </div>
+
+                        <div id="split-input-fields" style="display: none;">
+                            <div class="form-group">
+                              <input type="text" class="form-control form-control-sm" name="mass_front" placeholder="Mass Front">
+                            </div>
+                            <div class="form-group">
+                              <input type="text" class="form-control form-control-sm" name="mass_rear" placeholder="Mass Rear">
+                            </div>
+                            <div class="form-group">
+                              <input type="text" class="form-control form-control-sm" name="mass_total" placeholder="Mass Total">
+                            </div>
                         </div>
 
                         <div class="form-group">
                             {{ form.mass_driver.label(class="form+control-label") }}
-                            {{ form.mass_driver(class="form-control form-control-sm") }}
+                            <div class="input-group">
+                                {{ form.mass_driver(class="form-control form-control-sm") }}
+                                <button class="btn btn-outline-secondary dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                  <li><a class="dropdown-item" href="#">Sweep</a></li>
+                                </ul>
+                            </div>
                         </div>
 
                         <div class="form-group">
