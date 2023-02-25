@@ -27,6 +27,36 @@ def calc_vmax(r, car):
     
     #This model includes 
 
+def calc_max_entry_v_for_brake(car, Vexit, r, d):
+    """
+    A function to calculate the max entry speed for a given sement in 
+    which the car could have braked to a given veloicty at the end of the segment
+
+    Car - Car Object
+    Vexit - Exit Velocity of previous segment
+    r = radius of segment
+    d = segment length
+    """
+    g = 9.8 #m/s^2
+    mew = car.attrs["CoF"]
+    m = car.attrs["mass_car"] + car.attrs["mass_driver"]
+    Cd = car.attrs["Cd"]
+    rho = car.attrs["rho"]
+    A = car.attrs["A"]
+    Cl = car.attrs["Cl"]
+
+    Drag = Cd*.5*rho*A*Vexit**2
+    if r < 1e-6:
+        Fb = math.sqrt((mew**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2)
+    else:
+        Fb = math.sqrt(((mew**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2) - ((m**2)*(Vexit**4))/(r**2))
+    Fs = Drag + Fb
+
+    u = math.sqrt(Vexit**2+(2*d*Fs)/m)
+
+    return u 
+
+
 
 def calculate_velocity_new(engine_force, drag_force, car, step=1, initial_velocity=0.001):
     """

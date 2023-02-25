@@ -47,8 +47,10 @@ def skidpad(r, car):
     Output: t, the amount of time skipad takes
     """
     v = calc_vmax(r,car)
-    circum = 2*3.24*r
+    circum = 2*3.14*r
     t = circum/v
 
-    return t
+    return t, v
+
+print(skidpad(IR,car))
 
