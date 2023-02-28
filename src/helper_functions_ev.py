@@ -13,12 +13,12 @@ def calc_vmax(r, car):
     Returns:
     The maximium velocity the car can go around the corner 
     """
-    mew = car.attrs["CoF"]
-    m = car.attrs["mass_car"] + car.attrs["mass_driver"]
-    Cd = car.attrs["Cd"]
-    rho = car.attrs["rho"]
-    A = car.attrs["A"]
-    Cl = car.attrs["Cl"]
+    mew = car.attrs["CoF"] #Coefficent of friction of the car object
+    m = car.attrs["mass_car"] + car.attrs["mass_driver"] #Total mass of the car object and driver
+    Cd = car.attrs["Cd"] #Coefficent of drag for the car object
+    rho = car.attrs["rho"] #Density of air from the car object
+    A = car.attrs["A"] #Frontal wing area of the car object
+    Cl = car.attrs["Cl"] #coefficent of lift for the car object
 
     g = 9.8 #Assign the acclertion due to gravity
 
@@ -45,21 +45,21 @@ def calc_max_entry_v_for_brake(car, Vexit, r, d):
     d = segment length
     """
     g = 9.8 #m/s^2
-    mew = car.attrs["CoF"]
-    m = car.attrs["mass_car"] + car.attrs["mass_driver"]
-    Cd = car.attrs["Cd"]
-    rho = car.attrs["rho"]
-    A = car.attrs["A"]
-    Cl = car.attrs["Cl"]
+    mew = car.attrs["CoF"] #Coefficent of Friction of the car object
+    m = car.attrs["mass_car"] + car.attrs["mass_driver"] #Total mass of the car object and driver
+    Cd = car.attrs["Cd"]#Coefficent of drag for the car object
+    rho = car.attrs["rho"]#Density of air for the car object
+    A = car.attrs["A"] #Frontal wing area of the car object
+    Cl = car.attrs["Cl"] #Coefficent of lift for the car object
 
-    Drag = Cd*.5*rho*A*Vexit**2
-    if r < 1e-6:
-        Fb = math.sqrt((mew**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2)
+    Drag = Cd*.5*rho*A*Vexit**2 #Calculate the drag of th car
+    if r < 1e-6: #for really small radi
+        Fb = math.sqrt((mew**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2) #Calculate the breaking force
     else:
-        Fb = math.sqrt(((mew**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2) - ((m**2)*(Vexit**4))/(r**2))
-    Fs = Drag + Fb
+        Fb = math.sqrt(((mew**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2) - ((m**2)*(Vexit**4))/(r**2)) #Calculate the braking force
+    Fs = Drag + Fb #sum up the overal force
 
-    u = math.sqrt(Vexit**2+(2*d*Fs)/m)
+    u = math.sqrt(Vexit**2+(2*d*Fs)/m) #Calculate the maximium entry velocity
 
     return u 
 
