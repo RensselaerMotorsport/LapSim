@@ -1,9 +1,10 @@
 """A module to calculate the velocities and time for a Skid Pad"""
 
 from classes.car_simple import Car
-from helper_functions_ev import calc_vmax 
+from helper_functions_ev import calc_vmax
+import numpy as np
 
-car = Car("C:/Users/hlaval/Desktop/Lapsim Code/LapSim/src/data/rm26.json")
+car = Car("data/rm26.json")
 
 
 ### Below is a troubleshooting script ###
@@ -47,8 +48,38 @@ def skidpad(r, car):
     Output: t, the amount of time skipad takes
     """
     v = calc_vmax(r,car)
-    circum = 2*3.24*r
+    circum = 2*3.14*r
     t = circum/v
 
-    return t
+    return t, v
+
+
+def test_skidpad(car, step=1000, returnPoints=False):
+    """A function to calculate the time elapsed or points earned at the skidpad dynamic event.
+
+    :param car: Car dictionary
+    :param step: Testing resolution
+    :param returnPoints: If True: returns points earned, if False: returns time elapsed
+    :return: Returns a value of time or points earned
+    """
+    radii = np.linspace(7.625, 10.625, step)
+    times = np.zeros(step)
+    for i in range(radii.size):
+        times[i] = skidpad(radii[i], car)[0]
+    t = times.min()
+    if returnPoints:
+        if t <= 5.046:
+            y = 75
+        elif t > 1.25 * 5.046:
+            y = 3.5
+        else:
+            p = 3.5 + 71.5 * 16/9 * ((1.25 * 5.046 / t)**2 - 1)
+            y = p
+    else:
+        y = t
+    return y
+
+
+print(test_skidpad(car, returnPoints=False))
+print(skidpad(IR,car))
 

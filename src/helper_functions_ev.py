@@ -4,20 +4,27 @@ import math
 
 def calc_vmax(r, car):
     """
-    Calculates the maximum velocity for a corner given it's radius. 
+    Calculates the maximum velocity for a corner given it's radius.
+
+    Inputs:
+    r, the radius of the corner
+    car, the car object we are considering
+
+    Returns:
+    The maximium velocity the car can go around the corner 
     """
-    mew = car.attrs["CoF"]
-    m = car.attrs["mass_car"] + car.attrs["mass_driver"]
-    Cd = car.attrs["Cd"]
-    rho = car.attrs["rho"]
-    A = car.attrs["A"]
-    Cl = car.attrs["Cl"]
+    mew = car.attrs["CoF"] #Coefficent of friction of the car object
+    m = car.attrs["mass_car"] + car.attrs["mass_driver"] #Total mass of the car object and driver
+    Cd = car.attrs["Cd"] #Coefficent of drag for the car object
+    rho = car.attrs["rho"] #Density of air from the car object
+    A = car.attrs["A"] #Frontal wing area of the car object
+    Cl = car.attrs["Cl"] #coefficent of lift for the car object
 
-    g = 9.8 
+    g = 9.8 #Assign the acclertion due to gravity
 
 
-    num = (-m*g*Cl*A*(mew**2)*rho*r) - (g*m*mew*(math.sqrt((Cd**2)*(rho**2)*(A**2)*(r**2)+(4*(m**2)))))
-    dem = (2*r)*(.25*(rho**2)*(Cl**2)*(A**2)*(mew**2) - .25*(Cd**2)*(rho**2)*(A**2)-((m**2)/(r**2)))
+    num = (-m*g*Cl*A*(mu**2)*rho*r) - (g*m*mu*(math.sqrt((Cd**2)*(rho**2)*(A**2)*(r**2)+(4*(m**2)))))
+    dem = (2*r)*(.25*(rho**2)*(Cl**2)*(A**2)*(mu**2) - .25*(Cd**2)*(rho**2)*(A**2)-((m**2)/(r**2)))
 
     return (math.sqrt(abs(num/dem)))
     #There are 4 possible solutions to this problem. Two have been selected (through abs) as possible real solutions as the others are negative. 
@@ -26,6 +33,36 @@ def calc_vmax(r, car):
     #It is possible that this solution does not always yield a real result and the other solutions are real but this will be something we come back to. 
     
     #This model includes 
+
+def calc_max_entry_v_for_brake(car, Vexit, r, d):
+    """
+    A function to calculate the max entry speed for a given sement in 
+    which the car could have braked to a given veloicty at the end of the segment
+
+    Car - Car Object
+    Vexit - Exit Velocity of previous segment
+    r = radius of segment
+    d = segment length
+    """
+    g = 9.8 #m/s^2
+    mew = car.attrs["CoF"] #Coefficent of Friction of the car object
+    m = car.attrs["mass_car"] + car.attrs["mass_driver"] #Total mass of the car object and driver
+    Cd = car.attrs["Cd"]#Coefficent of drag for the car object
+    rho = car.attrs["rho"]#Density of air for the car object
+    A = car.attrs["A"] #Frontal wing area of the car object
+    Cl = car.attrs["Cl"] #Coefficent of lift for the car object
+
+    Drag = Cd*.5*rho*A*Vexit**2 #Calculate the drag of th car
+    if r < 1e-6: #for really small radi
+        Fb = math.sqrt((mew**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2) #Calculate the breaking force
+    else:
+        Fb = math.sqrt(((mew**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2) - ((m**2)*(Vexit**4))/(r**2)) #Calculate the braking force
+    Fs = Drag + Fb #sum up the overal force
+
+    u = math.sqrt(Vexit**2+(2*d*Fs)/m) #Calculate the maximium entry velocity
+
+    return u 
+
 
 
 def calculate_velocity_new(engine_force, drag_force, car, step=1, initial_velocity=0.001):
@@ -40,19 +77,25 @@ def calculate_velocity_new(engine_force, drag_force, car, step=1, initial_veloci
     
     Returns: the velocity at the end of the time step
     """
-    car_mass = car.attrs["mass_car"]
-    driver_mass = car.attrs["mass_driver"]
+    car_mass = car.attrs["mass_car"] #mass of the car in the car object
+    driver_mass = car.attrs["mass_driver"] #mass of the driver in the car object
 
-    return math.sqrt((initial_velocity**2) + 2 * step * ((engine_force - drag_force) / (car_mass + driver_mass)))
+    return math.sqrt((initial_velocity**2) + 2 * step * ((engine_force - drag_force) / (car_mass + driver_mass))) #calculate velocity at the end of a time step
 
     
 def get_drag_force(velocity: float, car):
-    """Calculates drag force given a velocity"""
-    coeff_drag = car.attrs["Cd"]
-    rho = car.attrs["rho"]
-    frontal_area = car.attrs["A"]
+    """Calculates drag force given a velocity
+    
+    Given: Velocity as a float, the velocity you are calculating the drag force for
+    car, the car object you are considering
 
-    return velocity**2 * coeff_drag * .5 * rho * frontal_area
+    Returns: the drag force at that velocity
+    """
+    coeff_drag = car.attrs["Cd"] #The coefficent of drag in the car object
+    rho = car.attrs["rho"] #The density of air in the car object
+    frontal_area = car.attrs["A"] #The frontal area of the car in the car object
+
+    return velocity**2 * coeff_drag * .5 * rho * frontal_area #Formula for drag force
 
 def calc_lat_accel(car, v, icr):
     """
@@ -97,10 +140,10 @@ def line_segment_time(car, distance, vinitial=0.001, timestep=.001):
 
     Outputs:
     t- the amount of time it takes to complete the segment."""
-    d=0
-    v=vinitial
-    time=0
-    while d<distance:
+    d=0 #Set initial distance object
+    v=vinitial #initial velocity
+    time=0 #Set time variable
+    while d<distance: 
         RPM = 60 * v / (2 * math.pi * car.attrs["tire_radius"]) * car.attrs["gear_ratios"]
         acceleration = motor_torque(car, RPM, peak=True) * car.attrs["gear_ratios"] / (car.attrs["tire_radius"] * (car.attrs["mass_car"] + car.attrs["mass_driver"]))
         time+=timestep
