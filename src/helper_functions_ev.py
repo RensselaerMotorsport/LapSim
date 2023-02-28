@@ -77,19 +77,25 @@ def calculate_velocity_new(engine_force, drag_force, car, step=1, initial_veloci
     
     Returns: the velocity at the end of the time step
     """
-    car_mass = car.attrs["mass_car"]
-    driver_mass = car.attrs["mass_driver"]
+    car_mass = car.attrs["mass_car"] #mass of the car in the car object
+    driver_mass = car.attrs["mass_driver"] #mass of the driver in the car object
 
-    return math.sqrt((initial_velocity**2) + 2 * step * ((engine_force - drag_force) / (car_mass + driver_mass)))
+    return math.sqrt((initial_velocity**2) + 2 * step * ((engine_force - drag_force) / (car_mass + driver_mass))) #calculate velocity at the end of a time step
 
     
 def get_drag_force(velocity: float, car):
-    """Calculates drag force given a velocity"""
-    coeff_drag = car.attrs["Cd"]
-    rho = car.attrs["rho"]
-    frontal_area = car.attrs["A"]
+    """Calculates drag force given a velocity
+    
+    Given: Velocity as a float, the velocity you are calculating the drag force for
+    car, the car object you are considering
 
-    return velocity**2 * coeff_drag * .5 * rho * frontal_area
+    Returns: the drag force at that velocity
+    """
+    coeff_drag = car.attrs["Cd"] #The coefficent of drag in the car object
+    rho = car.attrs["rho"] #The density of air in the car object
+    frontal_area = car.attrs["A"] #The frontal area of the car in the car object
+
+    return velocity**2 * coeff_drag * .5 * rho * frontal_area #Formula for drag force
 
 def calc_lat_accel(car, v, icr):
     """
@@ -134,10 +140,10 @@ def line_segment_time(car, distance, vinitial=0.001, timestep=.001):
 
     Outputs:
     t- the amount of time it takes to complete the segment."""
-    d=0
-    v=vinitial
-    time=0
-    while d<distance:
+    d=0 #Set initial distance object
+    v=vinitial #initial velocity
+    time=0 #Set time variable
+    while d<distance: 
         RPM = 60 * v / (2 * math.pi * car.attrs["tire_radius"]) * car.attrs["gear_ratios"]
         acceleration = motor_torque(car, RPM, peak=True) * car.attrs["gear_ratios"] / (car.attrs["tire_radius"] * (car.attrs["mass_car"] + car.attrs["mass_driver"]))
         time+=timestep
