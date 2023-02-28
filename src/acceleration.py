@@ -43,7 +43,7 @@ def test_accel(car, LG, UG, n=100, returnPoints=False):
         x.append(car.attrs["gear_ratios"])
         y.append(run_accel(car, returnPoints=returnPoints))
         car.attrs["gear_ratios"] += step
-    import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt #Create the plot of gear ratio versus time
     plt.title("Acceleration event times", fontsize=18, y=1.04)
     plt.xlabel("Gear Ratio", fontsize=12)
     plt.ylabel("Time elapsed (s)", fontsize=12)
