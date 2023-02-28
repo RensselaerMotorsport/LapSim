@@ -6,7 +6,7 @@ def calc_vmax(r, car):
     """
     Calculates the maximum velocity for a corner given it's radius. 
     """
-    mew = car.attrs["CoF"]
+    mu = car.attrs["CoF"]
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
     Cd = car.attrs["Cd"]
     rho = car.attrs["rho"]
@@ -16,8 +16,8 @@ def calc_vmax(r, car):
     g = 9.8 
 
 
-    num = (-m*g*Cl*A*(mew**2)*rho*r) - (g*m*mew*(math.sqrt((Cd**2)*(rho**2)*(A**2)*(r**2)+(4*(m**2)))))
-    dem = (2*r)*(.25*(rho**2)*(Cl**2)*(A**2)*(mew**2) - .25*(Cd**2)*(rho**2)*(A**2)-((m**2)/(r**2)))
+    num = (-m*g*Cl*A*(mu**2)*rho*r) - (g*m*mu*(math.sqrt((Cd**2)*(rho**2)*(A**2)*(r**2)+(4*(m**2)))))
+    dem = (2*r)*(.25*(rho**2)*(Cl**2)*(A**2)*(mu**2) - .25*(Cd**2)*(rho**2)*(A**2)-((m**2)/(r**2)))
 
     return (math.sqrt(abs(num/dem)))
     #There are 4 possible solutions to this problem. Two have been selected (through abs) as possible real solutions as the others are negative. 
