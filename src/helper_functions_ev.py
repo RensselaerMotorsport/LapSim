@@ -4,16 +4,23 @@ import math
 
 def calc_vmax(r, car):
     """
-    Calculates the maximum velocity for a corner given it's radius. 
-    """
-    mew = car.attrs["CoF"]
-    m = car.attrs["mass_car"] + car.attrs["mass_driver"]
-    Cd = car.attrs["Cd"]
-    rho = car.attrs["rho"]
-    A = car.attrs["A"]
-    Cl = car.attrs["Cl"]
+    Calculates the maximum velocity for a corner given it's radius.
 
-    g = 9.8 
+    Inputs:
+    r, the radius of the corner
+    car, the car object we are considering
+
+    Returns:
+    The maximium velocity the car can go around the corner 
+    """
+    mew = car.attrs["CoF"] #Take the coefficent of friction from the car object
+    m = car.attrs["mass_car"] + car.attrs["mass_driver"] #Take the mass from the car object
+    Cd = car.attrs["Cd"] #Take coefficent of drag from the car object
+    rho = car.attrs["rho"] #Take the density of air from the car object
+    A = car.attrs["A"] #Take the frontal area of the car object
+    Cl = car.attrs["Cl"] #Take coefficent of lift from the car
+
+    g = 9.8 #Assign the acclertion due to gravity
 
 
     num = (-m*g*Cl*A*(mew**2)*rho*r) - (g*m*mew*(math.sqrt((Cd**2)*(rho**2)*(A**2)*(r**2)+(4*(m**2)))))
