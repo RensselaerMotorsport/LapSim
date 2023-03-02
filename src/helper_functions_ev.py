@@ -45,7 +45,7 @@ def calc_max_entry_v_for_brake(car, Vexit, r, d):
     d = segment length
     """
     g = 9.8 #m/s^2
-    mew = car.attrs["CoF"] #Coefficent of Friction of the car object
+    mu = car.attrs["CoF"] #Coefficent of Friction of the car object
     m = car.attrs["mass_car"] + car.attrs["mass_driver"] #Total mass of the car object and driver
     Cd = car.attrs["Cd"]#Coefficent of drag for the car object
     rho = car.attrs["rho"]#Density of air for the car object
@@ -54,9 +54,9 @@ def calc_max_entry_v_for_brake(car, Vexit, r, d):
 
     Drag = Cd*.5*rho*A*Vexit**2 #Calculate the drag of th car
     if r < 1e-6: #for really small radi
-        Fb = math.sqrt((mew**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2) #Calculate the breaking force
+        Fb = math.sqrt((mu**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2) #Calculate the breaking force
     else:
-        Fb = math.sqrt(((mew**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2) - ((m**2)*(Vexit**4))/(r**2)) #Calculate the braking force
+        Fb = math.sqrt(((mu**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2) - ((m**2)*(Vexit**4))/(r**2)) #Calculate the braking force
     Fs = Drag + Fb #sum up the overal force
 
     u = math.sqrt(Vexit**2+(2*d*Fs)/m) #Calculate the maximium entry velocity
@@ -165,7 +165,7 @@ def motor_torque(car, RPM, peak=False, voltage=0, current=0):
     if current == 0 : current = car.attrs["max_current"]
     maxCTorque = 130 # Emrax 228 HV
     maxPTorque = 230 # Emrax 228 HV
-    if RPM < voltage / 0.07348: # Only works for Emrax 228
+    if RPM < voltage * 8: # Only works for Emrax 228
         if peak:
             return min(60 / (2*math.pi) * current * voltage / RPM, maxPTorque) # Converts RPM -> angular velocity
         else:
