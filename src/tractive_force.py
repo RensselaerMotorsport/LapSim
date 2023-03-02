@@ -26,7 +26,7 @@ def plot_traction_force(car, maxv=100/3.6, step=0.01):
     plt.plot(V, F)
     plt.show()
 
-def plot_tractive_force(car, gear=3.5, maxv=200/3.6, step=1):
+def plot_tractive_force(car, gear=3, maxv=200/3.6, step=1):
     RPM = step
     V = []
     F = []
