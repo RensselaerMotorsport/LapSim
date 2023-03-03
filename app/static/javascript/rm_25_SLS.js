@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const splitGearRatios = document.querySelector('#split-gear-ratios');
     const GearRatiosForm = document.querySelector('#gear-ratios-form');
 
-
+    //TODO: if untoggled we need to clear the values in the form
     toggleMassCar.addEventListener('click', function() {
       if (splitMassCar.style.display === 'none') {
         splitMassCar.style.display = 'block';
