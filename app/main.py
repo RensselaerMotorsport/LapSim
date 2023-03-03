@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, make_response #basic flask modules
+from flask import Flask, render_template, request, make_response, flash #basic flask modules
 from forms import straightLineForm25#, straightLineForm26 #classes from forms.py
 import itertools #for looping through all possible combinations of sweep values
 import numpy #for generating range of sweep values
@@ -69,10 +69,20 @@ def rm25_straight_line_sim():
                 if str(key).endswith('_begin'):
                     base_key = str(key)[:-6]
                     if request.form[base_key+'_step'] == '' or request.form[base_key+'_end'] == '':
-                        print ('ERROR: Please fill out all fields for sweep')
-                        continue
+                        flash(base_key + ' sweep fourm isn\'t filled out completly.', 'success')
+                        return render_template('rm25_straight_line_sim.html', title="RM25 Staight Line Sim", form=form)
                     values[base_key] = request.form[key], request.form[base_key+'_step'], request.form[base_key+'_end']
                     sweep_toggled = True
+                elif str(key).endswith('_end'):
+                    base_key = str(key)[:-4]
+                    if request.form[base_key+'_begin'] == '' or  request.form[base_key+'_step'] == '':
+                        flash(base_key + ' sweep fourm isn\'t filled out completly.', 'success')
+                        return render_template('rm25_straight_line_sim.html', title="RM25 Staight Line Sim", form=form)
+                elif str(key).endswith('_step'):
+                    base_key = str(key)[:-5]
+                    if request.form[base_key+'_begin'] == '' or request.form[base_key+'_end'] == '':
+                        flash(base_key + ' sweep fourm isn\'t filled out completly.', 'success')
+                        return render_template('rm25_straight_line_sim.html', title="RM25 Staight Line Sim", form=form)
 
         if sweep_toggled == True:
             #generate list of all possible combinations of sweep values
@@ -84,10 +94,8 @@ def rm25_straight_line_sim():
             #loop through all possible combinations of sweep values
             for combo in sweep_combos:
                 #ERROR: breaks here
-                for i in range(len(filtered_keys)):
+                for i in range(min(len(filtered_keys), len(combo))):
                     if filtered_keys[i] in values:
-                        print (filtered_keys[i])
-                        print (i)
                         car[filtered_keys[i]] = combo[i]
                     else:
                         fill_blank_with_default(filtered_keys[i], car)
@@ -95,8 +103,8 @@ def rm25_straight_line_sim():
                 resp = make_response(output())
 
                 # FOR DEBUGGING
-                # with open('output'+str(combo)+'.json', 'w') as f:
-                #     f.write(json_obj)
+                with open('output'+str(combo)+'.json', 'w') as f:
+                    f.write(json_obj)
 
                 resp.set_cookie('data' + str(combo), json_obj)
 

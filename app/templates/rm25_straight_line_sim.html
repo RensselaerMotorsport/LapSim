@@ -2,8 +2,6 @@
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/rm25_SLS.css') }}">
-
-<!-- Make file for this -->
 <script src="{{ url_for('static', filename='javascript/rm_25_SLS.js') }}"></script>
 {% endblock head %}
 
@@ -17,6 +15,16 @@
                 <div class="form-group" >
                     {{ form.submit(class="btn btn-outline-danger") }}
                 </div>
+
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class="flashes">
+                        {% for message in messages %}
+                        <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% endwith %}
 
                 <div class="grid">
                     <div class="g-col-6">
