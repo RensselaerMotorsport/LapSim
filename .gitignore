@@ -1,4 +1,7 @@
 venv
+.venv
 .vscode
 .idea
+
 *.pyc
+

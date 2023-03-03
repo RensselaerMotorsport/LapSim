@@ -21,7 +21,7 @@ rpm_torque = pd.read_csv(r'C:\Users\barbot\Dropbox\PC\Documents\Projects\LapSim\
 step = 0.1  # meters
 initial_velocity = 0.01  # meters per second
 
-car = Car(r'C:\Users\barbot\Dropbox\PC\Documents\Projects\LapSim\src\data\rm26.json')
+car = Car("data/rm26.json") 
 
 distance_travelled = 0
 total_distance = 500  # meters
