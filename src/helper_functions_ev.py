@@ -129,7 +129,7 @@ def calc_t(v1, v2, d_step):
 #not sure how we should distinguish the difference between long and lat velocities
 #good thing is we know all long accel is caused by engine force and any lat accel is caused by curavture
 
-def line_segment_time(car, distance, vinitial=0.001, timestep=.001):
+def line_segment_time(car, distance, GR=0, vinitial=0.001, timestep=.001, peak=False, mu=0):
     """
     Calculates the amount of time it takes to travel a straight line distance.
 
@@ -143,9 +143,15 @@ def line_segment_time(car, distance, vinitial=0.001, timestep=.001):
     d=0 #Set initial distance object
     v=vinitial #initial velocity
     time=0 #Set time variable
+    if GR == 0: GR = car.attrs["final_drive"]
+    if mu == 0: mu = car.attrs["CoF"]
+    r = car.attrs["tire_radius"]
+    m = car.attrs["mass_car"] + car.attrs["mass_driver"]
+    rho = car.attrs["rho"]
+    A = car.attrs["A"]
     while d<distance: 
-        RPM = 60 * v / (2 * math.pi * car.attrs["tire_radius"]) * car.attrs["gear_ratios"]
-        acceleration = motor_torque(car, RPM, peak=True) * car.attrs["gear_ratios"] / (car.attrs["tire_radius"] * (car.attrs["mass_car"] + car.attrs["mass_driver"]))
+        RPM = 60 * v / (2 * math.pi * r) * GR
+        acceleration = (min((motor_torque(car, RPM, peak=peak) * GR / (r), traction_force(car, v, mu))) - rho * A * v**2 / 2)/ m
         time+=timestep
         d+=v*timestep
         v+=acceleration*timestep
@@ -163,12 +169,39 @@ def motor_torque(car, RPM, peak=False, voltage=0, current=0):
     """
     if voltage == 0 : voltage = car.attrs["max_voltage"]
     if current == 0 : current = car.attrs["max_current"]
+    backemf = car.attrs["induced_voltage"] * RPM
+    voltage -= backemf # Accounts for back emf at higher RPM
+    bPower = voltage * current
     maxCTorque = 130 # Emrax 228 HV
     maxPTorque = 230 # Emrax 228 HV
-    if RPM < voltage * 8: # Only works for Emrax 228
+    efficiency = car.attrs["tractive_efficiency"] * car.attrs["drivetrain_efficiency"]
+    w = RPM * (2*math.pi) / 60
+    Kv = car.attrs["constant_kv"]
+    if RPM < (voltage + backemf) * Kv:
         if peak:
-            return min(60 / (2*math.pi) * current * voltage / RPM, maxPTorque) # Converts RPM -> angular velocity
+            return min(bPower * efficiency / w, maxPTorque) # Accounts for drivetrain & tractive efficiencies
         else:
-            return min(60 / (2*math.pi) * current * voltage / RPM, maxCTorque)
+            return min(bPower * efficiency / w, maxCTorque)
     else: return 0
 
+def traction_force(car, v, mu):
+    g = 9.80665  # m/s^2
+    m = car.attrs["mass_car"] + car.attrs["mass_driver"]
+    rho = car.attrs["rho"]
+    A = car.attrs["A"]
+    Cl = car.attrs["Cl"]
+    Cd = car.attrs["Cl"]
+    h = car.attrs["CG_height"]
+    l = car.attrs["wheelbase"]
+    return ((rho * A * v**2 * Cl / 2 + m * g) / 2 * mu) / (1 - (h * mu) / l)# - rho * A * v**2 * Cd / 2
+
+def braking_force(car, v, mu):
+    g = 9.80665  # m/s^2
+    m = car.attrs["mass_car"] + car.attrs["mass_driver"]
+    rho = car.attrs["rho"]
+    A = car.attrs["A"]
+    Cl = car.attrs["Cl"]
+    Cd = car.attrs["Cd"]
+    h = car.attrs["CG_height"]
+    l = car.attrs["wheelbase"]
+    return ((rho * A * v**2 * Cl / 2 + m * g) / 2 * mu) / (1 + (h * mu) / l) + rho * A * v**2 * Cd / 2

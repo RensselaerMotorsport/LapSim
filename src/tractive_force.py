@@ -40,4 +40,4 @@ def plot_tractive_force(car, gear=3, maxv=200/3.6, step=1):
     plt.plot(V, F)
     plt.show()
 
-plot_tractive_force(car)
+plot_traction_force(car)
