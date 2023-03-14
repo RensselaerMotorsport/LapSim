@@ -145,7 +145,7 @@ def line_segment_time(car, distance, vinitial=0.001, timestep=.001):
     time=0 #Set time variable
     while d<distance: 
         RPM = 60 * v / (2 * math.pi * car.attrs["tire_radius"]) * car.attrs["gear_ratios"]
-        acceleration = motor_torque(car, RPM, peak=True) * car.attrs["gear_ratios"] / (car.attrs["tire_radius"] * (car.attrs["mass_car"] + car.attrs["mass_driver"]))
+        acceleration = motor_torque(car, RPM, peak=True) * 2.9 / (car.attrs["tire_radius"] * (car.attrs["mass_car"] + car.attrs["mass_driver"]))
         time+=timestep
         d+=v*timestep
         v+=acceleration*timestep

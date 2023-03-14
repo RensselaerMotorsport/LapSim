@@ -125,32 +125,170 @@ class straightLineForm25(FlaskForm):
 
     submit = SubmitField('Calculate')
 
-class straightLineForm26(FlaskForm):
+class rm_26_acceleration_form(FlaskForm):
 
     directory = os.getcwd()
-    rm26_data = json.loads(open(directory+"\\app\\rm26.json").read())
+    data = json.loads(open(directory+"\\app\\rm26.json").read())
 
     #each field for data to be entered
-    mass_car = DecimalField('Car Mass ('+str(rm26_data['mass_car'])+')')
-    mass_driver = DecimalField('Driver Mass ('+str(rm26_data['mass_driver'])+')')
-    proportion_front = DecimalField('Proportion Front ('+str(rm26_data['proportion_front'])+')')
-    front_track_width = DecimalField('Front Track Width ('+str(rm26_data['front_track_width'])+')')
-    rear_track_width = DecimalField('Rear Track Width ('+str(rm26_data['rear_track_width'])+')')
-    wheelbase = DecimalField('Wheelbase ('+str(rm26_data['wheelbase'])+')')
-    CG_height = DecimalField('Center of Gravity Height ('+str(rm26_data['CG_height'])+')')
-    yaw_inertia = DecimalField('Yaw Inertia ('+str(rm26_data['yaw_inertia'])+')')
-    CoF = DecimalField('Coefficient of Friction ('+str(rm26_data['CoF'])+')')
-    load_sensitivity = DecimalField('Load Sensitivity ('+str(rm26_data['load_sensitivity'])+')')
-    Cd = DecimalField('Coefficient of Drag ('+str(rm26_data['Cd'])+')')
-    Cl = DecimalField('Coefficient of Lift ('+str(rm26_data['Cl'])+')')
-    A = DecimalField('Frontal Area ('+str(rm26_data['A'])+')')
-    rho = DecimalField('Rho ('+str(rm26_data['rho'])+')')
-    front_downforce = DecimalField('Front Downforce ('+str(rm26_data['front_downforce'])+')')
-    cp_height = DecimalField('Center of Pressure Height ('+str(rm26_data['cp_height'])+')')
-    brake_bias = DecimalField('Brake Bias ('+str(rm26_data['brake_bias'])+')')
-    primary_drive = DecimalField('Primary Drive ('+str(rm26_data['primary_drive'])+')')
-    engine_sprocket_teeth = DecimalField('Engine Sprocket Teeth ('+str(rm26_data['engine_sprocket_teeth'])+')')
-    diff_sprocket_teeth = DecimalField('Diff Sprocket Teeth ('+str(rm26_data['diff_sprocket_teeth'])+')')
-    tire_radius = DecimalField('Tire Radius ('+str(rm26_data['tire_radius'])+')')
-    gear_ratios = StringField('Gear Ratios; enter values as a comma separated list ('+str(rm26_data['gear_ratios']).lstrip('[').rstrip(']')+')')
+    mass_car = DecimalField('Car Mass ('+str(data['mass_car'])+')')
+    mass_car_begin = DecimalField('Car Mass Begin')
+    mass_car_end = DecimalField('Car Mass End')
+    mass_car_step = DecimalField('Car Mass Step')
+
+    mass_driver = DecimalField('Driver Mass ('+str(data['mass_driver'])+')')
+    mass_driver_begin = DecimalField('Driver Mass Begin')
+    mass_driver_end = DecimalField('Driver Mass End')
+    mass_driver_step = DecimalField('Driver Mass Step')
+
+    proportion_front = DecimalField('Proportion Front ('+str(data['proportion_front'])+')')
+    proportion_front_begin = DecimalField('Proportion Front Begin')
+    proportion_front_end = DecimalField('Proportion Front End')
+    proportion_front_step = DecimalField('Proportion Front Step')
+
+    front_track_width = DecimalField('Front Track Width ('+str(data['front_track_width'])+')')
+    front_track_width_begin = DecimalField('Front Track Width Begin')
+    front_track_width_end = DecimalField('Front Track Width End')
+    front_track_width_step = DecimalField('Front Track Width Step')
+
+    rear_track_width = DecimalField('Rear Track Width ('+str(data['rear_track_width'])+')')
+    rear_track_width_begin = DecimalField('Rear Track Width Begin')
+    rear_track_width_end = DecimalField('Rear Track Width End')
+    rear_track_width_step = DecimalField('Rear Track Width Step')
+
+    wheelbase = DecimalField('Wheelbase ('+str(data['wheelbase'])+')')
+    wheelbase_begin = DecimalField('Wheelbase Begin')
+    wheelbase_end = DecimalField('Wheelbase End')
+    wheelbase_step = DecimalField('Wheelbase Step')
+
+    CG_height = DecimalField('Center of Gravity Height ('+str(data['CG_height'])+')')
+    CG_height_begin = DecimalField('Center of Gravity Height Begin')
+    CG_height_end = DecimalField('Center of Gravity Height End')
+    CG_height_step = DecimalField('Center of Gravity Height Step')
+
+    yaw_inertia = DecimalField('Yaw Inertia ('+str(data['yaw_inertia'])+')')
+    yaw_inertia_begin = DecimalField('Yaw Inertia Begin')
+    yaw_inertia_end = DecimalField('Yaw Inertia End')
+    yaw_inertia_step = DecimalField('Yaw Inertia Step')
+
+    CoF = DecimalField('Coefficient of Friction ('+str(data['CoF'])+')')
+    CoF_begin = DecimalField('Coefficient of Friction Begin')
+    CoF_end = DecimalField('Coefficient of Friction End')
+    CoF_step = DecimalField('Coefficient of Friction Step')
+
+    load_sensitivity = DecimalField('Load Sensitivity ('+str(data['load_sensitivity'])+')')
+    load_sensitivity_begin = DecimalField('Load Sensitivity Begin')
+    load_sensitivity_end = DecimalField('Load Sensitivity End')
+    load_sensitivity_step = DecimalField('Load Sensitivity Step')
+
+    Cd = DecimalField('Coefficient of Drag ('+str(data['Cd'])+')')
+    Cd_begin = DecimalField('Coefficient of Drag Begin')
+    Cd_end = DecimalField('Coefficient of Drag End')
+    Cd_step = DecimalField('Coefficient of Drag Step')
+
+    Cl = DecimalField('Coefficient of Lift ('+str(data['Cl'])+')')
+    Cl_begin = DecimalField('Coefficient of Lift Begin')
+    Cl_end = DecimalField('Coefficient of Lift End')
+    Cl_step = DecimalField('Coefficient of Lift Step')
+
+    A = DecimalField('Frontal Area ('+str(data['A'])+')')
+    A_begin = DecimalField('Frontal Area Begin')
+    A_end = DecimalField('Frontal Area End')
+    A_step = DecimalField('Frontal Area Step')
+
+    rho = DecimalField('Rho ('+str(data['rho'])+')')
+    rho_begin = DecimalField('Rho Begin')
+    rho_end = DecimalField('Rho End')
+    rho_step = DecimalField('Rho Step')
+
+    front_downforce = DecimalField('Front Downforce ('+str(data['front_downforce'])+')')
+    front_downforce_begin = DecimalField('Front Downforce Begin')
+    front_downforce_end = DecimalField('Front Downforce End')
+    front_downforce_step = DecimalField('Front Downforce Step')
+
+    cp_height = DecimalField('Center of Pressure Height ('+str(data['cp_height'])+')')
+    cp_height_begin = DecimalField('Center of Pressure Height Begin')
+    cp_height_end = DecimalField('Center of Pressure Height End')
+    cp_height_step = DecimalField('Center of Pressure Height Step')
+
+    brake_bias = DecimalField('Brake Bias ('+str(data['brake_bias'])+')')
+    brake_bias_begin = DecimalField('Brake Bias Begin')
+    brake_bias_end = DecimalField('Brake Bias End')
+    brake_bias_step = DecimalField('Brake Bias Step')
+
+    tire_radius = DecimalField('Tire Radius ('+str(data['tire_radius'])+')')
+    tire_radius_begin = DecimalField('Tire Radius Begin')
+    tire_radius_end = DecimalField('Tire Radius End')
+    tire_radius_step = DecimalField('Tire Radius Step')
+
+    gear_ratios = DecimalField('Gear Ratios ('+str(data['gear_ratios'])+')')
+    gear_ratios_begin = DecimalField('Gear Ratios Begin')
+    gear_ratios_end = DecimalField('Gear Ratios End')
+    gear_ratios_step = DecimalField('Gear Ratios Step')
+
+    max_current = DecimalField('Max Current ('+str(data['max_current'])+')')
+    max_current_begin = DecimalField('Max Current Begin')
+    max_current_end = DecimalField('Max Current End')
+    max_current_step = DecimalField('Max Current Step')
+
+    max_voltage = DecimalField('Max Voltage ('+str(data['max_voltage'])+')')
+    max_voltage_begin = DecimalField('Max Voltage Begin')
+    max_voltage_end = DecimalField('Max Voltage End')
+    max_voltage_step = DecimalField('Max Voltage Step')
+
+    max_cont_torque = DecimalField('Max Continuous Torque ('+str(data['max_cont_torque'])+')')
+    max_cont_torque_begin = DecimalField('Max Continuous Torque Begin')
+    max_cont_torque_end = DecimalField('Max Continuous Torque End')
+    max_cont_torque_step = DecimalField('Max Continuous Torque Step')
+
+    max_peak_torque = DecimalField('Max Peak Torque ('+str(data['max_peak_torque'])+')')
+    max_peak_torque_begin = DecimalField('Max Peak Torque Begin')
+    max_peak_torque_end = DecimalField('Max Peak Torque End')
+    max_peak_torque_step = DecimalField('Max Peak Torque Step')
+
+    final_drive = DecimalField('Final Drive ('+str(data['final_drive'])+')')
+    final_drive_begin = DecimalField('Final Drive Begin')
+    final_drive_end = DecimalField('Final Drive End')
+    final_drive_step = DecimalField('Final Drive Step')
+
+    tractive_efficiency = DecimalField('Tractive Efficiency ('+str(data['tractive_efficiency'])+')')
+    tractive_efficiency_begin = DecimalField('Tractive Efficiency Begin')
+    tractive_efficiency_end = DecimalField('Tractive Efficiency End')
+    tractive_efficiency_step = DecimalField('Tractive Efficiency Step')
+
+    drivetrain_efficiency = DecimalField('Drivetrain Efficiency ('+str(data['drivetrain_efficiency'])+')')
+    drivetrain_efficiency_begin = DecimalField('Drivetrain Efficiency Begin')
+    drivetrain_efficiency_end = DecimalField('Drivetrain Efficiency End')
+    drivetrain_efficiency_step = DecimalField('Drivetrain Efficiency Step')
+
     submit = SubmitField('Calculate')
+
+# class straightLineForm26(FlaskForm):
+
+#     directory = os.getcwd()
+#     rm26_data = json.loads(open(directory+"\\app\\rm26.json").read())
+
+#     #each field for data to be entered
+#     mass_car = DecimalField('Car Mass ('+str(rm26_data['mass_car'])+')')
+#     mass_driver = DecimalField('Driver Mass ('+str(rm26_data['mass_driver'])+')')
+#     proportion_front = DecimalField('Proportion Front ('+str(rm26_data['proportion_front'])+')')
+#     front_track_width = DrcimalField('Front Track Width ('+str(rm26_data['front_track_width'])+')')
+#     rear_track_width = DecimalField('Rear Track Width ('+str(rm26_data['rear_track_width'])+')')
+#     wheelbase = DecimalField('Wheelbase ('+str(rm26_data['wheelbase'])+')')
+#     CG_height = DecimalField('Center of Gravity Height ('+str(rm26_data['CG_height'])+')')
+#     yaw_inertia = DecimalField('Yaw Inertia ('+str(rm26_data['yaw_inertia'])+')')
+#     CoF = DecimalField('Coefficient of Friction ('+str(rm26_data['CoF'])+')')
+#     load_sensitivity = DecimalField('Load Sensitivity ('+str(rm26_data['load_sensitivity'])+')')
+#     Cd = DecimalField('Coefficient of Drag ('+str(rm26_data['Cd'])+')')
+#     Cl = DecimalField('Coefficient of Lift ('+str(rm26_data['Cl'])+')')
+#     A = DecimalField('Frontal Area ('+str(rm26_data['A'])+')')
+#     rho = DecimalField('Rho ('+str(rm26_data['rho'])+')')
+#     front_downforce = DecimalField('Front Downforce ('+str(rm26_data['front_downforce'])+')')
+#     cp_height = DecimalField('Center of Pressure Height ('+str(rm26_data['cp_height'])+')')
+#     brake_bias = DecimalField('Brake Bias ('+str(rm26_data['brake_bias'])+')')
+#     primary_drive = DecimalField('Primary Drive ('+str(rm26_data['primary_drive'])+')')
+#     engine_sprocket_teeth = DecimalField('Engine Sprocket Teeth ('+str(rm26_data['engine_sprocket_teeth'])+')')
+#     diff_sprocket_teeth = DecimalField('Diff Sprocket Teeth ('+str(rm26_data['diff_sprocket_teeth'])+')')
+#     tire_radius = DecimalField('Tire Radius ('+str(rm26_data['tire_radius'])+')')
+#     gear_ratios = StringField('Gear Ratios; enter values as a comma separated list ('+str(rm26_data['gear_ratios']).lstrip('[').rstrip(']')+')')
+#     submit = SubmitField('Calculate')

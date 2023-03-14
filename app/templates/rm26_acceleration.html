@@ -1,0 +1,532 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/rm25_SLS.css') }}">
+<script src="{{ url_for('static', filename='javascript/rm_25_SLS.js') }}"></script>
+{% endblock head %}
+
+{% block content %}
+    <div class="content-section">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="mb-4">Input values (blank values will use json data)</legend>
+                <!--rather meaty input box code-->
+                <div class="form-group" >
+                    {{ form.submit(class="btn btn-outline-danger") }}
+                </div>
+
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class="flashes">
+                        {% for message in messages %}
+                        <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% endwith %}
+
+                <div class="grid">
+                    <div class="g-col-6">
+                        <div class="form-group">
+                            {{ form.mass_car.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.mass_car(class="form-control form-control-sm", id="mass-car-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-mass-car">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-mass-car" style="display: none;">
+                            <div class="form-group">
+                                {{ form.mass_car_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.mass_car_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.mass_car_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            {{ form.mass_driver.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.mass_driver(class="form-control form-control-sm", id="mass-driver-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-mass-driver">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-mass-driver" style="display: none;">
+                            <div class="form-group">
+                                {{ form.mass_driver_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.mass_driver_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.mass_driver_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.proportion_front.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.proportion_front(class="form-control form-control-sm", id="proportion-front-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-proportion-front">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-proportion-front" style="display: none;">
+                            <div class="form-group">
+                                {{ form.proportion_front_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.proportion_front_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.proportion_front_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.front_track_width.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.front_track_width(class="form-control form-control-sm", id="front-track-width-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-front-track-width">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-front-track-width" style="display: none;">
+                            <div class="form-group">
+                                {{ form.front_track_width_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.front_track_width_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.front_track_width_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.rear_track_width.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.rear_track_width(class="form-control form-control-sm", id="rear-track-width-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-rear-track-width">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-rear-track-width" style="display: none;">
+                            <div class="form-group">
+                                {{ form.rear_track_width_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.rear_track_width_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.rear_track_width_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.wheelbase.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.wheelbase(class="form-control form-control-sm", id="wheelbase-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-wheelbase">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-wheelbase" style="display: none;">
+                            <div class="form-group">
+                                {{ form.wheelbase_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.wheelbase_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.wheelbase_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.CG_height.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.CG_height(class="form-control form-control-sm", id="cg-height-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-cg-height">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-cg-height" style="display: none;">
+                            <div class="form-group">
+                                {{ form.CG_height_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.CG_height_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.CG_height_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.yaw_inertia.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.yaw_inertia(class="form-control form-control-sm", id="yaw-inertia-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-yaw-inertia">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-yaw-inertia" style="display: none;">
+                            <div class="form-group">
+                                {{ form.yaw_inertia_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.yaw_inertia_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.yaw_inertia_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.CoF.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.CoF(class="form-control form-control-sm", id="cof-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-cof">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-cof" style="display: none;">
+                            <div class="form-group">
+                                {{ form.CoF_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.CoF_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.CoF_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.load_sensitivity.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.load_sensitivity(class="form-control form-control-sm", id="load-sensitivity-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-load-sensitivity">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-load-sensitivity" style="display: none;">
+                            <div class="form-group">
+                                {{ form.load_sensitivity_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.load_sensitivity_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.load_sensitivity_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.Cd.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.Cd(class="form-control form-control-sm", id="cd-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-cd">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-cd" style="display: none;">
+                            <div class="form-group">
+                                {{ form.Cd_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.Cd_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.Cd_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="g-col-6">
+                        <div class="form-group">
+                            {{ form.Cl.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.Cl(class="form-control form-control-sm", id="cl-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-cl">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-cl" style="display: none;">
+                            <div class="form-group">
+                                {{ form.Cl_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.Cl_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.Cl_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.A.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.A(class="form-control form-control-sm", id="a-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-a">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-a" style="display: none;">
+                            <div class="form-group">
+                                {{ form.A_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.A_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.A_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.rho.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.rho(class="form-control form-control-sm", id="rho-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-rho">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-rho" style="display: none;">
+                            <div class="form-group">
+                                {{ form.rho_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.rho_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.rho_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.front_downforce.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.front_downforce(class="form-control form-control-sm", id="front-downforce-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-front-downforce">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-front-downforce" style="display: none;">
+                            <div class="form-group">
+                                {{ form.front_downforce_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.front_downforce_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.front_downforce_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.cp_height.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.cp_height(class="form-control form-control-sm", id="cp-height-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-cp-height">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-cp-height" style="display: none;">
+                            <div class="form-group">
+                                {{ form.cp_height_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.cp_height_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.cp_height_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.brake_bias.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.brake_bias(class="form-control form-control-sm", id="brake-bias-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-brake-bias">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-brake-bias" style="display: none;">
+                            <div class="form-group">
+                                {{ form.brake_bias_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.brake_bias_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.brake_bias_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.tire_radius.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.tire_radius(class="form-control form-control-sm", id="tire-radius-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-tire-radius">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-tire-radius" style="display: none;">
+                            <div class="form-group">
+                                {{ form.tire_radius_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.tire_radius_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.tire_radius_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.gear_ratios.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.gear_ratios(class="form-control form-control-sm", id="gear-ratios-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-gear-ratios">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-gear-ratios" style="display: none;">
+                            <div class="form-group">
+                                {{ form.gear_ratios_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.gear_ratios_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.gear_ratios_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+						<div class="form-group">
+							{{ form.max_current.label(class="form+control-label") }}
+							<div class="input-group">
+								{{ form.max_current(class="form-control form-control-sm", id="max-current-form") }}
+								<button class="btn btn-outline-secondary btn-sm" type="button" id="button-max-current">Toggle Sweep</button>
+							</div>
+						</div>
+						<div id="split-max-current" style="display: none;">
+							<div class="form-group">
+								{{ form.max_current_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+							</div>
+							<div class="form-group">
+								{{ form.max_current_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+							</div>
+							<div class="form-group">
+								{{ form.max_current_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+							</div>
+						</div>
+
+						<div class="form-group">
+							{{ form.max_voltage.label(class="form+control-label") }}
+							<div class="input-group">
+								{{ form.max_voltage(class="form-control form-control-sm", id="max-voltage-form") }}
+								<button class="btn btn-outline-secondary btn-sm" type="button" id="button-max-voltage">Toggle Sweep</button>
+							</div>
+						</div>
+						<div id="split-max-voltage" style="display: none;">
+							<div class="form-group">
+								{{ form.max_voltage_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+							</div>
+							<div class="form-group">
+								{{ form.max_voltage_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+							</div>
+							<div class="form-group">
+								{{ form.max_voltage_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+							</div>
+						</div>
+
+						<div class="form-group">
+							{{ form.max_cont_torque.label(class="form+control-label") }}
+							<div class="input-group">
+								{{ form.max_cont_torque(class="form-control form-control-sm", id="max-cont-torque-form") }}
+								<button class="btn btn-outline-secondary btn-sm" type="button" id="button-max-cont-torque">Toggle Sweep</button>
+							</div>
+						</div>
+						<div id="split-max-cont-torque" style="display: none;">
+							<div class="form-group">
+								{{ form.max_cont_torque_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+							</div>
+							<div class="form-group">
+								{{ form.max_cont_torque_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+							</div>
+							<div class="form-group">
+								{{ form.max_cont_torque_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+							</div>
+						</div>
+
+						<div class="form-group">
+							{{ form.max_peak_torque.label(class="form+control-label") }}
+							<div class="input-group">
+								{{ form.max_peak_torque(class="form-control form-control-sm", id="max-peak-torque-form") }}
+								<button class="btn btn-outline-secondary btn-sm" type="button" id="button-max-peak-torque">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-max-peak-torque" style="display: none;">
+                            <div class="form-group">
+                                {{ form.max_peak_torque_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.max_peak_torque_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.max_peak_torque_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.final_drive.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.final_drive(class="form-control form-control-sm", id="final-drive-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-final-drive">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-final-drive" style="display: none;">
+                            <div class="form-group">
+                                {{ form.final_drive_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.final_drive_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.final_drive_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.tractive_efficiency.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.tractive_efficiency(class="form-control form-control-sm", id="tractive-efficiency-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-tractive-efficiency">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-tractive-efficiency" style="display: none;">
+                            <div class="form-group">
+                                {{ form.tractive_efficiency_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.tractive_efficiency_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.tractive_efficiency_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.drivetrain_efficiency.label(class="form+control-label") }}
+                            <div class="input-group">
+                                {{ form.drivetrain_efficiency(class="form-control form-control-sm", id="drivetrain-efficiency-form") }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="button-drivetrain-efficiency">Toggle Sweep</button>
+                            </div>
+                        </div>
+                        <div id="split-drivetrain-efficiency" style="display: none;">
+                            <div class="form-group">
+                                {{ form.drivetrain_efficiency_begin(class="form-control form-control-sm", placeholder="Begin Sweep") }}
+                            </div>
+                            <div class="form-group">
+                                {{ form.drivetrain_efficiency_end(class="form-control form-control-sm", placeholder="End Sweep")}}
+                            </div>
+                            <div class="form-group">
+                                {{ form.drivetrain_efficiency_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
+                            </div>
+						</div>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+{% endblock content %}
