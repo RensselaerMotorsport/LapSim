@@ -13,7 +13,7 @@ def calc_vmax(r, car):
     Returns:
     The maximium velocity the car can go around the corner 
     """
-    mew = car.attrs["CoF"] #Coefficent of friction of the car object
+    mu = car.attrs["CoF"] #Coefficent of friction of the car object
     m = car.attrs["mass_car"] + car.attrs["mass_driver"] #Total mass of the car object and driver
     Cd = car.attrs["Cd"] #Coefficent of drag for the car object
     rho = car.attrs["rho"] #Density of air from the car object
@@ -66,7 +66,7 @@ def calc_max_entry_v_for_brake(car, Vexit, r, d):
         Fb = math.sqrt((mu**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2) #Calculate the breaking force
     else:
         Fb = math.sqrt(((mu**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2) - ((m**2)*(Vexit**4))/(r**2)) #Calculate the braking force
-    Fs = Drag + Fb #sum up the overal force
+        Fs = Drag + Fb #sum up the overal force
         if friction_force < centripetal_force:
             raise ValueError("Friction force is smaller than centripetal force, tires are slipping!")
         Fb = math.sqrt(friction_force-centripetal_force)
