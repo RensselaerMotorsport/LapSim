@@ -35,28 +35,58 @@ def plot_torque_rpm():
 
 
 def calc_tractive_force(car, GR, v, vMax, peak=False):
-    r = car.attrs["tire_radius"]
-    V = []
-    F = []
-    while v <= vMax:
-        V.append(v)
-        F.append(motor_torque(car, v * 60 * GR / (2 * math.pi * r), peak=peak) * GR / r)
-        v += 0.01
+    """A function for calculating the tractive force along a series of velocities. 
+    
+    Given: car, the car object we are considering
+    GR, the gear ratio
+    v, the initial velocity we are considering
+    vMax, the maxiumum velocity that you are considering
+    peak, determines whether or not you want to use peak motor force, is a boolean, False means you do not, True means you want to use peak motor force
+    
+    Returns: V, a list of velocities
+    F, a list of related tractive forces"""
+    r = car.attrs["tire_radius"] #gets the tire radius of the car
+    V = [] #sets the velocity array
+    F = [] #Sets the tractive force array
+    while v <= vMax: #Set up the loop over velocities
+        V.append(v) #adds the current velocity to the velocity list
+        F.append(motor_torque(car, v * 60 * GR / (2 * math.pi * r), peak=peak) * GR / r) #calculates the tractive force using the motor torque function
+        v += 0.01 #increases the velocity before the loop restarts
     return V, F
 
 
 def calc_traction_force(car, v, vMax, mu):
-    V = []
-    F = []
-    while v <= vMax:
-        V.append(v)
-        F.append(traction_force(car, v, mu))
-        v += 0.01
+    """A function for calculating the traction force along a range of velocities.
+    
+    Given: car, the car object we are considering
+    v, the initial velocity you are considering 
+    vMax, the maximium velocity you are considering
+    mu, the coefficent of friction
+    
+    Returns: V, the array of velocities considered
+    F, the related Traction Forces"""
+    V = [] #sets the velocity array
+    F = [] #sets the tractive force array
+    while v <= vMax: #Set up the loop over velocities
+        V.append(v) #adds the current velocity to the velocity array
+        F.append(traction_force(car, v, mu)) #Calculates the traction force using the traction force function
+        v += 0.01 #Increases the velocity before the loop restarts
     return V, F
 
 
 def braking_length(car, v0, v1, mu=0, tstep=0.001, returnTime=False):
-    if mu == 0: mu = car.attrs["CoF"]
+    """A function for calculating the distance nessecary to slow down from one velocity to another.
+    
+    Given: car, the car object you are considering
+    v0, the initial velocity of the segment
+    v1, the desired finial velocity of the segment
+    mu, the coefficent of static fricition, default is to set it to 0 which takes it from the car object
+    tstep, the time interval between points that we are considering, the smaller this value is the more accurate the estimate is
+    returnTime, is a boolean, if set to True the function will return the time it took to change speed, if set to True it will return the distance taken to change speed, default is False
+    
+    Returns: t, if returnTime=True, the time it took to change speed
+    d, if returnTime=False, the distance it took to change speed"""
+    if mu == 0: mu = car.attrs["CoF"] 
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
     v = v0
     t = 0
@@ -92,7 +122,7 @@ def forward_int(car, v0, d1, GR=0, mu=0, tstep=0.001, peak=False):
 
 
 def brake_pos(car, v1, v, d, mu=0):
-    # CURRENTLY BROKEN
+    # CURRENTLY BROKEN Braking
     if mu == 0: mu = car.attrs["CoF"]
     for i in range(-len(v), -1):
         if braking_length(car, v[-i - 1], v1, mu=mu) <= d[len(d) - 1] - d[0]:
