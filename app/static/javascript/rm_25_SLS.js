@@ -87,7 +87,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const splitGearRatios = document.querySelector('#split-gear-ratios');
     const GearRatiosForm = document.querySelector('#gear-ratios-form');
 
-    //TODO: if untoggled we need to clear the values in the form
+	const max_current = document.querySelector('#max-current');
+	const max_current_form = document.querySelector('#max-current-form');
+	const max_current_split = document.querySelector('#split-max-current');
+
+	const max_voltage = document.querySelector('#max-voltage');
+	const max_voltage_form = document.querySelector('#max-voltage-form');
+	const max_voltage_split = document.querySelector('#split-max-voltage');
+
+
+
     toggleMassCar.addEventListener('click', function() {
       if (splitMassCar.style.display === 'none') {
         splitMassCar.style.display = 'block';

@@ -87,7 +87,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const splitGearRatios = document.querySelector('#split-gear-ratios');
     const GearRatiosForm = document.querySelector('#gear-ratios-form');
 
-    //TODO: if untoggled we need to clear the values in the form
+	const toggleMaxCurrent = document.querySelector('#max-current');
+	const splitMaxCurrent = document.querySelector('#split-max-current');
+	const MaxCurrentForm = document.querySelector('#max-current-form');
+
+	const toggleMaxVoltage = document.querySelector('#max-voltage');
+	const splitMaxVoltage = document.querySelector('#split-max-voltage');
+	const MaxVoltageForm = document.querySelector('#max-voltage-form');
+
+	const toggleMaxContTorque = document.querySelector('#max-cont-torque');
+	const splitMaxContTorque = document.querySelector('#split-max-cont-torque');
+	const MaxContTorqueForm = document.querySelector('#max-cont-torque-form');
+
+	const toggleMaxPeakTorque = document.querySelector('#max-peak-torque');
+	const splitMaxPeakTorque = document.querySelector('#split-max-peak-torque');
+	const MaxPeakTorqueForm = document.querySelector('#max-peak-torque-form');
+
+	const toggleFinalDrive = document.querySelector('#final-drive');
+	const splitFinalDrive = document.querySelector('#split-final-drive');
+	const FinalDriveForm = document.querySelector('#final-drive-form');
+
+	const toggleTractiveEfficiency = document.querySelector('#tractive-efficiency');
+	const splitTractiveEfficiency = document.querySelector('#split-tractive-efficiency');
+	const TractiveEfficiencyForm = document.querySelector('#tractive-efficiency-form');
+
+	const toggleDrivetrainEfficiency = document.querySelector('#drivetrain-efficiency');
+	const splitDrivetrainEfficiency = document.querySelector('#split-drivetrain-efficiency');
+	const DrivetrainEfficiencyForm = document.querySelector('#drivetrain-efficiency-form');
+
     toggleMassCar.addEventListener('click', function() {
       if (splitMassCar.style.display === 'none') {
         splitMassCar.style.display = 'block';
@@ -307,4 +334,74 @@ document.addEventListener('DOMContentLoaded', function() {
             GearRatiosForm.style.display = 'block';
         }
     });
+
+	toggleMaxCurrent.addEventListener('click', function() {
+		if (splitMaxCurrent.style.display === 'none') {
+			splitMaxCurrent.style.display = 'block';
+			MaxCurrentForm.style.display = 'none';
+		} else {
+			splitMaxCurrent.style.display = 'none';
+			MaxCurrentForm.style.display = 'block';
+		}
+	});
+
+	toggleMaxVoltage.addEventListener('click', function() {
+		if (splitMaxVoltage.style.display === 'none') {
+			splitMaxVoltage.style.display = 'block';
+			MaxVoltageForm.style.display = 'none';
+		} else {
+			splitMaxVoltage.style.display = 'none';
+			MaxVoltageForm.style.display = 'block';
+		}
+	});
+
+	toggleMaxContTorque.addEventListener('click', function() {
+		if (splitMaxContTorque.style.display === 'none') {
+			splitMaxContTorque.style.display = 'block';
+			MaxContTorqueForm.style.display = 'none';
+		} else {
+			splitMaxContTorque.style.display = 'none';
+			MaxContTorqueForm.style.display = 'block';
+		}
+	});
+
+	toggleMaxPeakTorque.addEventListener('click', function() {
+		if (splitMaxPeakTorque.style.display === 'none') {
+			splitMaxPeakTorque.style.display = 'block';
+			MaxPeakTorqueForm.style.display = 'none';
+		} else {
+			splitMaxPeakTorque.style.display = 'none';
+			MaxPeakTorqueForm.style.display = 'block';
+		}
+	});
+
+	toggleFinalDrive.addEventListener('click', function() {
+		if (splitFinalDrive.style.display === 'none') {
+			splitFinalDrive.style.display = 'block';
+			FinalDriveForm.style.display = 'none';
+		} else {
+			splitFinalDrive.style.display = 'none';
+			FinalDriveForm.style.display = 'block';
+		}
+	});
+
+	toggleTractiveEfficiency.addEventListener('click', function() {
+		if (splitTractiveEfficiency.style.display === 'none') {
+			splitTractiveEfficiency.style.display = 'block';
+			TractiveEfficiencyForm.style.display = 'none';
+		} else {
+			splitTractiveEfficiency.style.display = 'none';
+			TractiveEfficiencyForm.style.display = 'block';
+		}
+	});
+
+	toggleDrivetrainEfficiency.addEventListener('click', function() { 
+		if (splitDrivetrainEfficiency.style.display === 'none') {
+			splitDrivetrainEfficiency.style.display = 'block';
+			DrivetrainEfficiencyForm.style.display = 'none';
+		} else {
+			splitDrivetrainEfficiency.style.display = 'none';
+			DrivetrainEfficiencyForm.style.display = 'block';
+		}
+	});
   });

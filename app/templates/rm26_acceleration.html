@@ -2,7 +2,7 @@
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/rm25_SLS.css') }}">
-<script src="{{ url_for('static', filename='javascript/rm_25_SLS.js') }}"></script>
+<script src="{{ url_for('static', filename='javascript/rm_26_acceleration.js') }}"></script>
 {% endblock head %}
 
 {% block content %}
@@ -237,9 +237,7 @@
                                 {{ form.Cd_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
                             </div>
                         </div>
-                    </div>
 
-                    <div class="g-col-6">
                         <div class="form-group">
                             {{ form.Cl.label(class="form+control-label") }}
                             <div class="input-group">
@@ -277,7 +275,9 @@
                                 {{ form.A_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
                             </div>
                         </div>
+                    </div>
 
+                    <div class="g-col-6">
                         <div class="form-group">
                             {{ form.rho.label(class="form+control-label") }}
                             <div class="input-group">
@@ -296,7 +296,7 @@
                                 {{ form.rho_step(class="form-control form-control-sm", placeholder="Step Sweep")}}
                             </div>
                         </div>
-
+                    
                         <div class="form-group">
                             {{ form.front_downforce.label(class="form+control-label") }}
                             <div class="input-group">
