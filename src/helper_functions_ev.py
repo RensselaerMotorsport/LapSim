@@ -45,11 +45,16 @@ def calc_max_entry_v_for_brake(car, Vexit, r, d):
     A = car.attrs["A"]
     Cl = car.attrs["Cl"]
 
+    friction_force = ((mew**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2)
+    centripetal_force = ((m**2)*(Vexit**4))/(r**2)
+
     Drag = Cd*.5*rho*A*Vexit**2
     if r < 1e-6:
         Fb = math.sqrt((mew**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2)
     else:
-        Fb = math.sqrt(((mew**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2) - ((m**2)*(Vexit**4))/(r**2))
+        if friction_force < centripetal_force:
+            raise ValueError("Friction force is smaller than centripetal force, tires are slipping!")
+        Fb = math.sqrt(friction_force-centripetal_force)
     Fs = Drag + Fb
 
     u = math.sqrt(Vexit**2+(2*d*Fs)/m)

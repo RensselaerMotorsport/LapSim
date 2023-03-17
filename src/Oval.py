@@ -17,7 +17,7 @@ corner_r = 15 #Range 15-25
 
 n = (straight_d*2)+2  #number of segments
  
-track = np.zeros((n,2))
+track = np.zeros((n+1,2))
 
 for i in range(n):
     track[i,0] = straight_d/straight_d
@@ -28,6 +28,8 @@ track[straight_d+1,1] = corner_r
 track[straight_d+1,0] = 2*math.pi*corner_r
 track[(straight_d*2)+1,1] = corner_r
 track[(straight_d*2)+1,0] = 2*math.pi*corner_r
+track[n,0] = 0
+track[n,1] = 0
 
 #print(track)
 
@@ -51,15 +53,19 @@ def runtrack(Car, track):
 
     u = np.zeros(track.size)
 
+    
     for i in range(track.size):
         iter = i+1
+        if iter == n:
+            break
+
         print("Iter =",iter)
         print("Velocity =",velocity[i])
         print("Radius =",track[i,1])
         print("Distance=",track[i,0])
 
-        if i > 0:
-            u[i+1] = calc_max_entry_v_for_brake(Car, velocity[i], track[i,1], track[i,0])
+        if i > 0 and i < n-1:
+            u[i] = calc_max_entry_v_for_brake(Car, velocity[i+1], track[i+1,1], track[i+1,0])
         if track[i,1] == 0:
             time[i+1],velocity[i+1] = line_segment_time(Car,track[i,0], velocity[i], timestep=.001) #velocity[i+1] is the exit velocity
         else:
@@ -72,13 +78,15 @@ def runtrack(Car, track):
                 time[i+1] = (math.pi*corner_r)/vmax
                 velocity[i+1] = vmax
             else: #velocity > vmax
-                for j in range(velocity[1],velocity[i]):
+                for j in range(i):
                     if velocity[j] < u[j]:
                         b = j                                #Equals the number of segments when braking must occur from the start of turn
                 for k in range(i-(i-b)):
                     velocity[k-1] = u[k]
-                    time[k-1] = 1/((velocity[k-1])/track[k-1,0])
-                
-    return np.sum(time)
+                    print(track[k-1,0])
+                    print(velocity[k-1])
+                    time[k-1] = (track[k-1,0]) / (velocity[k-1])
+
+    return #("Lap Time is", np.sum(time, axis=None))
 
 print(runtrack(Car, track))
