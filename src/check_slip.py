@@ -30,7 +30,7 @@ def calc_friction_force(t_no, ax, v, ay=0):
     friction_force
     """
 
-    if t_no == 1:
+    if t_no == 1: #Calculating friction for
         return (Steady_weight[0]+wt.calc_total_weight_transfer(ax, ay, v, t_no))*Cf
 
     elif t_no == 2:
