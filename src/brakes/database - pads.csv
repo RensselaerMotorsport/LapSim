@@ -1,15 +1,8 @@
 Brand,Model,Pad Type,Part Number,Area (in^2),Coefficient of Friction (Min),Coefficient of Friction (Max),Ideal Temp (F),Price Per Pad,Compatible Rotor Material,Link
 Wilwood,Purple Pad for Aluminum Rotor,4908,150-12270K,1.83,0.29,0.44,475,$13.47,Aluminum,https://www.wilwood.com/BrakePads/BrakePadsProd?itemno=150-12270K
-Wilwood,BP 20,4908,150-14981K,1.83,0.4,0.45,850,$18.63,"Steel
-Stainless Steel
-Iron",https://www.wilwood.com/BrakePads/BrakePadsProd?itemno=150-14981K
-Wilwood,Composite Metallic,4908,150-12128K,1.83,0.37,0.51,1250,$17.05,"Steel
-Stainless Steel
-Iron
-Super Alloy
-Titanium",https://www.wilwood.com/brakepads/BrakePadsProd?itemno=150-12128K
-,,,,,,,,,,
-Wilwood,High Friction Metallic,4108,150-4091,2,,,,,,
-Wilwood,Sintered Metallic,4108,150-4091K,2,,,,,,
-SBS,Dual Carbon,29-002,655DC,2.17,,,,,,
-EBC,GPFAX EBC Sintered Brake Pads,29-002,GPFAX184HH,2.17,0.6,0.7,,$23.47,,https://www.bikehps.com/ebc/EBC_GPFAX_Dyno.html
+Wilwood,BP 20,4908,150-14981K,1.83,0.4,0.45,850,$18.63,"Steel Stainless Steel Iron",https://www.wilwood.com/BrakePads/BrakePadsProd?itemno=150-14981K
+Wilwood,Composite Metallic,4908,150-12128K,1.83,0.37,0.51,1250,$17.05,"Steel Stainless Steel Iron Super Alloy Titanium",https://www.wilwood.com/brakepads/BrakePadsProd?itemno=150-12128K
+Wilwood,High Friction Metallic,4108,150-4091,2,0,0,0,0,0,0
+Wilwood,Sintered Metallic,4108,150-4091K,2,0,0,0,0,0,0
+SBS,Dual Carbon,29-002,655DC,2.17,0,0,0,0,0,0
+EBC,GPFAX EBC Sintered Brake Pads,29-002,GPFAX184HH,2.17,0.6,0.7,0,$23.47,0,https://www.bikehps.com/ebc/EBC_GPFAX_Dyno.html
