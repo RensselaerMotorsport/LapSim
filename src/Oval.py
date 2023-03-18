@@ -8,35 +8,30 @@ from skidpad import skidpad
 import numpy as np
 import math
 
-
+#Import Car Object
 Car = Car("C:/Users/hlaval/Desktop/Lapsim Code/LapSim/src/data/rm26.json")
 
-
+#Set Parameters for track 
 straight_d = 77  #Range 61-77
-corner_r = 15 #Range 15-25
-
+corner_r = 15    #Range 15-25
 n = (straight_d*2)+2  #number of segments
- 
+
+#Track is a two element array that stores the distance of a segment in the first column and its radius in the second
 track = np.zeros((n+1,2))
 
+#Create Track Using Parameters
 for i in range(n):
     track[i,0] = straight_d/straight_d
-
 #print(track)
 
+#Add Corners for the Oval 
 track[straight_d+1,1] = corner_r
 track[straight_d+1,0] = 2*math.pi*corner_r
 track[(straight_d*2)+1,1] = corner_r
 track[(straight_d*2)+1,0] = 2*math.pi*corner_r
 track[n,0] = 0
 track[n,1] = 0
-
 #print(track)
-
-# track = np.array([straight_d,0],
-#                  [2*math.pi*corner_r,corner_r],
-#                  [straight_d,0],
-#                  [2*math.pi*corner_r,corner_r]) #2-D array, first entry is the distance step and the second is corner radius.
 
 
 def runtrack(Car, track):
@@ -44,9 +39,12 @@ def runtrack(Car, track):
     A function to run the oval track given the car object, straight distance, and corner radius and output a time. 
     
     Parameters:
-    car - car object
+    Car - car object
     track - 2-D array of distance and radius
+
+    Return - Track Time
     """
+    #Initialize time and velocity arrays, time will be output and velocity can be conditional output (In future)
     time = np.zeros(track.size)
     velocity = np.zeros(track.size)
     velocity[0] = .0001
@@ -71,16 +69,13 @@ def runtrack(Car, track):
         else:
             vmax = calc_vmax(corner_r,Car)
             print("Vmax=", vmax)
-            if velocity[i] < vmax:
+            if velocity[i] < vmax or velocity[i] == vmax:
                 time[i+1] = (math.pi*corner_r)/velocity[i]
                 velocity[i+1] = velocity[i]
-            if velocity[i] == vmax:
-                time[i+1] = (math.pi*corner_r)/vmax
-                velocity[i+1] = vmax
             else: #velocity > vmax
                 for j in range(i):
                     if velocity[j] < u[j]:
-                        b = j                                #Equals the number of segments when braking must occur from the start of turn
+                        b = j                          #Equals the number of segments when braking must occur from the start of turn
                 for k in range(i-(i-b)):
                     velocity[k-1] = u[k]
                     print(track[k-1,0])
@@ -89,4 +84,5 @@ def runtrack(Car, track):
 
     return #("Lap Time is", np.sum(time, axis=None))
 
-print(runtrack(Car, track))
+#print(runtrack(Car, track))
+
