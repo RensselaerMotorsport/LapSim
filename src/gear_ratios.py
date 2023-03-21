@@ -74,7 +74,7 @@ def calc_traction_force(car, v, vMax, mu):
     return V, F
 
 
-def braking_length(car, v0, v1, mu=0, tstep=0.001, returnTime=False):
+def braking_length(car, v0, v1, mu=0, tstep=0.001, returnVal=0):
     """A function for calculating the distance nessecary to slow down from one velocity to another.
     
     Given: car, the car object you are considering
@@ -91,15 +91,28 @@ def braking_length(car, v0, v1, mu=0, tstep=0.001, returnTime=False):
     v = v0
     t = 0
     d = 0
+    V = []
     while v > v1:
         d += v * tstep
         t += tstep
         v -= braking_force(car, v, mu) / m * tstep
-    if returnTime:
+        V.append(v)
+    if returnVal == 0:
         return t
-    else:
+    elif returnVal == 1:
         return d
+    elif returnVal == 2:
+        return V
 
+"""
+#TEST CODE
+brake = braking_length(car, 27, 0, returnVal=2)
+t = []
+for i in range(len(brake)):
+    t.append(i/1000)
+
+plt.plot(t, brake)
+plt.show()"""
 
 def forward_int(car, v0, d1, GR=0, mu=0, tstep=0.001, peak=False):
     """Forward integration to find a new velocity and the distance traveled over a specified time step.
@@ -137,7 +150,7 @@ def brake_pos(car, v1, v, d, mu=0):
     if mu == 0: mu = car.attrs["CoF"]
     for i in range(-len(v), -1):
         if braking_length(car, v[-i - 1], v1, mu=mu) <= d[len(d) - 1] - d[0]:
-            return braking_length(car, v[-i - 1], v1, mu=mu), braking_length(car, v[-i - 1], v1, mu=mu, returnTime=True)
+            return braking_length(car, v[-i - 1], v1, mu=mu), braking_length(car, v[-i - 1], v1, mu=mu, returnVal=1)
     raise ValueError
 
 
@@ -234,5 +247,5 @@ def display_specs(car, GR, mu=0):
     print("Accel time (s): " + str(run_accel(car, GR=GR, peak=True, mu=mu)))
 
 
-display_specs(car, 38/12, mu=1.7)
+#display_specs(car, 38/12, mu=1.7)
 #plot_accel(car, 2.5, 4, [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0], plotPoints=True, peak=True)
