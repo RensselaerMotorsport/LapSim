@@ -102,6 +102,17 @@ def braking_length(car, v0, v1, mu=0, tstep=0.001, returnTime=False):
 
 
 def forward_int(car, v0, d1, GR=0, mu=0, tstep=0.001, peak=False):
+    """Forward integration to find a new velocity and the distance traveled over a specified time step.
+    
+    Given: car, the car object you are considering
+    v0: the initial velocity of the segment
+    d1: the desired distance of the segment
+    GR, the gear ratio you are considering, default is 0 which will take the value from the car object you entered
+    mu, the coefficent of static friction, default is 0 which will take the value from the car object you entered
+    peak, determines whether or not we are running at peak torque, default is False which means it is not running at peak torque
+    
+    Returns: v, the velocity at the end of the segment
+    d, the distance traveled in the segment"""
     if mu == 0: mu = car.attrs["CoF"]
     if GR == 0: GR = car.attrs["final_drive"]
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
@@ -149,12 +160,20 @@ def racing_segment_time(car, v0, v1, d1, GR=0, mu=0, peak=False, tstep=0.001):
 
 
 def plot_tfd(car, GR, mu):
-    vMax = 35
-    v = 0.01
+    """Plots the tractive force diagram versus different velocities at a specified gear ratio and coefficent of friction.
+    
+    Given: car, the car object we are considering
+    GR, the gear ratio we are considering
+    mu, the coefficent of static friction we are considering
+    
+    Returns: A plot of the tractive force versus velocity at the specified gear ratio and coefficent of friction. Includes a plot of both peak and continuous torque as well as traction force
+    Tractive force is what the motor can output, traction force is what the car can handle in real space, what the traction ability of the car is"""
+    vMax = 35 #maximum velocity we are considering
+    v = 0.01 #minimum velocity we are considering
 
-    Ptractive = calc_tractive_force(car, GR, v, vMax, peak=True)
-    Ctractive = calc_tractive_force(car, GR, v, vMax)
-    traction = calc_traction_force(car, v, vMax, mu)
+    Ptractive = calc_tractive_force(car, GR, v, vMax, peak=True) #tractive force at peak torque
+    Ctractive = calc_tractive_force(car, GR, v, vMax) #tractive force at continuous torque
+    traction = calc_traction_force(car, v, vMax, mu) #traction force
     plt.plot(Ptractive[0], Ptractive[1], '-g')
     plt.plot(Ctractive[0], Ctractive[1], '-b')
     plt.plot(traction[0], traction[1], '-r')
