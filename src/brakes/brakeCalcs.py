@@ -7,6 +7,7 @@ import math
 # import matplotlib.pyplot as plt
 import numpy as np
 import csv 
+from matplotlib import pyplot as plt
 
 """Assumptions"""
 # acceleration during braking is 1.1G (one tire compound, completly locked up)
@@ -34,6 +35,7 @@ minPedalRatio = float(0.5) #minimum brake pedal ratio., TBD: should actually be 
 maxPedalRatio = float(10) #maximum brake pedal ratio., TBD: should actually be smaller than this
 sampleSize = 5 #number of samples to take for each brake system configuration, can change to increase accuracy
 
+colors = np.array(["r","g","b","c","m","y"])
 #TBD: should I allow for multiple tire compounds?
 
 """Brake Constants"""
@@ -424,7 +426,10 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
 #Brake System Calculation Functions
 def FilterEntries(frontPosibleCombinations,rearPosibleCombinations):
     #delete duplicate entries
-    frontPosibleCombinations = np.unique(frontPosibleCombinations, axis=0)
+    frontPosibleCombinations = np.unique(frontPosibleCombinations, axis=0)    
+
+
+    
 
     #if brake pedal ratio isnt in both front and rear combination arrays, delete that combination
     fi = np.shape(frontPosibleCombinations)[0]
@@ -440,30 +445,49 @@ def FilterEntries(frontPosibleCombinations,rearPosibleCombinations):
     frontPosibleCombinations = np.unique(frontPosibleCombinations, axis=0)
     
     #collect all hardware combinations
-    frontHardwareCombinations = np.zeros((fi,2))
+    frontHardwareCombinations = np.zeros((fi,8))
     for i in range(fi):
         frontHardwareCombinations[i,0] = frontPosibleCombinations[i,3]
         frontHardwareCombinations[i,1] = frontPosibleCombinations[i,4]
     frontHardwareCombinations = np.unique(frontHardwareCombinations, axis=0)
-    rearHardwareCombinations = np.zeros((ri,2))
+    rearHardwareCombinations = np.zeros((ri,8))
     for i in range(ri):
         rearHardwareCombinations[i,0] = rearPosibleCombinations[i,3]
         rearHardwareCombinations[i,1] = rearPosibleCombinations[i,4]
     rearHardwareCombinations = np.unique(rearHardwareCombinations, axis=0)
     
-    print(frontPosibleCombinations)
+    fh1 = np.shape(frontHardwareCombinations)[0]
 
-    #find min and max values for each hardware combination
-    for i in range(fi):
-        for j in range(np.shape(frontHardwareCombinations)[0]):
-            if (frontPosibleCombinations[i,3]==frontHardwareCombinations[j,0])&(frontPosibleCombinations[i,4]==frontHardwareCombinations[j,1]):
-                brakePedalRatios = np.array([frontPosibleCombinations[i,1]])
-                frontMasterCylinderSizes = np.array([frontPosibleCombinations[i,2]])
-                frontOuterRadises = np.array([frontPosibleCombinations[i,5]])
-    minFrontBrakePedalRatio = np.min(brakePedalRatios)
-    maxFrontBrakePedalRatio = np.max(brakePedalRatios)
-    print(minFrontBrakePedalRatio)
-    print(maxFrontBrakePedalRatio)
+    """
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+    for i in range (fi):
+        for j in range(fh1):
+            #color code by caliper
+            c = colors[j]
+            ax.scatter(frontPosibleCombinations[i,1],frontPosibleCombinations[j,2],frontPosibleCombinations[i,5], c)
+     """      
+
+    #find min brake pedal ratio for each hardware combination
+    for i in range(fh1):
+        #find min and max brake pedal ratio with this hardware
+        frontHardwareCombinations[i,2] = np.min(frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]))][:,1])
+        frontHardwareCombinations[i,3] = np.max(rearPosibleCombinations[np.where((rearPosibleCombinations[:,3] == rearHardwareCombinations[i,0]) & (rearPosibleCombinations[:,4] == rearHardwareCombinations[i,1]))][:,1])
+        #find min and max rotor size with this hardware
+        frontHardwareCombinations[i,4] = np.min(frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]))][:,5])
+        frontHardwareCombinations[i,5] = np.max(rearPosibleCombinations[np.where((rearPosibleCombinations[:,3] == rearHardwareCombinations[i,0]) & (rearPosibleCombinations[:,4] == rearHardwareCombinations[i,1]))][:,5])
+        #find min and max master cylinder size with this hardware
+        frontHardwareCombinations[i,6] = np.min(frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]))][:,2])
+        frontHardwareCombinations[i,7] = np.max(rearPosibleCombinations[np.where((rearPosibleCombinations[:,3] == rearHardwareCombinations[i,0]) & (rearPosibleCombinations[:,4] == rearHardwareCombinations[i,1]))][:,2])
+
+    print(frontHardwareCombinations)
+
+    """frontHardwareCombinations
+    0: caliper
+    1: pad
+    2: min brake pedal ratio
+    3: max brake pedal ratio
+    """
 
     return(frontHardwareCombinations,rearHardwareCombinations)
 
@@ -499,8 +523,8 @@ def RequiredTorque(wheelbase, frontTireDiameter, rearTireDiameter, vehicleWeight
     weightTransfer = (centerOfGravityHeight * vehicleWeight * acceleration) / (wheelbase)
     normalLoadFront = ((vehicleWeight * forwardWeightDistribution) + weightTransfer)/2
     normalLoadRear = (vehicleWeight - (2*normalLoadFront))/2
-    requiredTorqueFront = (frontTireDiameter/2)*normalLoadFront*acceleration
-    requiredTorqueRear = (rearTireDiameter/2)*normalLoadRear*acceleration
+    requiredTorqueFront = 2*(frontTireDiameter/2)*normalLoadFront*acceleration
+    requiredTorqueRear = 2*(rearTireDiameter/2)*normalLoadRear*acceleration
     print("\nYour vehicle will reqire", requiredTorqueFront, "lbs-ft of front braking torque to lock the wheels.")
     print("Your vehicle will reqire", requiredTorqueRear, "lbs-ft of rear braking torque to lock the wheels.")
     return requiredTorqueFront, requiredTorqueRear
