@@ -218,12 +218,12 @@ def output():
             data = request.cookies.get('data' + str(combo))
             if data:
                 car = Car(data)
-                time.append(run_accel(car))
+                time.append(float(round(run_accel(car), 3)))
         return render_template('output.html', time=time)
     data = request.cookies.get('data')
     car = Car(data)
     time = []
-    time.append(run_accel(car))
+    time.append(float(round(run_accel(car), 3)))
     return render_template('output.html', time=time)
 
 if __name__ == "__main__":
