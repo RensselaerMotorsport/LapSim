@@ -39,10 +39,14 @@ def calc_max_entry_v_for_brake(car, Vexit, r, d):
     A function to calculate the max entry speed for a given sement in 
     which the car could have braked to a given veloicty at the end of the segment
 
+    Given:
     Car - Car Object
     Vexit - Exit Velocity of previous segment
     r = radius of segment
     d = segment length
+
+    Returns:
+    u- the maximium entry speed which allows the car to exit the segment at a specified speed
     """
     g = 9.8 #m/s^2
     mu = car.attrs["CoF"] #Coefficent of Friction of the car object
@@ -170,18 +174,20 @@ def line_segment_time(car, distance, GR=0, vinitial=0.001, timestep=.001, peak=F
         v+=acceleration*timestep
     return time, v
 
-def motor_torque(car, RPM, peak=False, voltage=0, current=0):
-    """do docstring here at some point. Torque = Current * Voltage / RPM.
-
-    :param car:
+def motor_torque(car, RPM, peak=False, voltage=-1, current=-1):
+    """Calculates maximium motor torque. Torque = Current * Voltage / RPM.
+    Given:
+    :param car: the car object we are considering
     :param RPM: motor RPM
-    :param peak:
-    :param voltage:
-    :param current:
-    :return:
+    :param peak: a boolean that determines whether or not we are running at peak torque, default is False which means it is not
+    :param voltage: the maximum voltage supplied to the car, default value is -1 which indicates that we are using the value in the car object
+    :param current: the maximum current supplied to the car, default value is -1, which indicates that we are using the value in the car object
+
+    Returns:
+    The maximum motor torque of the car.
     """
-    if voltage == 0 : voltage = car.attrs["max_voltage"]
-    if current == 0 : current = car.attrs["max_current"]
+    if voltage == -1 : voltage = car.attrs["max_voltage"]
+    if current == -1 : current = car.attrs["max_current"]
     backemf = car.attrs["induced_voltage"] * RPM
     voltage -= backemf # Accounts for back emf at higher RPM
     bPower = voltage * current
