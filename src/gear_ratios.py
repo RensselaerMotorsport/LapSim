@@ -74,7 +74,7 @@ def calc_traction_force(car, v, vMax, mu):
     return V, F
 
 
-def braking_length(car, v0, v1, mu=0, tstep=0.001, returnTime=False):
+def braking_length(car, v0, v1, mu=0, tstep=0.001, returnVal=0):
     """A function for calculating the distance nessecary to slow down from one velocity to another.
     
     Given: car, the car object you are considering
@@ -91,17 +91,41 @@ def braking_length(car, v0, v1, mu=0, tstep=0.001, returnTime=False):
     v = v0
     t = 0
     d = 0
+    V = []
     while v > v1:
         d += v * tstep
         t += tstep
         v -= braking_force(car, v, mu) / m * tstep
-    if returnTime:
+        V.append(v)
+    if returnVal == 0:
         return t
-    else:
+    elif returnVal == 1:
         return d
+    elif returnVal == 2:
+        return V
 
+"""
+#TEST CODE
+brake = braking_length(car, 27, 0, returnVal=2)
+t = []
+for i in range(len(brake)):
+    t.append(i/1000)
+
+plt.plot(t, brake)
+plt.show()"""
 
 def forward_int(car, v0, d1, GR=0, mu=0, tstep=0.001, peak=False):
+    """Forward integration to find a new velocity and the distance traveled over a specified time step.
+    
+    Given: car, the car object you are considering
+    v0: the initial velocity of the segment
+    d1: the desired distance of the segment
+    GR, the gear ratio you are considering, default is 0 which will take the value from the car object you entered
+    mu, the coefficent of static friction, default is 0 which will take the value from the car object you entered
+    peak, determines whether or not we are running at peak torque, default is False which means it is not running at peak torque
+    
+    Returns: v, the velocity at the end of the segment
+    d, the distance traveled in the segment"""
     if mu == 0: mu = car.attrs["CoF"]
     if GR == 0: GR = car.attrs["final_drive"]
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
@@ -126,7 +150,7 @@ def brake_pos(car, v1, v, d, mu=0):
     if mu == 0: mu = car.attrs["CoF"]
     for i in range(-len(v), -1):
         if braking_length(car, v[-i - 1], v1, mu=mu) <= d[len(d) - 1] - d[0]:
-            return braking_length(car, v[-i - 1], v1, mu=mu), braking_length(car, v[-i - 1], v1, mu=mu, returnTime=True)
+            return braking_length(car, v[-i - 1], v1, mu=mu), braking_length(car, v[-i - 1], v1, mu=mu, returnVal=1)
     raise ValueError
 
 
@@ -149,12 +173,20 @@ def racing_segment_time(car, v0, v1, d1, GR=0, mu=0, peak=False, tstep=0.001):
 
 
 def plot_tfd(car, GR, mu):
-    vMax = 35
-    v = 0.01
+    """Plots the tractive force diagram versus different velocities at a specified gear ratio and coefficent of friction.
+    
+    Given: car, the car object we are considering
+    GR, the gear ratio we are considering
+    mu, the coefficent of static friction we are considering
+    
+    Returns: A plot of the tractive force versus velocity at the specified gear ratio and coefficent of friction. Includes a plot of both peak and continuous torque as well as traction force
+    Tractive force is what the motor can output, traction force is what the car can handle in real space, what the traction ability of the car is"""
+    vMax = 35 #maximum velocity we are considering
+    v = 0.01 #minimum velocity we are considering
 
-    Ptractive = calc_tractive_force(car, GR, v, vMax, peak=True)
-    Ctractive = calc_tractive_force(car, GR, v, vMax)
-    traction = calc_traction_force(car, v, vMax, mu)
+    Ptractive = calc_tractive_force(car, GR, v, vMax, peak=True) #tractive force at peak torque
+    Ctractive = calc_tractive_force(car, GR, v, vMax) #tractive force at continuous torque
+    traction = calc_traction_force(car, v, vMax, mu) #traction force
     plt.plot(Ptractive[0], Ptractive[1], '-g')
     plt.plot(Ctractive[0], Ctractive[1], '-b')
     plt.plot(traction[0], traction[1], '-r')
@@ -215,5 +247,5 @@ def display_specs(car, GR, mu=0):
     print("Accel time (s): " + str(run_accel(car, GR=GR, peak=True, mu=mu)))
 
 
-display_specs(car, 38/12, mu=1.7)
+#display_specs(car, 38/12, mu=1.7)
 #plot_accel(car, 2.5, 4, [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0], plotPoints=True, peak=True)
