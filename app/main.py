@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, make_response, flash, redirect, url_for #basic flask modules
-from forms import straightLineForm25, rm_26_acceleration_form #, straightLineForm26 #classes from forms.py
+from forms import straightLineForm25, rm_26_form #, straightLineForm26 #classes from forms.py
 import itertools #for looping through all possible combinations of sweep values
 import numpy #for generating range of sweep values
 import json
@@ -37,6 +37,116 @@ def fill_blank_with_default(i, car):
             else:
                 #otherwise, we can just convert to float
                 car[i] = float(request.form[i])
+
+@app.route('/output', methods=['GET', 'POST'])
+def output():
+    print("debug: into output")
+    # Retrive args
+    sweep_toggled = request.args.get('sweep_toggled')
+    # might be a security risk
+    operation = globals()[request.args.get('operation')]
+
+    if (sweep_toggled):
+        # Retrive args
+        sweep_combos = tuple(tuple(x) for x in json.loads(request.args.get('sweep_combos_str')))
+        time = []
+        for combo in sweep_combos:
+            data = request.cookies.get('data' + str(combo))
+            if data:
+                car = Car(data)
+                time.append(float(round(operation(car), 3)))
+        return render_template('output.html', time=time)
+    data = request.cookies.get('data')
+    car = Car(data)
+    time = []
+    time.append(float(round(operation(car), 3)))
+    return render_template('output.html', time=time)
+
+# TODO: add RM_25 support and json
+# pass in json, form name, and function and it creates a form
+def create_form(form_name, operation):
+    form = rm_26_form(form_name)
+    length = len(rm_26_form.fields) # get length of fields dictionary
+    formatted_title = form_name.replace('_', ' ').replace('/', '').title()
+
+    # Submit Form
+    if form.is_submitted():
+
+        #begins with default json data
+        car = rm_26_form.data
+        #loops through returned form data
+
+        #create list excluding csrf token and submit button and also begin, step, and end values
+        keys_to_exclude = ['_begin', '_end', '_step']  # define the suffixes to exclude
+        filtered_keys = []  # create an empty list to store the filtered keys
+        sweep_keys = []
+
+        for key in list(request.form.keys())[2:]:
+            if not any(key.endswith(suffix) for suffix in keys_to_exclude):
+                filtered_keys.append(key)
+            else:
+                sweep_keys.append(key)
+
+        values = {}
+        sweep_toggled = False
+
+        for key in sweep_keys:
+            if str(request.form[key]) != '':
+                #check if begin, step, and end are all filled out
+                if str(key).endswith('_begin'):
+                    base_key = str(key)[:-6]
+                    if request.form[base_key+'_step'] == '' or request.form[base_key+'_end'] == '':
+                        flash(base_key + ' sweep fourm isn\'t filled out completly.', 'success')
+                        return render_template('form.html', title=formatted_title, form=form, length=length)
+                    values[base_key] = request.form[key], request.form[base_key+'_step'], request.form[base_key+'_end']
+                    sweep_toggled = True
+                elif str(key).endswith('_end'):
+                    base_key = str(key)[:-4]
+                    if request.form[base_key+'_begin'] == '' or  request.form[base_key+'_step'] == '':
+                        flash(base_key + ' sweep fourm isn\'t filled out completly.', 'success')
+                        return render_template('form.html', title=formatted_title, form=form, length=length)
+                elif str(key).endswith('_step'):
+                    base_key = str(key)[:-5]
+                    if request.form[base_key+'_begin'] == '' or request.form[base_key+'_end'] == '':
+                        flash(base_key + ' sweep fourm isn\'t filled out completly.', 'success')
+                        return render_template('form.html', title=formatted_title, form=form, length=length)
+
+        if sweep_toggled == True:
+            #generate list of all possible combinations of sweep values
+            sweep_values = []
+            for key in values:
+                sweep_values.append(list(numpy.arange(float(values[key][0]), float(values[key][2])+1, float(values[key][1]))))
+            sweep_combos = list(itertools.product(*sweep_values))
+
+            sweep_combos_str = json.dumps(sweep_combos)
+            resp = make_response(redirect(url_for('output', operation=operation, sweep_toggled=sweep_toggled, sweep_combos_str=sweep_combos_str)))
+            #loop through all possible combinations of sweep values
+            for combo in sweep_combos:
+                for i in range(min(len(filtered_keys), len(combo))):
+                    if filtered_keys[i] in values:
+                        car[filtered_keys[i]] = combo[i]
+                    else:
+                        print("debug: " + str(i))
+                        if not request.form[i+1]:
+                            print("debug: " + str(i) + " is empty")
+                        elif request.form[filtered_keys[i]] != '':
+                            car[i] = float(request.form[filtered_keys[i]])
+
+                json_obj = json.dumps(car, indent=2)
+
+                resp.set_cookie('data' + str(combo), json_obj)
+
+        else:
+            for i in filtered_keys:
+                if request.form[i] != '':
+                    car[i] = float(request.form[i])
+
+            json_obj = json.dumps(car, indent=2)
+            resp = make_response(redirect(url_for('output', operation=operation)))
+            resp.set_cookie('data', json_obj)
+        return resp
+
+    return render_template('form.html', title=formatted_title, form=form, length=length)
 
 #straight line simulation page
 @app.route('/rm25_straight_line_sim', methods=['GET', 'POST'])
@@ -122,109 +232,9 @@ def rm25_straight_line_sim():
 
 @app.route('/rm26_acceleration', methods=['GET', 'POST'])
 def rm26_acceleration():
-    form = rm_26_acceleration_form('/rm26_acceleration')
+    return create_form('/rm26_acceleration', 'run_accel')
 
-    # Submit Form
-    if form.is_submitted():
-
-        #begins with default json data
-        car = rm_26_acceleration_form.data
-        #loops through returned form data
-
-        #create list excluding csrf token and submit button and also begin, step, and end values
-        keys_to_exclude = ['_begin', '_end', '_step']  # define the suffixes to exclude
-        filtered_keys = []  # create an empty list to store the filtered keys
-        sweep_keys = []
-
-        for key in list(request.form.keys())[2:]:
-            if not any(key.endswith(suffix) for suffix in keys_to_exclude):
-                filtered_keys.append(key)
-            else:
-                sweep_keys.append(key)
-
-        values = {}
-        sweep_toggled = False
-
-        for key in sweep_keys:
-            if str(request.form[key]) != '':
-                #check if begin, step, and end are all filled out
-                if str(key).endswith('_begin'):
-                    base_key = str(key)[:-6]
-                    if request.form[base_key+'_step'] == '' or request.form[base_key+'_end'] == '':
-                        flash(base_key + ' sweep fourm isn\'t filled out completly.', 'success')
-                        return render_template('rm25_straight_line_sim.html', title="RM25 Staight Line Sim", form=form)
-                    values[base_key] = request.form[key], request.form[base_key+'_step'], request.form[base_key+'_end']
-                    sweep_toggled = True
-                elif str(key).endswith('_end'):
-                    base_key = str(key)[:-4]
-                    if request.form[base_key+'_begin'] == '' or  request.form[base_key+'_step'] == '':
-                        flash(base_key + ' sweep fourm isn\'t filled out completly.', 'success')
-                        return render_template('rm25_straight_line_sim.html', title="RM25 Staight Line Sim", form=form)
-                elif str(key).endswith('_step'):
-                    base_key = str(key)[:-5]
-                    if request.form[base_key+'_begin'] == '' or request.form[base_key+'_end'] == '':
-                        flash(base_key + ' sweep fourm isn\'t filled out completly.', 'success')
-                        return render_template('rm25_straight_line_sim.html', title="RM25 Staight Line Sim", form=form)
-
-        if sweep_toggled == True:
-            #generate list of all possible combinations of sweep values
-            sweep_values = []
-            for key in values:
-                sweep_values.append(list(numpy.arange(float(values[key][0]), float(values[key][2])+1, float(values[key][1]))))
-            sweep_combos = list(itertools.product(*sweep_values))
-            
-            sweep_combos_str = json.dumps(sweep_combos)
-            resp = make_response(redirect(url_for('output', sweep_toggled=sweep_toggled, sweep_combos_str=sweep_combos_str)))
-            #loop through all possible combinations of sweep values
-            for combo in sweep_combos:
-                for i in range(min(len(filtered_keys), len(combo))):
-                    if filtered_keys[i] in values:
-                        car[filtered_keys[i]] = combo[i]
-                    else:
-                        if request.form[i] != '':
-                            car[i] = float(request.form[i])
-                json_obj = json.dumps(car, indent=2)
-
-                # FOR DEBUGGING
-                with open('output'+str(combo)+'.json', 'w') as f:
-                    f.write(json_obj)
-
-                resp.set_cookie('data' + str(combo), json_obj)
-
-        else:
-            for i in filtered_keys:
-                if request.form[i] != '':
-                    car[i] = float(request.form[i])
-
-            json_obj = json.dumps(car, indent=2)
-            resp = make_response(redirect('/output'))
-            resp.set_cookie('data', json_obj)
-        return resp
-
-    return render_template('rm26_acceleration.html', title="RM26 Acceleration", form=form)
-
-
-
-@app.route('/output', methods=['GET', 'POST'])
-def output():
-    # Retrive args
-    sweep_toggled = request.args.get('sweep_toggled')
-    
-    if (sweep_toggled):
-        # Retrive args
-        sweep_combos = tuple(tuple(x) for x in json.loads(request.args.get('sweep_combos_str'))) 
-        time = []
-        for combo in sweep_combos:
-            data = request.cookies.get('data' + str(combo))
-            if data:
-                car = Car(data)
-                time.append(float(round(run_accel(car), 3)))
-        return render_template('output.html', time=time)
-    data = request.cookies.get('data')
-    car = Car(data)
-    time = []
-    time.append(float(round(run_accel(car), 3)))
-    return render_template('output.html', time=time)
+#TODO: Make more forms!!!!!
 
 if __name__ == "__main__":
     app.run(debug=False)

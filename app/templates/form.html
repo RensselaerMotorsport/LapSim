@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/rm25_SLS.css') }}">
+<script src="{{ url_for('static', filename='javascript/toggle_sweep.js') }}"></script>
+{% endblock head %}
+
+{% block content %}
+    <div class="content-section">
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="mb-4">Input values (blank values will use json data)</legend>
+                <!--rather meaty input box code-->
+                <div class="form-group" >
+                    {{ form.submit(class="btn btn-outline-danger") }}
+                </div>
+
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class="flashes">
+                        {% for message in messages %}
+                        <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% endwith %}
+
+                <div class="grid">
+                <div class="g-col-6">
+                {% for field in form %}
+                    {% if field.type != 'HiddenField' and not field.name.endswith('_begin') and not field.name.endswith('_end')
+                    and not field.name.endswith('_step') and loop.revindex > 2 %}
+                        <div class="form-group">
+                            {{ field.label(class="form-control-label") }}
+                            <div class="input-group">
+                                {{ field(class="form-control form-control-sm", id=field.name + '_form') }}
+                                <button class="btn btn-outline-secondary btn-sm" type="button" id="{{ field.name }}_button">{{ 'Toggle Sweep' }}</button>
+                            </div>
+                        </div>
+                        <div id="{{ field.name }}_split" style="display: none;">
+                            {% for subfield in form if subfield.name.startswith(field.name) and subfield.name != field.name %}
+                                <div class="form-group">
+                                    {{ subfield(class="form-control form-control-sm", placeholder=subfield.label.text) }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if loop.index == length // 2 %}
+                        </div>
+                        <div class="g-col-6">
+                    {% endif %}
+                {% endfor %}
+                </div>
+                </div>
+
+            </fieldset>
+        </form>
+    </div>
+{% endblock content %}
