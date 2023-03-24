@@ -1,6 +1,8 @@
 """A module to calculate intermediate steps in the lapsim for an ev car"""
 
 import math
+from classes.car_simple import Car
+car = Car("C:/Users/hlaval/Desktop/Lapsim Code/LapSim/src/data/rm26.json")
 
 def calc_vmax(r, car):
     """
@@ -37,7 +39,7 @@ def calc_vmax(r, car):
 def calc_max_entry_v_for_brake(car, Vexit, r, d):
     """
     A function to calculate the max entry speed for a given sement in 
-    which the car could have braked to a given veloicty at the end of the segment
+    which the car could have braked to a given velocity at the end of the segment
 
     Given:
     Car - Car Object
@@ -204,6 +206,13 @@ def motor_torque(car, RPM, peak=False, voltage=-1, current=-1):
     else: return 0
 
 def traction_force(car, v, mu):
+    """Calculates the traction force with a given velocity and coefficent of friction.
+    
+    Given: car, the car object we are considering
+    v, the velocity we are measuring the traction force at
+    mu, the coefficent of friction we are considering
+    
+    Returns: traction force"""
     g = 9.80665  # m/s^2
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
     rho = car.attrs["rho"]
@@ -215,6 +224,13 @@ def traction_force(car, v, mu):
     return ((rho * A * v**2 * Cl / 2 + m * g) / 2 * mu) / (1 - (h * mu) / l)# - rho * A * v**2 * Cd / 2
 
 def braking_force(car, v, mu):
+    """Calculates the braking force with a given velocity and coefficent of friction.
+    
+    Given: car, the car object we are considering
+    v, the velocity we are considering
+    mu, the coefficent of friction you are considering
+    
+    Returns: braking force"""
     g = 9.80665  # m/s^2
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
     rho = car.attrs["rho"]
@@ -224,3 +240,27 @@ def braking_force(car, v, mu):
     h = car.attrs["CG_height"]
     l = car.attrs["wheelbase"]
     return ((rho * A * v**2 * Cl / 2 + m * g) / 2 * mu) / (1 + (h * mu) / l) + rho * A * v**2 * Cd / 2
+
+
+def braking_length(car, v0, v1, mu=0, dstep=0.1, returnVal=0):
+    if mu == 0: mu = car.attrs["CoF"]
+    m = car.attrs["mass_car"] + car.attrs["mass_driver"]
+    v= v0
+    t = 0
+    d = 0
+    V= []
+    while v > v1:
+        t += dstep/v
+        t_seg = dstep/v
+        d += dstep
+        v -= braking_force(car, v, mu)/m*t_seg
+        V.append(v)
+    if returnVal == 0:
+        return t
+    elif returnVal == 1:
+        return d
+    elif returnVal == 2:
+        return V
+    
+
+print(braking_length(car,22,0,returnVal=1))
