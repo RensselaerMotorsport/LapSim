@@ -209,10 +209,8 @@ def create_26_form(form_name, operation):
                         car[filtered_keys[i]] = combo[i]
                     else:
                         print("debug: " + str(i))
-                        if not request.form[i+1]:
-                            print("debug: " + str(i) + " is empty")
-                        elif request.form[filtered_keys[i]] != '':
-                            car[i] = float(request.form[filtered_keys[i]])
+                        if request.form[i] != '':
+                            car[i] = float(request.form[i])
 
                 json_obj = json.dumps(car, indent=2)
 
