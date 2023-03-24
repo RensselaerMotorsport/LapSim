@@ -229,6 +229,17 @@ def braking_force(car, v, mu):
 
 
 def braking_length(car, v0, v1, mu=0, dstep=0.1, returnVal=0):
+    """A function for calculating the distance nessecary to slow down from one velocity to another.
+    
+    Given: car, the car object you are considering
+    v0, the initial velocity of the segment
+    v1, the desired finial velocity of the segment
+    mu, the coefficent of static fricition, default is to set it to 0 which takes it from the car object
+    tstep, the time interval between points that we are considering, the smaller this value is the more accurate the estimate is
+    returnTime, is a boolean, if set to True the function will return the time it took to change speed, if set to True it will return the distance taken to change speed, default is False
+    
+    Returns: t, if returnTime=True, the time it took to change speed
+    d, if returnTime=False, the distance it took to change speed"""
     if mu == 0: mu = car.attrs["CoF"]
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
     v= v0
@@ -249,4 +260,6 @@ def braking_length(car, v0, v1, mu=0, dstep=0.1, returnVal=0):
         return V
     
 
-print(braking_length(car,22,0,returnVal=1))
+
+
+
