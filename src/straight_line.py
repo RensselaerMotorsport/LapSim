@@ -16,7 +16,8 @@ import matplotlib.pyplot as plt
 
 import os
 
-rpm_torque = pd.read_csv(r'C:\Users\barbot\Dropbox\PC\Documents\Projects\LapSim\src\data\emrax_torque.csv')
+directory = os.getcwd()
+rpm_torque = pd.read_csv(directory+'\\data\\emrax_torque.csv')
 
 step = 0.1  # meters
 initial_velocity = 0.01  # meters per second
