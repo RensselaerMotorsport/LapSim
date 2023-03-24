@@ -227,7 +227,10 @@ def braking_force(car, v, mu):
     """Calculates the braking force with a given velocity and coefficent of friction.
     
     Given: car, the car object we are considering
-    v, the velocity we are considering"""
+    v, the velocity we are considering
+    mu, the coefficent of friction you are considering
+    
+    Returns: braking force"""
     g = 9.80665  # m/s^2
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
     rho = car.attrs["rho"]
