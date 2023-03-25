@@ -259,6 +259,36 @@ def braking_length(car, v0, v1, mu=0, dstep=0.1, returnVal=0):
     elif returnVal == 2:
         return V
     
+def forward_int(car, v0, d1, GR=0, mu=0, dstep=0.0001, peak=False):
+    """Forward integration to find a new velocity and the distance traveled over a specified time step.
+    
+    Given: car, the car object you are considering
+    v0: the initial velocity of the segment
+    d1: the desired distance of the segment
+    GR, the gear ratio you are considering, default is 0 which will take the value from the car object you entered
+    mu, the coefficent of static friction, default is 0 which will take the value from the car object you entered
+    peak, determines whether or not we are running at peak torque, default is False which means it is not running at peak torque
+    
+    Returns: v, the velocity at the end of the segment
+    d, the distance traveled in the segment"""
+    if mu == 0: mu = car.attrs["CoF"]
+    if GR == 0: GR = car.attrs["final_drive"]
+    m = car.attrs["mass_car"] + car.attrs["mass_driver"]
+    r = car.attrs["tire_radius"]
+    if v0 == 0: v0 = 0.01
+    v = [v0]
+    d = [0]
+    t = [0]
+    i = 0
+    while d[i] < d1:
+        RPM = 60 * v[i] / (2 * math.pi * r)
+        a = min((motor_torque(car, RPM, peak=peak) * GR / (r), traction_force(car, v[i], mu))) / m
+        tstep = dstep/v[i]
+        v.append(v[i] + a * tstep)
+        t.append(t[i] + tstep)
+        d.append(d[i] + v[i] * tstep)
+        i += 1
+    return v, d
 
 
 
