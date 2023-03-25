@@ -8,6 +8,8 @@ from skidpad import skidpad
 import numpy as np
 import math
 
+
+
 #Import Car Object
 Car = Car("C:/Users/hlaval/Desktop/Lapsim Code/LapSim/src/data/rm26.json")
 
@@ -86,3 +88,6 @@ def runtrack(Car, track):
 
 #print(runtrack(Car, track))
 
+
+plt.plot(forward_int(Car, 0,27,returnVal=0),forward_int(Car, 0,27,returnVal=1))
+plt.show
