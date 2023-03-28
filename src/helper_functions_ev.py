@@ -13,7 +13,7 @@ def calc_vmax(r, car):
     Returns:
     The maximium velocity the car can go around the corner 
     """
-    mew = car.attrs["CoF"] #Coefficent of friction of the car object
+    mu = car.attrs["CoF"] #Coefficent of friction of the car object
     m = car.attrs["mass_car"] + car.attrs["mass_driver"] #Total mass of the car object and driver
     Cd = car.attrs["Cd"] #Coefficent of drag for the car object
     rho = car.attrs["rho"] #Density of air from the car object

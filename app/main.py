@@ -12,6 +12,7 @@ sys.path.insert(1, directory+'\\src')
 # from test import test_func
 from acceleration import run_accel
 from classes.car_simple import Car
+from skidpad import test_skidpad
 
 app = Flask(__name__)
 
@@ -238,6 +239,10 @@ def rm25_straight_line_sim():
 @app.route('/rm26_acceleration', methods=['GET', 'POST'])
 def rm26_acceleration():
     return create_26_form('/rm26_acceleration', 'run_accel')
+
+@app.route('/rm26_skidpad', methods=['GET', 'POST'])
+def rm26_skidpad():
+    return create_26_form('/rm26_skidpad', 'test_skidpad')
 
 #TODO: Make more forms!!!!!
 
