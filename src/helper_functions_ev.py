@@ -247,6 +247,7 @@ def braking_length(car, v0, v1, mu=0, dstep=0.1, returnVal=0):
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
     v= v0
     t = 0
+    t_V = []
     d = 0
     V= []
     while v > v1:
@@ -255,12 +256,15 @@ def braking_length(car, v0, v1, mu=0, dstep=0.1, returnVal=0):
         d += dstep
         v -= braking_force(car, v, mu)/m*t_seg
         V.append(v)
+        t_V.append(t_seg)
     if returnVal == 0:
         return t
     elif returnVal == 1:
         return d
     elif returnVal == 2:
         return V
+    elif returnVal == 3:
+        return t_seg
     
 def forward_int(car, v0, d1, GR=0, mu=0, dstep=0.0001, peak=False):
     """Forward integration to find a new velocity and the distance traveled over a specified time step.
