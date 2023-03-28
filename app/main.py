@@ -204,11 +204,12 @@ def create_26_form(form_name, operation):
             resp = make_response(redirect(url_for('output', operation=operation, sweep_toggled=sweep_toggled, sweep_combos_str=sweep_combos_str)))
             #loop through all possible combinations of sweep values
             for combo in sweep_combos:
-                for i in range(min(len(filtered_keys), len(combo))):
+                index = 0
+                for i in range(len(filtered_keys)):
                     if filtered_keys[i] in values:
-                        car[filtered_keys[i]] = combo[i]
+                        car[filtered_keys[i]] = combo[index]
+                        index += 1
                     else:
-                        print("debug: " + str(i))
                         if request.form[filtered_keys[i]] != '':
                             car[filtered_keys[i]] = float(request.form[filtered_keys[i]])
 
