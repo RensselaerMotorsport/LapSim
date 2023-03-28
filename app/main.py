@@ -5,6 +5,7 @@ import numpy #for generating range of sweep values
 import json
 import os
 import sys
+import matplotlib
 
 directory = os.getcwd()
 sys.path.insert(1, directory+'\\src')
@@ -39,6 +40,9 @@ def fill_blank_with_default(i, car):
                 #otherwise, we can just convert to float
                 car[i] = float(request.form[i])
 
+def generate_plot():
+    
+
 @app.route('/output', methods=['GET', 'POST'])
 def output():
     print("debug: into output")
@@ -61,6 +65,7 @@ def output():
     car = Car(data)
     time = []
     time.append(float(round(operation(car), 3)))
+
     return render_template('output.html', time=time)
 
 def create_25_form(form_name, operation):
