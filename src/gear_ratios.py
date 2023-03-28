@@ -12,28 +12,6 @@ warnings.filterwarnings("ignore")
 car = Car("data/rm26.json")
 
 
-def plot_torque_rpm():
-    x1 = []
-    y1 = []
-    maxRPM = 4500
-
-    for i in range(1, maxRPM, 1):
-        x1.append(i)
-        y1.append(motor_torque(car, i, peak=False))
-
-    fig, ax = plt.subplots(1)
-    ax.plot(x1, y1, '-g')
-    ax.set_ylim(ymin=0)
-    ax.set_xlim(left=0)
-
-    plt.title("Tractive Force", fontsize=18, y=1.04)
-    plt.xlabel("Motor speed (RPM)", fontsize=12)
-    plt.ylabel("Torque (Nm)", fontsize=12)
-    ax.legend(["Continuous motor torque"])
-    ax.grid()
-    plt.show()
-
-
 def calc_tractive_force(car, GR, v, vMax, peak=False):
     """A function for calculating the tractive force along a series of velocities. 
     
@@ -104,6 +82,7 @@ def braking_length(car, v0, v1, mu=0, tstep=0.001, returnVal=0):
     elif returnVal == 2:
         return V
 
+
 def forward_int(car, v0, d1, GR=0, mu=0, tstep=0.001, peak=False):
     """Forward integration to find a new velocity and the distance traveled over a specified time step.
     
@@ -133,33 +112,6 @@ def forward_int(car, v0, d1, GR=0, mu=0, tstep=0.001, peak=False):
         d.append(d[i] + v[i] * tstep)
         i += 1
     return v, d
-
-
-def brake_pos(car, v1, v, d, mu=0):
-    # CURRENTLY BROKEN Braking
-    if mu == 0: mu = car.attrs["CoF"]
-    for i in range(-len(v), -1):
-        if braking_length(car, v[-i - 1], v1, mu=mu) <= d[len(d) - 1] - d[0]:
-            return braking_length(car, v[-i - 1], v1, mu=mu), braking_length(car, v[-i - 1], v1, mu=mu, returnVal=1)
-    raise ValueError
-
-
-def find_time(d, bpos, tstep):
-    # CURRENTLY BROKEN
-    for i in range(len(d)):
-        if bpos <= d[i] + 0.05 and bpos >= d[i] - 0.05:
-            return i * tstep
-    raise ValueError
-
-
-def racing_segment_time(car, v0, v1, d1, GR=0, mu=0, peak=False, tstep=0.001):
-    # CURRENTLY BROKEN
-    if mu == 0: mu = car.attrs["CoF"]
-    if GR == 0: GR = car.attrs["final_drive"]
-    v, d = forward_int(car, v0, d1, GR=GR, mu=mu, peak=peak, tstep=tstep)
-    bpos = brake_pos(car, v1, v, d, mu=mu)
-    return bpos[1] + find_time(d, bpos[0], tstep)
-    # print(racing_segment_time(car, 0, 99, 75))
 
 
 def plot_tfd(car, GR, mu):
