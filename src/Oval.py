@@ -3,10 +3,13 @@
 from helper_functions_ev import calc_vmax
 from helper_functions_ev import line_segment_time
 from helper_functions_ev import calc_max_entry_v_for_brake
+from helper_functions_ev import braking_length
 from classes.car_simple import Car
 from skidpad import skidpad
 import numpy as np
 import math
+
+
 
 #Import Car Object
 Car = Car("C:/Users/hlaval/Desktop/Lapsim Code/LapSim/src/data/rm26.json")
@@ -57,10 +60,10 @@ def runtrack(Car, track):
         if iter == n:
             break
 
-        print("Iter =",iter)
-        print("Velocity =",velocity[i])
-        print("Radius =",track[i,1])
-        print("Distance=",track[i,0])
+        #print("Iter =",iter)
+        #print("Velocity =",velocity[i])
+        #print("Radius =",track[i,1])
+        #print("Distance=",track[i,0])
 
         if i > 0 and i < n-1:
             u[i] = calc_max_entry_v_for_brake(Car, velocity[i+1], track[i+1,1], track[i+1,0])
@@ -68,21 +71,24 @@ def runtrack(Car, track):
             time[i+1],velocity[i+1] = line_segment_time(Car,track[i,0], velocity[i], timestep=.001) #velocity[i+1] is the exit velocity
         else:
             vmax = calc_vmax(corner_r,Car)
-            print("Vmax=", vmax)
+            #print("Vmax=", vmax)
             if velocity[i] < vmax or velocity[i] == vmax:
                 time[i+1] = (math.pi*corner_r)/velocity[i]
                 velocity[i+1] = velocity[i]
             else: #velocity > vmax
-                for j in range(i):
-                    if velocity[j] < u[j]:
-                        b = j                          #Equals the number of segments when braking must occur from the start of turn
-                for k in range(i-(i-b)):
-                    velocity[k-1] = u[k]
-                    print(track[k-1,0])
-                    print(velocity[k-1])
-                    time[k-1] = (track[k-1,0]) / (velocity[k-1])
+                for j in range(1,77):
+                    d = braking_length(Car,velocity(-j),vmax,returnVal=1)
+                    if d - 77-j < 1:
+                        velocity[j:] = braking_length(Car,velocity(-j),vmax,returnVal=2)
+                        time[j:] = braking_length(Car,velocity(-j),vmax,returnVal=3)
 
-    return #("Lap Time is", np.sum(time, axis=None))
+
+
+    return ("Lap Time is", np.sum(time, axis=None))
 
 #print(runtrack(Car, track))
+
+
+#plt.plot(forward_int(Car, 0,27,returnVal=0),forward_int(Car, 0,27,returnVal=1))
+#plt.show
 
