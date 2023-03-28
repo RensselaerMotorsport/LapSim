@@ -8,6 +8,9 @@ import math
 import numpy as np
 import csv 
 from matplotlib import pyplot as plt
+import timeit
+
+start = timeit.default_timer()
 
 """Assumptions"""
 # acceleration during braking is 1.1G (one tire compound, completly locked up)
@@ -370,174 +373,88 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
     """ Iterating Through All Possible Brake System Configurations """
     #frontPosibleCombinations = np.zeros((brakePedalRatios.size+1)*(frontMasterCylinderSizes.size+1)*(frontCaliperIndex+1)*(frontPadIndex+1)*(frontRotorOuterRadises.size+1))
     #rearPosibleCombinations = np.zeros((brakePedalRatios.size+1)*(rearMasterCylinderSizes.size+1)*(rearCaliperIndex+1)*(rearPadIndex+1)*(rearRotorOuterRadises+1))
-    frontPosibleCombinations = np.zeros((50000,6))
-    rearPosibleCombinations = np.zeros((50000,6))
+    posibleCombinations = np.zeros((5000,11))
     i = 0
-    j = 0
     
     #TBD, make more efficent by preventing repeat calculations
-    for a in range(brakePedalRatios.size):
-        # Front Calculations
-        for b in range(frontMasterCylinderSizes.size):
-            for c in range(frontCaliperIndex):
-                for d in range(frontPadIndex):
-                    for e in range(frontRotorOuterRadises.size):
-                        # make sure pad and caliper are compatible 
-                        if (padType[d] == caliperPadType[c]):
-                            # make sure caliper and rotor are compatible
-                            if (frontRotorOuterRadises[e] <= caliperMaxRotorDiameter[c]):
-                                #print(TorqueAtCombination(brakePedalRatios[a],frontMasterCylinderSizes[b],caliperPistonArea[c],padCoefficientOfFrictionMin[d],frontRotorOuterRadises[e])*factorOfSafety >= requiredTorqueFront)
-                                if (TorqueAtCombination(brakePedalRatios[a],frontMasterCylinderSizes[b],caliperPistonArea[c],padCoefficientOfFrictionMin[d],frontRotorOuterRadises[e])*factorOfSafety >= requiredTorqueFront):
-                                    frontPosibleCombinations[i,0] = (TorqueAtCombination(brakePedalRatios[a],frontMasterCylinderSizes[b],caliperPistonArea[c],padCoefficientOfFrictionMin[d],frontRotorOuterRadises[e]))
-                                    frontPosibleCombinations[i,1] = brakePedalRatios[a] # record brake pedal rato
-                                    frontPosibleCombinations[i,2] = frontMasterCylinderSizes[b] # record front master cylinder size
-                                    frontPosibleCombinations[i,3] = c # record front caliper size
-                                    frontPosibleCombinations[i,4] = d # record front pad size
-                                    frontPosibleCombinations[i,5] = frontRotorOuterRadises[e] # record front rotor size
-                                    i+=1
-                                    #delete duplicate entries 
-        # Rear Calculations
-        for b in range(rearMasterCylinderSizes.size):
-            for c in range(rearCaliperIndex):
-                for d in range(rearPadIndex):
-                    for e in range(rearRotorOuterRadises.size):
-                        # make sure pad and caliper are compatible 
-                        if (padType[d] == caliperPadType[c]):
-                            # make sure caliper and rotor are compatible
-                            if (rearRotorOuterRadises[e] <= caliperMaxRotorDiameter[c]):
-                                if (TorqueAtCombination(brakePedalRatios[a],rearMasterCylinderSizes[b],caliperPistonArea[c],padCoefficientOfFrictionMin[d],rearRotorOuterRadises[e])*factorOfSafety >= requiredTorqueRear):
-                                    rearPosibleCombinations[j,0] = (TorqueAtCombination(brakePedalRatios[a],rearMasterCylinderSizes[b],caliperPistonArea[c],padCoefficientOfFrictionMin[d],rearRotorOuterRadises[e]))
-                                    rearPosibleCombinations[j,1] = brakePedalRatios[a] # record brake pedal rato
-                                    rearPosibleCombinations[j,2] = rearMasterCylinderSizes[b] # record rear master cylinder size
-                                    rearPosibleCombinations[j,3] = c # record rear caliper size
-                                    rearPosibleCombinations[j,4] = d # record rear pad size
-                                    rearPosibleCombinations[j,5] = rearRotorOuterRadises[e] # record rear rotor size
-                                    j+=1
-    
-    frontPosibleCombinations,rearPosibleCombinations = FilterEntries(frontPosibleCombinations,rearPosibleCombinations,requiredTorqueFront,requiredTorqueRear)
+    #iterates through front and rear calipers and pads
+    for c in range(frontCaliperIndex):
+        for d in range(frontPadIndex):
+            #makes sure front pad and caliper are compatible 
+            if (padType[d] == caliperPadType[c]):
+                #iterates through rear calipers and pads
+                for c1 in range(rearCaliperIndex):
+                    for d1 in range(rearPadIndex):
+                        #makes sure rear pad and caliper are compatible 
+                        if (padType[d1] == caliperPadType[c1]):
+                            # resets difference for this hardware combination
+                            difference = -1
+                            frontTorque = 0
+                            rearTorque = 0
+                            #iterates through master cylinders
+                            for b in range(frontMasterCylinderSizes.size):
+                                for b1 in range(rearMasterCylinderSizes.size):
+                                    #iterates through front rotors
+                                    for e in range(frontRotorOuterRadises.size):
+                                        #checks if front rotors are compatible with caliper
+                                        if (frontRotorOuterRadises[e] <= caliperMaxRotorDiameter[c]):
+                                            #iterates through rear rotors
+                                            for e1 in range(rearRotorOuterRadises.size):
+                                                #checks if rear rotors are compatible with caliper
+                                                if (rearRotorOuterRadises[e1] <= caliperMaxRotorDiameter[c1]):
+                                                    #TBD make sure rotors arent too small for caliper
+                                                    for a in range(brakePedalRatios.size):
+                                                    #checks if the torque is greater than the required torque and less than 2 times the required torque
+                                                        frontTorque = TorqueAtCombination(brakePedalRatios[a],frontMasterCylinderSizes[b],caliperPistonArea[c],padCoefficientOfFrictionMin[d],frontRotorOuterRadises[e])
+                                                        if (frontTorque >= requiredTorqueFront*factorOfSafety and frontTorque <= 2*requiredTorqueFront*factorOfSafety):
+                                                            rearTorque = TorqueAtCombination(brakePedalRatios[a],rearMasterCylinderSizes[b1],caliperPistonArea[c1],padCoefficientOfFrictionMin[d1],rearRotorOuterRadises[e1])
+                                                            if (rearTorque >= requiredTorqueRear*factorOfSafety and rearTorque <= 2*requiredTorqueRear*factorOfSafety):
+                                                                if abs(abs(frontTorque-requiredTorqueFront) - abs(rearTorque-requiredTorqueRear))<difference or difference==-1:
+                                                                    #record new best difference
+                                                                    #TBD, make difference percent based
+                                                                    difference = abs(abs(frontTorque-requiredTorqueFront) - abs(rearTorque-requiredTorqueRear))
+                                                                    #record new best combination
+                                                                    posibleCombinations[i,0] = (frontTorque)
+                                                                    posibleCombinations[i,1] = (rearTorque)
+                                                                    posibleCombinations[i,2] = brakePedalRatios[a] # record brake pedal rato
+                                                                    posibleCombinations[i,3] = frontMasterCylinderSizes[b] # record front master cylinder size
+                                                                    posibleCombinations[i,4] = rearMasterCylinderSizes[b1] # record rear master cylinder size
+                                                                    posibleCombinations[i,5] = c # record front caliper size
+                                                                    posibleCombinations[i,6] = c1 # record rear caliper size
+                                                                    posibleCombinations[i,7] = d # record front pad size
+                                                                    posibleCombinations[i,8] = d1 # record rear pad size
+                                                                    posibleCombinations[i,9] = frontRotorOuterRadises[e] # record front rotor size
+                                                                    posibleCombinations[i,10] = rearRotorOuterRadises[e1] # record rear rotor size
+                                                                    i+=1
+                        
+    #prints number of front and rear combinations
+    print("Number of combinations: ", i) 
 
-    
-
-    
-    return frontPosibleCombinations, rearPosibleCombinations
-
-
-#Brake System Calculation Functions
-def FilterEntries(frontPosibleCombinations,rearPosibleCombinations,requiredTorqueFront,requiredTorqueRear):
     #delete duplicate entries
-    frontPosibleCombinations = np.unique(frontPosibleCombinations, axis=0)    
-    rearPosibleCombinations = np.unique(rearPosibleCombinations, axis=0)
+    posibleCombinations = np.unique(posibleCombinations, axis=0)    
 
-    #if brake pedal ratio isnt in both front and rear combination arrays, delete that combination
-    fi = np.shape(frontPosibleCombinations)[0]
-    ri = np.shape(rearPosibleCombinations)[0]
-    for i in range(fi):
-        if (frontPosibleCombinations[i,1] not in rearPosibleCombinations[:,1]):
-            frontPosibleCombinations[i,:] = np.zeros(6)
-    for i in range(ri):
-        if (rearPosibleCombinations[i,1] not in frontPosibleCombinations[:,1]):
-            rearPosibleCombinations[i,:] = np.zeros(6)
+    print("Number of combinations: ", i) 
+
+    #posibleCombinations = FilterEntries(posibleCombinations,requiredTorqueFront,requiredTorqueRear)
+
+    #print results
+    for i in range(posibleCombinations.size+1):
+        print("Front Torque: ", posibleCombinations[i,0])
+        print("Rear Torque: ", posibleCombinations[i,1])
+        print("Brake Pedal Ratio: ", posibleCombinations[i,2])
+        print("Front Master Cylinder Size: ", posibleCombinations[i,3])
+        print("Rear Master Cylinder Size: ", posibleCombinations[i,4])
+        print("Front Caliper: ", caliperBrands[int(posibleCombinations[i,5])] , caliperPartNumber[int(posibleCombinations[i,5])] , caliperModel[int(posibleCombinations[i,5])])
+        print("Rear Caliper: ", caliperBrands[int(posibleCombinations[i,6])] , caliperPartNumber[int(posibleCombinations[i,5])] , caliperModel[int(posibleCombinations[i,6])])
+        print("Front Pad: ", padBrand[int(posibleCombinations[i,7])] , padModel[int(posibleCombinations[i,7])])
+        print("Rear Pad: ", padBrand[int(posibleCombinations[i,8])] , padModel[int(posibleCombinations[i,8])])
+        print("Front Rotor: ", posibleCombinations[i,9])
+        print("Rear Rotor: ", posibleCombinations[i,10])
+        print("\n")
+        print(i)
     
-    #delete entries where torque is over twice as high as required
-    for i in range(fi):
-        if (frontPosibleCombinations[i,0] >= requiredTorqueFront*2):
-            frontPosibleCombinations[i,:] = np.zeros(6)
-    for i in range(ri):
-        if (rearPosibleCombinations[i,0] >= requiredTorqueRear*2):
-            rearPosibleCombinations[i,:] = np.zeros(6)
-   
-    #delete duplicate entries (again)
-    frontPosibleCombinations = np.unique(frontPosibleCombinations, axis=0)
-    rearPosibleCombinations = np.unique(rearPosibleCombinations, axis=0)
-    
-    #collect all hardware combinations
-    frontHardwareCombinations = np.zeros((np.shape(frontPosibleCombinations)[0],8))
-    rearHardwareCombinations = np.zeros((np.shape(rearPosibleCombinations)[0],8))
-    for i in range(np.shape(frontPosibleCombinations)[0]):
-        frontHardwareCombinations[i,0] = frontPosibleCombinations[i,3]
-        frontHardwareCombinations[i,1] = frontPosibleCombinations[i,4]
-    frontHardwareCombinations = np.unique(frontHardwareCombinations, axis=0)
-    rearHardwareCombinations = np.zeros((ri,8))
-    for i in range(np.shape(rearPosibleCombinations)[0]):
-        rearHardwareCombinations[i,0] = rearPosibleCombinations[i,3]
-        rearHardwareCombinations[i,1] = rearPosibleCombinations[i,4]
-    rearHardwareCombinations = np.unique(rearHardwareCombinations, axis=0)
+    return posibleCombinations
 
-    #find ideal values for each hardware combination
-    for i in range(np.shape(frontHardwareCombinations)[0]):
-        for j in range(np.shape(rearHardwareCombinations)[0]):
-            #find all pedal ratios for this hardware combination
-            bestTorqueDifference  = np.zeros((i,j))
-            bestPedalRatio = np.zeros((i,j))
-            bestMasterCylinderFront  = np.zeros((i,j))
-            bestMasterCylinderRear  = np.zeros((i,j))
-            bestRotorFront  = np.zeros((i,j))
-            bestRotorRear = np.zeros((i,j))
-            # find all pedal ratios for this hardware combination
-            pedalRatios = frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]))][:,1]
-            pedalRatios = np.unique(pedalRatios)
-            for k in range(np.shape(pedalRatios)[0]):
-                #find all front master cylinder sizes for this hardware combination
-                masterCylinderFront = frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]) & (frontPosibleCombinations[:,1] == pedalRatios[k]))][:,2]
-                masterCylinderFront = np.unique(masterCylinderFront)
-                for l in range(np.shape(masterCylinderFront)[0]):
-                    #find all rear master cylinder sizes for this hardware combination
-                    masterCylinderRear = rearPosibleCombinations[np.where((rearPosibleCombinations[:,3] == rearHardwareCombinations[j,0]) & (rearPosibleCombinations[:,4] == rearHardwareCombinations[j,1]) & (rearPosibleCombinations[:,1] == pedalRatios[k]))][:,2]
-                    masterCylinderRear = np.unique(masterCylinderRear)
-                    for m in range(np.shape(masterCylinderRear)[0]):
-                        #find all front rotor sizes for this hardware combination
-                        rotorFront = frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]) & (frontPosibleCombinations[:,1] == pedalRatios[k]) & (frontPosibleCombinations[:,2] == masterCylinderFront[l]))][:,5]
-                        rotorFront = np.unique(rotorFront)
-                        for n in range(np.shape(rotorFront)[0]):
-                            #find all rear rotor sizes for this hardware combination
-                            rotorRear = rearPosibleCombinations[np.where((rearPosibleCombinations[:,3] == rearHardwareCombinations[j,0]) & (rearPosibleCombinations[:,4] == rearHardwareCombinations[j,1]) & (rearPosibleCombinations[:,1] == pedalRatios[k]) & (rearPosibleCombinations[:,2] == masterCylinderRear[m]))][:,5]
-                            rotorRear = np.unique(rotorRear)
-                            for o in range(np.shape(rotorRear)[0]):
-                                frontTorque = frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]) & (frontPosibleCombinations[:,1] == pedalRatios[k]) & (frontPosibleCombinations[:,2] == masterCylinderFront[l]) & (frontPosibleCombinations[:,5] == rotorFront[n]))][:,0]
-                                rearTorque = rearPosibleCombinations[np.where((rearPosibleCombinations[:,3] == rearHardwareCombinations[j,0]) & (rearPosibleCombinations[:,4] == rearHardwareCombinations[j,1]) & (rearPosibleCombinations[:,1] == pedalRatios[k]) & (rearPosibleCombinations[:,2] == masterCylinderRear[m]) & (rearPosibleCombinations[:,5] == rotorRear[o]))][:,0]
-                                difference[k,l,m,n,o,] = abs(frontTorque - rearTorque)
-            #for each combo of i and j, what combo of k,l,m,n,o gives the smallest difference between front and rear torque
-            bestTorqueDifference[i,j] = np.amin(difference)
-            bestPedalRatio[i,j] = pedalRatios[np.where(difference == np.amin(difference))[0]]
-            bestMasterCylinderFront[i,j] = masterCylinderFront[np.where(difference == np.amin(difference))[1]]
-            bestMasterCylinderRear[i,j] = masterCylinderRear[np.where(difference == np.amin(difference))[2]]
-            bestRotorFront[i,j] = rotorFront[np.where(difference == np.amin(difference))[3]]
-            bestRotorRear[i,j] = rotorRear[np.where(difference == np.amin(difference))[4]]
-            
-
-            #find i and j that give the smallest difference
-            #print(difference.size)
-            #index = np.where(difference == np.amin(difference))
-
-            #print(index)
-                                #if (abs(frontTorque - rearTorque) < bestTorqueDifference):
-                                 #   bestTorqueDifference[i,j] = abs(frontTorque - rearTorque)
-                                  #  bestPedalRatio[i,j] = pedalRatios[k]
-                                   # bestMasterCylinderFront[i,j] = masterCylinderFront[l]
-                                    #bestMasterCylinderRear[i,j] = masterCylinderRear[m]
-                                    #bestRotorFront[i,j] = rotorFront[n]
-                                    #bestRotorRear[i,j] = rotorRear[o]
-
-            #print(pedalRatios)
-
-
-    return(frontHardwareCombinations,rearHardwareCombinations)
-
-    
-    """
-    if (frontPosibleCombinations.size == 0):
-        print("No front brake system combinations meet the requirements")
-    else: 
-        print("Front Brake System Combinations:")
-        for x in range(fi):
-            if (frontPosibleCombinations[x,0] != 0):
-                print(frontPosibleCombinations[x,:])
-        print("Rear Brake System Combinations:")
-        for y in range(ri):
-            if (rearPosibleCombinations[y,0] != 0):
-                print(rearPosibleCombinations[y,:])
-    """
-    return frontPosibleCombinations,rearPosibleCombinations
     
 def RequiredTorque(wheelbase, frontTireDiameter, rearTireDiameter, vehicleWeight, forwardWeightDistribution, centerOfGravityHeight, acceleration):
     """ Calculates the required torque to lock the wheels
@@ -587,3 +504,7 @@ BrakeSystem(700, 8, 8, 10, 10, 60.5, 0.49, 13, -1, -1, -1, -1, -1, -1, -1, -1, -
 #vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelShellDiameter, rearWheelShellDiameter, wheelbase, forwardWeightDistribution, centerOfGravityHeight, brakePedalRatio, brakeBias, frontMasterCylinder, rearMasterCylinder, frontCaliper, rearCaliper, frontPad, rearPad, frontRotorOuter, rearRotorOuter, factorOfSafety= UserInput()
 #BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelShellDiameter, rearWheelShellDiameter, wheelbase, forwardWeightDistribution, centerOfGravityHeight, brakePedalRatio, brakeBias, frontMasterCylinder, rearMasterCylinder, frontCaliper, rearCaliper, frontPad, rearPad, frontRotorOuter, rearRotorOuter, factorOfSafety)
 #print(caliperPistonArea)
+
+stop = timeit.default_timer()
+
+print('Time: ', stop - start)  
