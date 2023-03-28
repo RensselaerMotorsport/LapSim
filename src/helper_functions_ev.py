@@ -206,6 +206,13 @@ def motor_torque(car, RPM, peak=False, voltage=-1, current=-1):
     else: return 0
 
 def traction_force(car, v, mu):
+    """Calculates the traction force with a given velocity and coefficent of friction.
+    
+    Given: car, the car object we are considering
+    v, the velocity we are measuring the traction force at
+    mu, the coefficent of friction we are considering
+    
+    Returns: traction force"""
     g = 9.80665  # m/s^2
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
     rho = car.attrs["rho"]
@@ -217,6 +224,13 @@ def traction_force(car, v, mu):
     return ((rho * A * v**2 * Cl / 2 + m * g) / 2 * mu) / (1 - (h * mu) / l)# - rho * A * v**2 * Cd / 2
 
 def braking_force(car, v, mu):
+    """Calculates the braking force with a given velocity and coefficent of friction.
+    
+    Given: car, the car object we are considering
+    v, the velocity we are considering
+    mu, the coefficent of friction you are considering
+    
+    Returns: braking force"""
     g = 9.80665  # m/s^2
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
     rho = car.attrs["rho"]
@@ -229,17 +243,6 @@ def braking_force(car, v, mu):
 
 
 def braking_length(car, v0, v1, mu=0, dstep=0.1, returnVal=0):
-    """A function for calculating the distance nessecary to slow down from one velocity to another.
-    
-    Given: car, the car object you are considering
-    v0, the initial velocity of the segment
-    v1, the desired finial velocity of the segment
-    mu, the coefficent of static fricition, default is to set it to 0 which takes it from the car object
-    tstep, the time interval between points that we are considering, the smaller this value is the more accurate the estimate is
-    returnTime, is a boolean, if set to True the function will return the time it took to change speed, if set to True it will return the distance taken to change speed, default is False
-    
-    Returns: t, if returnTime=True, the time it took to change speed
-    d, if returnTime=False, the distance it took to change speed"""
     if mu == 0: mu = car.attrs["CoF"]
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
     v= v0
@@ -290,6 +293,4 @@ def forward_int(car, v0, d1, GR=0, mu=0, dstep=0.0001, peak=False):
         i += 1
     return v, d
 
-
-
-
+print(braking_length(car,22,0,returnVal=1))

@@ -417,7 +417,6 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
     frontPosibleCombinations,rearPosibleCombinations = FilterEntries(frontPosibleCombinations,rearPosibleCombinations,requiredTorqueFront,requiredTorqueRear)
 
     
-    
 
     
     return frontPosibleCombinations, rearPosibleCombinations
@@ -464,74 +463,63 @@ def FilterEntries(frontPosibleCombinations,rearPosibleCombinations,requiredTorqu
         rearHardwareCombinations[i,1] = rearPosibleCombinations[i,4]
     rearHardwareCombinations = np.unique(rearHardwareCombinations, axis=0)
 
-    #garbage below here 
-    #find ideal brake pedal ratio and master cylinder size for each hardware combination
-    for i in range(np.shape(frontHardwareCombinations)[0]):
-        pedalRatiosfront = np.unique(frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]))][:,1])
-        masterCylindersFront = np.unique(frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]))][:,2])
-        rotorSizesFront = np.unique(frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]))][:,5])
-    for j in range(np.shape(rearHardwareCombinations)[0]):
-        pedalRatiosrear = np.unique(rearPosibleCombinations[np.where((rearPosibleCombinations[:,3] == rearHardwareCombinations[i,0]) & (rearPosibleCombinations[:,4] == rearHardwareCombinations[i,1]))][:,1])
-        masterCylindersRear = np.unique(rearPosibleCombinations[np.where((rearPosibleCombinations[:,3] == rearHardwareCombinations[i,0]) & (rearPosibleCombinations[:,4] == rearHardwareCombinations[i,1]))][:,2])
-        rotorSizesRear = np.unique(rearPosibleCombinations[np.where((rearPosibleCombinations[:,3] == rearHardwareCombinations[i,0]) & (rearPosibleCombinations[:,4] == rearHardwareCombinations[i,1]))][:,5])
-    
-    pedalRatios = np.intersect1d(pedalRatiosfront,pedalRatiosrear)
-
-
-    
+    #find ideal values for each hardware combination
     for i in range(np.shape(frontHardwareCombinations)[0]):
         for j in range(np.shape(rearHardwareCombinations)[0]):
+            #find all pedal ratios for this hardware combination
+            bestTorqueDifference  = np.zeros((i,j))
+            bestPedalRatio = np.zeros((i,j))
+            bestMasterCylinderFront  = np.zeros((i,j))
+            bestMasterCylinderRear  = np.zeros((i,j))
+            bestRotorFront  = np.zeros((i,j))
+            bestRotorRear = np.zeros((i,j))
+            # find all pedal ratios for this hardware combination
+            pedalRatios = frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]))][:,1]
+            pedalRatios = np.unique(pedalRatios)
             for k in range(np.shape(pedalRatios)[0]):
-                for l in range(np.shape(masterCylindersFront)[0]):
-                    for m in range (np.shape(masterCylindersRear)[0]):
-                        for n in range(np.shape(rotorSizesFront)[0]):
-                            for o in range(np.shape(rotorSizesRear)[0]):
-                                frontTorque = frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]) & (frontPosibleCombinations[:,1] == pedalRatios[k]) & (frontPosibleCombinations[:,2] == masterCylindersFront[l]) & (frontPosibleCombinations[:,5] == rotorSizesFront[n]))][:,0]
-                                rearTorque = rearPosibleCombinations[np.where((rearPosibleCombinations[:,3] == rearHardwareCombinations[j,0]) & (rearPosibleCombinations[:,4] == rearHardwareCombinations[j,1]) & (rearPosibleCombinations[:,1] == pedalRatios[k]) & (rearPosibleCombinations[:,2] == masterCylindersRear[m]) & (rearPosibleCombinations[:,5] == rotorSizesRear[o]))][:,0]
-                                print("Torques")
-                                print(frontTorque, rearTorque)
-            #find combination with smallest difference                   
-    print("FrontTorque, RearTorque, Difference")
-    print(pedalRatios)
-    #print(frontTorque)
-    #print(rearTorque)
+                #find all front master cylinder sizes for this hardware combination
+                masterCylinderFront = frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]) & (frontPosibleCombinations[:,1] == pedalRatios[k]))][:,2]
+                masterCylinderFront = np.unique(masterCylinderFront)
+                for l in range(np.shape(masterCylinderFront)[0]):
+                    #find all rear master cylinder sizes for this hardware combination
+                    masterCylinderRear = rearPosibleCombinations[np.where((rearPosibleCombinations[:,3] == rearHardwareCombinations[j,0]) & (rearPosibleCombinations[:,4] == rearHardwareCombinations[j,1]) & (rearPosibleCombinations[:,1] == pedalRatios[k]))][:,2]
+                    masterCylinderRear = np.unique(masterCylinderRear)
+                    for m in range(np.shape(masterCylinderRear)[0]):
+                        #find all front rotor sizes for this hardware combination
+                        rotorFront = frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]) & (frontPosibleCombinations[:,1] == pedalRatios[k]) & (frontPosibleCombinations[:,2] == masterCylinderFront[l]))][:,5]
+                        rotorFront = np.unique(rotorFront)
+                        for n in range(np.shape(rotorFront)[0]):
+                            #find all rear rotor sizes for this hardware combination
+                            rotorRear = rearPosibleCombinations[np.where((rearPosibleCombinations[:,3] == rearHardwareCombinations[j,0]) & (rearPosibleCombinations[:,4] == rearHardwareCombinations[j,1]) & (rearPosibleCombinations[:,1] == pedalRatios[k]) & (rearPosibleCombinations[:,2] == masterCylinderRear[m]))][:,5]
+                            rotorRear = np.unique(rotorRear)
+                            for o in range(np.shape(rotorRear)[0]):
+                                frontTorque = frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]) & (frontPosibleCombinations[:,1] == pedalRatios[k]) & (frontPosibleCombinations[:,2] == masterCylinderFront[l]) & (frontPosibleCombinations[:,5] == rotorFront[n]))][:,0]
+                                rearTorque = rearPosibleCombinations[np.where((rearPosibleCombinations[:,3] == rearHardwareCombinations[j,0]) & (rearPosibleCombinations[:,4] == rearHardwareCombinations[j,1]) & (rearPosibleCombinations[:,1] == pedalRatios[k]) & (rearPosibleCombinations[:,2] == masterCylinderRear[m]) & (rearPosibleCombinations[:,5] == rotorRear[o]))][:,0]
+                                difference[k,l,m,n,o,] = abs(frontTorque - rearTorque)
+            #for each combo of i and j, what combo of k,l,m,n,o gives the smallest difference between front and rear torque
+            bestTorqueDifference[i,j] = np.amin(difference)
+            bestPedalRatio[i,j] = pedalRatios[np.where(difference == np.amin(difference))[0]]
+            bestMasterCylinderFront[i,j] = masterCylinderFront[np.where(difference == np.amin(difference))[1]]
+            bestMasterCylinderRear[i,j] = masterCylinderRear[np.where(difference == np.amin(difference))[2]]
+            bestRotorFront[i,j] = rotorFront[np.where(difference == np.amin(difference))[3]]
+            bestRotorRear[i,j] = rotorRear[np.where(difference == np.amin(difference))[4]]
+            
 
+            #find i and j that give the smallest difference
+            #print(difference.size)
+            #index = np.where(difference == np.amin(difference))
 
-    print(np.shape(frontPosibleCombinations)[0])
-    print(np.shape(rearPosibleCombinations)[0])
+            #print(index)
+                                #if (abs(frontTorque - rearTorque) < bestTorqueDifference):
+                                 #   bestTorqueDifference[i,j] = abs(frontTorque - rearTorque)
+                                  #  bestPedalRatio[i,j] = pedalRatios[k]
+                                   # bestMasterCylinderFront[i,j] = masterCylinderFront[l]
+                                    #bestMasterCylinderRear[i,j] = masterCylinderRear[m]
+                                    #bestRotorFront[i,j] = rotorFront[n]
+                                    #bestRotorRear[i,j] = rotorRear[o]
 
-    fh1 = np.shape(frontHardwareCombinations)[0]
+            #print(pedalRatios)
 
-    """
-    fig = plt.figure()
-    ax = plt.axes(projection='3d')
-    for i in range (fi):
-        for j in range(fh1):
-            #color code by caliper
-            c = colors[j]
-            ax.scatter(frontPosibleCombinations[i,1],frontPosibleCombinations[j,2],frontPosibleCombinations[i,5], c)
-     """      
-
-    #find min brake pedal ratio for each hardware combination
-    for i in range(fh1):
-        #find min and max brake pedal ratio with this hardware
-        frontHardwareCombinations[i,2] = np.min(frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]))][:,1])
-        frontHardwareCombinations[i,3] = np.max(rearPosibleCombinations[np.where((rearPosibleCombinations[:,3] == rearHardwareCombinations[i,0]) & (rearPosibleCombinations[:,4] == rearHardwareCombinations[i,1]))][:,1])
-        #find min and max rotor size with this hardware
-        frontHardwareCombinations[i,4] = np.min(frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]))][:,5])
-        frontHardwareCombinations[i,5] = np.max(rearPosibleCombinations[np.where((rearPosibleCombinations[:,3] == rearHardwareCombinations[i,0]) & (rearPosibleCombinations[:,4] == rearHardwareCombinations[i,1]))][:,5])
-        #find min and max master cylinder size with this hardware
-        frontHardwareCombinations[i,6] = np.min(frontPosibleCombinations[np.where((frontPosibleCombinations[:,3] == frontHardwareCombinations[i,0]) & (frontPosibleCombinations[:,4] == frontHardwareCombinations[i,1]))][:,2])
-        frontHardwareCombinations[i,7] = np.max(rearPosibleCombinations[np.where((rearPosibleCombinations[:,3] == rearHardwareCombinations[i,0]) & (rearPosibleCombinations[:,4] == rearHardwareCombinations[i,1]))][:,2])
-
-    print(frontHardwareCombinations)
-
-    """frontHardwareCombinations
-    0: caliper
-    1: pad
-    2: min brake pedal ratio
-    3: max brake pedal ratio
-    """
 
     return(frontHardwareCombinations,rearHardwareCombinations)
 
