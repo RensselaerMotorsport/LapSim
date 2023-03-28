@@ -104,16 +104,6 @@ def braking_length(car, v0, v1, mu=0, tstep=0.001, returnVal=0):
     elif returnVal == 2:
         return V
 
-"""
-#TEST CODE
-brake = braking_length(car, 27, 0, returnVal=2)
-t = []
-for i in range(len(brake)):
-    t.append(i/1000)
-
-plt.plot(t, brake)
-plt.show()"""
-
 def forward_int(car, v0, d1, GR=0, mu=0, tstep=0.001, peak=False):
     """Forward integration to find a new velocity and the distance traveled over a specified time step.
     
