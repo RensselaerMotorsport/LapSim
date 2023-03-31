@@ -5,7 +5,7 @@ from helper_functions_ev import line_segment_time
 from helper_functions_ev import calc_max_entry_v_for_brake
 from helper_functions_ev import braking_length
 from classes.car_simple import Car
-from skidpad import skidpad
+#from skidpad import skidpad
 import numpy as np
 import math
 
@@ -68,7 +68,8 @@ def runtrack(Car, track):
         #print("Distance=",track[i,0])
 
         if i > 0 and i < n-1:
-            u[i] = calc_max_entry_v_for_brake(Car, velocity[i+1], track[i+1,1], track[i+1,0])
+            if track[i+1,1] != 0:
+                u[i] = calc_max_entry_v_for_brake(Car, velocity[i+1], track[i+1,1], track[i+1,0])
         if track[i,1] == 0:
             time[i+1],velocity[i+1] = line_segment_time(Car,track[i,0], velocity[i], timestep=.001) #velocity[i+1] is the exit velocity
         else:
@@ -77,19 +78,22 @@ def runtrack(Car, track):
             if velocity[i] < vmax or velocity[i] == vmax:
                 time[i+1] = (math.pi*corner_r)/velocity[i]
                 velocity[i+1] = velocity[i]
+
             elif velocity > vmax:
                 for j in range(1,77):
-                    d = braking_length(Car,velocity(-j),vmax,returnVal=1)
+                    d = braking_length(Car,velocity(77-j),vmax,returnVal=1)
                     if d - 77-j < 1:
-                        velocity[j:] = braking_length(Car,velocity(-j),vmax,returnVal=2)
-                        time[j:] = braking_length(Car,velocity(-j),vmax,returnVal=3)
+                        velocity[j:] = braking_length(Car,velocity(77-j),vmax,returnVal=2)
+                        time[j:] = braking_length(Car,velocity(77-j),vmax,returnVal=3)
 
-
-
+    #import matplotlib.pyplot as plt
+    #print(time)
+    #print(velocity)
+    #plt.scatter(time, velocity)
+    #plt.show()
     return ("Lap Time is", np.sum(time, axis=None))
 
-print(runtrack(Car, track))
-
+#print(runtrack(Car, track))
 
 #plt.plot(forward_int(Car, 0,27,returnVal=0),forward_int(Car, 0,27,returnVal=1))
 #plt.show
