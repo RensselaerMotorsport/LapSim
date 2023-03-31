@@ -3,16 +3,25 @@
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/rm25_SLS.css') }}">
 <script src="{{ url_for('static', filename='javascript/toggle_sweep.js') }}"></script>
-
+<!-- For chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='javascript/chart.js') }}"></script>
 {% endblock head %}
 
 {% block content %}
-<h1> You Submitted! </h1>
-
 <form action="/output" method="GET">
   <p> Times: </p>
-  {% for t in time %}
+  {% for t in time_data %}
     <p> {{ t }} seconds to complete acceleration.</p>
   {% endfor %}
 </form>
+
+<!-- Pass in varibles to js -->
+<script type="text/javascript">
+  const timeData = {{ time_data | tojson }};
+  const sweepCombos = {{ sweep_combos | tojson }};
+  const values_data = {{ values | tojson }};
+</script>
+<div style="width: 800px;"><canvas id="sim_graph"></canvas></div>
+
 {% endblock content %}

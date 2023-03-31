@@ -40,33 +40,34 @@ def fill_blank_with_default(i, car):
                 #otherwise, we can just convert to float
                 car[i] = float(request.form[i])
 
-def generate_plot():
-    
-
 @app.route('/output', methods=['GET', 'POST'])
 def output():
-    print("debug: into output")
     # Retrive args
     sweep_toggled = request.args.get('sweep_toggled')
-    # might be a security risk
+    # Might be a security risk
     operation = globals()[request.args.get('operation')]
 
     if (sweep_toggled):
         # Retrive args
+        values = json.loads(request.args.get('values_str'))
         sweep_combos = tuple(tuple(x) for x in json.loads(request.args.get('sweep_combos_str')))
-        time = []
+        time_data = []
+
         for combo in sweep_combos:
             data = request.cookies.get('data' + str(combo))
             if data:
                 car = Car(data)
-                time.append(float(round(operation(car), 3)))
-        return render_template('output.html', time=time)
-    data = request.cookies.get('data')
-    car = Car(data)
-    time = []
-    time.append(float(round(operation(car), 3)))
+                time_data.append(float(round(operation(car), 3)))
+        return render_template('output.html', time_data=time_data, sweep_combos=sweep_combos, values=values)
+    else:
+        data = request.cookies.get('data')
+        car = Car(data)
+        time_data = []
+        time_data.append(float(round(operation(car), 3)))
+        # Pass an empty list for sweep_combos when sweep is not toggled
+        return render_template('output.html', time_data=time_data, sweep_combos=[], values={})
 
-    return render_template('output.html', time=time)
+
 
 def create_25_form(form_name, operation):
 
@@ -206,8 +207,10 @@ def create_26_form(form_name, operation):
                 sweep_values.append(list(numpy.arange(float(values[key][0]), float(values[key][2])+1, float(values[key][1]))))
             sweep_combos = list(itertools.product(*sweep_values))
 
+            values_str = json.dumps(values)
             sweep_combos_str = json.dumps(sweep_combos)
-            resp = make_response(redirect(url_for('output', operation=operation, sweep_toggled=sweep_toggled, sweep_combos_str=sweep_combos_str)))
+            resp = make_response(redirect(url_for('output', operation=operation, sweep_toggled=sweep_toggled,
+                                                  sweep_combos_str=sweep_combos_str, values_str=values_str)))
             #loop through all possible combinations of sweep values
             for combo in sweep_combos:
                 index = 0
@@ -222,7 +225,6 @@ def create_26_form(form_name, operation):
                 json_obj = json.dumps(car, indent=2)
 
                 resp.set_cookie('data' + str(combo), json_obj)
-
         else:
             for i in filtered_keys:
                 if request.form[i] != '':
@@ -239,7 +241,6 @@ def create_26_form(form_name, operation):
 @app.route('/rm25_straight_line_sim', methods=['GET', 'POST'])
 def rm25_straight_line_sim():
     return create_25_form('/rm25_straight_line_sim', '')
-
 
 @app.route('/rm26_acceleration', methods=['GET', 'POST'])
 def rm26_acceleration():
