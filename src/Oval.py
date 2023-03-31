@@ -82,7 +82,9 @@ def runtrack(Car, track):
                     d = braking_length(Car,velocity(-j),vmax,returnVal=1)
                     if abs(d - 77-j) < 1:
                         velocity[j:] = braking_length(Car,velocity(-j),vmax,returnVal=2)
-                        time[j:] = braking_length(Car,velocity(-j),vmax,returnVal=3)
+                        time[j:] = braking_length(Car,velocity(-j),vmax,returnVal=3
+                time[i+1] = (math.pi*corner_r)/vmax
+                velocity[i+1] = vmax
 
 
 
