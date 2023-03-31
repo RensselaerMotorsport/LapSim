@@ -12,9 +12,11 @@ import math
 
 
 #Import Car Object
-Car = Car("C:/Users/hlaval/Desktop/Lapsim Code/LapSim/src/data/rm26.json")
+#Car = Car("C:/Users/hlaval/Desktop/Lapsim Code/LapSim/src/data/rm26.json")
+Car = Car("data/rm26.json")
 
-#Set Parameters for track 
+
+#Set Parameters for track
 straight_d = 77  #Range 61-77
 corner_r = 15    #Range 15-25
 n = (straight_d*2)+2  #number of segments
@@ -75,7 +77,7 @@ def runtrack(Car, track):
             if velocity[i] < vmax or velocity[i] == vmax:
                 time[i+1] = (math.pi*corner_r)/velocity[i]
                 velocity[i+1] = velocity[i]
-            else: #velocity > vmax
+            elif velocity > vmax:
                 for j in range(1,77):
                     d = braking_length(Car,velocity(-j),vmax,returnVal=1)
                     if abs(d - 77-j) < 1:
@@ -86,7 +88,7 @@ def runtrack(Car, track):
 
     return ("Lap Time is", np.sum(time, axis=None))
 
-#print(runtrack(Car, track))
+print(runtrack(Car, track))
 
 
 #plt.plot(forward_int(Car, 0,27,returnVal=0),forward_int(Car, 0,27,returnVal=1))
