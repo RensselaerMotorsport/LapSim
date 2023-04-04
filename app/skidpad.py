@@ -1,6 +1,5 @@
 """A module to calculate the velocities and time for a Skid Pad"""
 
-from classes.car_simple import Car
 from helper_functions_ev import calc_vmax
 import numpy as np
 

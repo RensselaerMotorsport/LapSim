@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
-from classes.car_simple import Car
-from helper_functions_ev import motor_torque
+from app.classes.car_simple import Car
+from app.helper_functions_ev import motor_torque
 import math
 car = Car("data/rm26.json")
 

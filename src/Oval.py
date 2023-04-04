@@ -1,10 +1,9 @@
 """A module to simulate Oval"""
 
-from helper_functions_ev import calc_vmax
-from helper_functions_ev import line_segment_time
-from helper_functions_ev import calc_max_entry_v_for_brake
-from classes.car_simple import Car
-from skidpad import skidpad
+from app.helper_functions_ev import calc_vmax
+from app.helper_functions_ev import line_segment_time
+from app.helper_functions_ev import calc_max_entry_v_for_brake
+from app.classes.car_simple import Car
 import numpy as np
 import math
 

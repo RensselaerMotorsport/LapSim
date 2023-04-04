@@ -5,7 +5,6 @@ import numpy #for generating range of sweep values
 import json
 import os
 import sys
-import matplotlib
 
 directory = os.getcwd()
 sys.path.insert(1, directory+'\\src')

@@ -1,6 +1,5 @@
-from classes.car_simple import Car
-from helper_functions_ev import line_segment_time
-import json
+from app.classes.car_simple import Car
+
 
 def test_func(data):
     if not data:

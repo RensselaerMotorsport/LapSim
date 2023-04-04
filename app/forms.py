@@ -8,7 +8,7 @@ import os #get current working directory for json file
 
 class rm_25_form(FlaskForm):
     directory = os.getcwd()
-    data = json.loads(open(directory+"\\app\\rm25.json").read())
+    data = json.loads(open(directory+"/rm25.json").read())
 
     fields = {}
     for key, value in list(data.items()):
@@ -30,7 +30,7 @@ class rm_25_form(FlaskForm):
 class rm_26_form(FlaskForm):
 
     directory = os.getcwd()
-    data = json.loads(open(directory+"\\app\\rm26.json").read())
+    data = json.loads(open(directory+"/rm26.json").read())
 
     # create fields dynamically with label set based on data
     fields = {}
