@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, make_response, flash, redirect, url_for #basic flask modules
-from forms import rm_25_form, rm_26_form #, straightLineForm26 #classes from forms.py
+from /app/forms import rm_25_form, rm_26_form #, straightLineForm26 #classes from forms.py
 import itertools #for looping through all possible combinations of sweep values
 import numpy #for generating range of sweep values
 import json
