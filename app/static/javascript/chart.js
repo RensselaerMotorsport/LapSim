@@ -1,35 +1,9 @@
+// Random color that contrast nicely with black
 function randomColor() {
-    const r = Math.floor(Math.random() * 256);
-    const g = Math.floor(Math.random() * 256);
-    const b = Math.floor(Math.random() * 256);
+    const r = Math.floor(Math.random() * 128 + 128);
+    const g = Math.floor(Math.random() * 128 + 128);
+    const b = Math.floor(Math.random() * 128 + 128);
     return `rgba(${r}, ${g}, ${b}, 1)`;
-}
-
-function generateYAxes(sweep_combos) {
-    const yAxes = [];
-
-    if (sweep_combos.length > 0) {
-        const num_axes = sweep_combos[0].length;
-        for (let i = 0; i < num_axes; i++) {
-            yAxes.push({
-                type: 'linear',
-                position: i === 0 ? 'left' : 'right',
-                display: true,
-                id: `y${i}`,
-                title: {
-                    display: true,
-                    text: `Y-axis ${i}`,
-                },
-                ticks: {
-                    callback: function (value) {
-                        return value;
-                    },
-                },
-            });
-        }
-    }
-
-    return yAxes;
 }
 
 
@@ -40,57 +14,25 @@ document.addEventListener('DOMContentLoaded', function () {
     const values = values_data;
     const value_names = Object.keys(values);
     const chartElement = document.getElementById('sim_graph');
-    let datasets = [];
 
-    const yAxes = generateYAxes(sweep_combos);
+    // Check if double sweep
+    if (value_names.length != 2) return null;
 
-    // Gen labels
-    const labels = [];
-    console.log(sweep_combos);
-    console.log(labels);
-    console.log(time_data);
-
-    for (let i = 0; i < sweep_combos.length; i++) {
-    const labelParts = [];
-
-    for (let j = 0; j < sweep_combos[i].length; j++) {
-        labelParts.push(`${value_names[j]}: ${sweep_combos[i][j]}`);
-    }
-
-    labels.push(labelParts.join(', '));
-    }
-
-    // Single Output
-    if (sweep_combos.length == 0) {
-        datasets = [{
-            label: '',
-            backgroundColor: randomColor(),
-            borderColor: randomColor(),
+    // Creating datasets
+    const datasets = sweep_combos.map((point, index) => {
+        const label = `${time_data[index]} (${value_names[0]}: ${point[0]}, ${value_names[1]}: ${point[1]})`;
+        return {
+            label: label,
             data: [{
-                x: time_data[0],
-                y: 0,
+                x: point[0],
+                y: point[1],
+                label: label
             }],
-        }];
-    }
-    // Sweep Outputs
-    else {
-        for (let i = 0; i < sweep_combos.length; i++) {
-            for (let j = 0; j < sweep_combos[i].length; j++) {
-              const yAxisID = `y${j}`;
-              datasets.push({
-                label: labels[i],
-                backgroundColor: randomColor(),
-                borderColor: randomColor(),
-                yAxisID: yAxisID,
-                data: [{
-                  x: time_data[i],
-                  y: sweep_combos[i][j],
-                }],
-              });
-            }
-        }
-        console.log(datasets);
-    }
+            borderColor: randomColor(),
+            borderWidth: 1,
+            pointRadius: 2,
+        };
+    });
 
     new Chart(chartElement, {
         type: 'scatter',
@@ -100,29 +42,33 @@ document.addEventListener('DOMContentLoaded', function () {
         options: {
             scales: {
                 x: {
+                    type: 'linear',
                     title: {
                         display: true,
-                        text: 'Time (s)',
+                        text: value_names[0],
                     },
                 },
                 y: {
-                    display: false,
-                    position: 'left',
-                    axes: yAxes, // Assign the generated y-axes to 'axes' property
+                    type: 'linear',
+                    title: {
+                        display: true,
+                        text: value_names[1],
+                    },
                 },
             },
             plugins: {
                 tooltip: {
                     callbacks: {
+                        title: function (context) {
+                            return context[0].dataset.label;
+                        },
                         label: function (context) {
-                            const time = context.parsed.x.toFixed(3);
-                            return `Time: ${time}s`;
+                            const xValue = context.parsed.x.toFixed(3);
+                            const yValue = context.parsed.y.toFixed(3);
+                            const time = context.raw.label.split(' ')[0];
+                            return `Time: ${time}, ${value_names[0]}: ${xValue}, ${value_names[1]}: ${yValue}`;
                         },
                     },
-                },
-                title: {
-                    display: true,
-                    text: 'Simulation Results',
                 },
             },
         },

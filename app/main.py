@@ -5,7 +5,6 @@ import numpy #for generating range of sweep values
 import json
 import os
 import sys
-import matplotlib
 
 directory = os.getcwd()
 sys.path.insert(1, directory+'\\src')
@@ -18,6 +17,10 @@ from skidpad import test_skidpad
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = '5993b6512522aa93a5306dd25249a174'
+
+MAX_REQUEST_SIZE = 65500
+MAX_COOKIE_SIZE = (MAX_REQUEST_SIZE - 100) // 100
+COOKIE_OVERHEAD = 100
 
 #home page
 @app.route('/')
@@ -39,6 +42,25 @@ def fill_blank_with_default(i, car):
             else:
                 #otherwise, we can just convert to float
                 car[i] = float(request.form[i])
+
+def request_size_exceeded(request_headers):
+    total_request_size = sum(sys.getsizeof(v) for k, v in request_headers.items())
+    return total_request_size >= MAX_REQUEST_SIZE
+
+def cookie_size_exceeded(request_cookies, new_cookie_key, new_cookie_value):
+    total_cookie_size = sum(sys.getsizeof(k) + sys.getsizeof(v) + COOKIE_OVERHEAD for k, v in request_cookies.items())
+    total_cookie_size += sys.getsizeof(new_cookie_key) + sys.getsizeof(new_cookie_value) + COOKIE_OVERHEAD
+    return total_cookie_size >= MAX_COOKIE_SIZE
+
+def can_add_cookie(request_cookies, request_headers, new_cookie_key, new_cookie_value):
+    total_request_size = sum(sys.getsizeof(v) for k, v in request_headers.items())
+    total_cookie_size = sum(sys.getsizeof(k) + sys.getsizeof(v) + COOKIE_OVERHEAD for k, v in request_cookies.items())
+    total_cookie_size += sys.getsizeof(new_cookie_key) + sys.getsizeof(new_cookie_value) + COOKIE_OVERHEAD
+    if total_request_size + total_cookie_size > MAX_REQUEST_SIZE:
+        return False
+    else:
+        return True
+
 
 @app.route('/output', methods=['GET', 'POST'])
 def output():
@@ -201,7 +223,7 @@ def create_26_form(form_name, operation):
                         return render_template('form.html', title=formatted_title, form=form, length=length)
 
         if sweep_toggled == True:
-            #generate list of all possible combinations of sweep values
+            # generate list of all possible combinations of sweep values
             sweep_values = []
             for key in values:
                 sweep_values.append(list(numpy.arange(float(values[key][0]), float(values[key][2])+1, float(values[key][1]))))
@@ -210,8 +232,8 @@ def create_26_form(form_name, operation):
             values_str = json.dumps(values)
             sweep_combos_str = json.dumps(sweep_combos)
             resp = make_response(redirect(url_for('output', operation=operation, sweep_toggled=sweep_toggled,
-                                                  sweep_combos_str=sweep_combos_str, values_str=values_str)))
-            #loop through all possible combinations of sweep values
+                                                sweep_combos_str=sweep_combos_str, values_str=values_str)))
+            # loop through all possible combinations of sweep values
             for combo in sweep_combos:
                 index = 0
                 for i in range(len(filtered_keys)):
@@ -222,9 +244,15 @@ def create_26_form(form_name, operation):
                         if request.form[filtered_keys[i]] != '':
                             car[filtered_keys[i]] = float(request.form[filtered_keys[i]])
 
-                json_obj = json.dumps(car, indent=2)
+                json_str = json.dumps(car, indent=2)
 
-                resp.set_cookie('data' + str(combo), json_obj)
+                new_cookie_key = f"data{combo}"
+                if can_add_cookie(request.cookies, request.headers, new_cookie_key, json_str):
+                    resp.set_cookie(new_cookie_key, json_str, samesite="Strict")
+                else:
+                    flash("Cookie size limit exceeded. Please remove some cookies.")
+                    return render_template('form.html', title=formatted_title, form=form, length=length)
+
         else:
             for i in filtered_keys:
                 if request.form[i] != '':
@@ -232,7 +260,7 @@ def create_26_form(form_name, operation):
 
             json_obj = json.dumps(car, indent=2)
             resp = make_response(redirect(url_for('output', operation=operation)))
-            resp.set_cookie('data', json_obj)
+            resp.set_cookie('data', json_obj, samesite="Strict")
         return resp
 
     return render_template('form.html', title=formatted_title, form=form, length=length)
