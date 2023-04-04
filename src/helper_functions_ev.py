@@ -3,7 +3,6 @@
 import math
 from classes.car_simple import Car
 car = Car("data/rm26.json")
-#car = Car("C:/Users/hlaval/Desktop/Lapsim Code/LapSim/src/data/rm26.json")
 
 def calc_vmax(r, car):
     """
@@ -245,6 +244,7 @@ def braking_force(car, v, mu):
 
 def braking_length(car, v0, v1, mu=0, dstep=0.1, returnVal=0):
     if mu == 0: mu = car.attrs["CoF"]
+
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
     v= v0
     t = 0
