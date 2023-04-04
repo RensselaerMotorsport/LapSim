@@ -12,7 +12,6 @@ import math
 
 
 #Import Car Object
-#Car = Car("C:/Users/hlaval/Desktop/Lapsim Code/LapSim/src/data/rm26.json")
 Car = Car("data/rm26.json")
 
 
@@ -82,7 +81,7 @@ def runtrack(Car, track):
                     d = braking_length(Car,velocity(-j),vmax,returnVal=1)
                     if abs(d - 77-j) < 1:
                         velocity[j:] = braking_length(Car,velocity(-j),vmax,returnVal=2)
-                        time[j:] = braking_length(Car,velocity(-j),vmax,returnVal=3
+                        time[j:] = braking_length(Car,velocity(-j),vmax,returnVal=3)
                 time[i+1] = (math.pi*corner_r)/vmax
                 velocity[i+1] = vmax
 
@@ -90,7 +89,7 @@ def runtrack(Car, track):
 
     return ("Lap Time is", np.sum(time, axis=None))
 
-print(runtrack(Car, track))
+#print(runtrack(Car, track))
 
 
 #plt.plot(forward_int(Car, 0,27,returnVal=0),forward_int(Car, 0,27,returnVal=1))
