@@ -243,6 +243,16 @@ def braking_force(car, v, mu):
 
 
 def braking_length(car, v0, v1, mu=0, dstep=0.1, returnVal=0):
+    """A function for calculating the distance required to brake from one speed to another speed.
+    
+    Given: car, the car object we are considering
+    v0, the initial velcoty of the segment
+    v1, the desired finial velocity of the segment
+    mu, the coefficent of static friction we are considering, default is 0 which has it call the json value
+    dstep, the segment distance step we are considering, default is .1
+    returnVal, default is zero which has the function return t, the time step, 1, would retun the distance tranvled, V would return the vector of velocities that work in the segment, 3 returns a vector of the time it takes to complete each segment
+    
+    Return: Dependent on the solution of returnVal"""
     if mu == 0: mu = car.attrs["CoF"]
 
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
@@ -265,7 +275,7 @@ def braking_length(car, v0, v1, mu=0, dstep=0.1, returnVal=0):
     elif returnVal == 2:
         return V
     elif returnVal == 3:
-        return t_seg
+        return t_V
     
 def forward_int(car, v0, d1, GR=0, mu=0, dstep=0.0001, peak=False):
     """Forward integration to find a new velocity and the distance traveled over a specified time step.
