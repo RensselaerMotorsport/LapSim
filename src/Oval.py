@@ -12,8 +12,8 @@ import math
 
 
 #Import Car Object
-Car = Car("data/rm26.json")
-
+try: Car = Car("data/rm26.json")
+except: Car = Car("C:/Users/hlaval/Desktop/Lapsim Code/LapSim/src/data/rm26.json")
 
 #Set Parameters for track
 straight_d = 77  #Range 61-77

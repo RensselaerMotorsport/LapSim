@@ -4,7 +4,8 @@ from classes.car_simple import Car
 from helper_functions_ev import calc_vmax
 import numpy as np
 
-car = Car("data/rm26.json")
+try: car = Car("data/rm26.json")
+except: car = Car("C:/Users/hlaval/Desktop/Lapsim Code/LapSim/src/data/rm26.json")
 
 
 ### Below is a troubleshooting script ###
