@@ -74,7 +74,7 @@ def runtrack(Car, track):
                 velocity[i+1] = velocity[i]
             elif velocity > vmax:
                 for j in range(1,77):
-                    d = braking_length(Car,velocity(-j),vmax,returnVal=1)
+                    d = braking_length(Car,velocity[-j],vmax,returnVal=1)
                     if d - 77-j < 1:
                         velocity[j:] = braking_length(Car,velocity(-j),vmax,returnVal=2)
                         time[j:] = braking_length(Car,velocity(-j),vmax,returnVal=3)
@@ -85,7 +85,7 @@ def runtrack(Car, track):
 
     return ("Lap Time is", np.sum(time, axis=None))
 
-#print(runtrack(Car, track))
+print(runtrack(car, track))
 
 
 #plt.plot(forward_int(Car, 0,27,returnVal=0),forward_int(Car, 0,27,returnVal=1))
