@@ -81,6 +81,6 @@ def test_skidpad(car, step=1000, returnPoints=False):
     return y
 
 
-print(test_skidpad(car, returnPoints=False))
-print(skidpad(IR,car))
+#print(test_skidpad(car, returnPoints=False))
+#print(skidpad(IR,car))
 
