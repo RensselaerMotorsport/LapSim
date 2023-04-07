@@ -5,15 +5,11 @@ from helper_functions_ev import line_segment_time
 from helper_functions_ev import calc_max_entry_v_for_brake
 from helper_functions_ev import braking_length
 from classes.car_simple import Car
-from skidpad import skidpad
 import numpy as np
 import math
+car = Car("data/rm26.json")
 
 
-
-#Import Car Object
-try: Car = Car("data/rm26.json")
-except: Car = Car("C:/Users/hlaval/Desktop/Lapsim Code/LapSim/src/data/rm26.json")
 
 #Set Parameters for track
 straight_d = 77  #Range 61-77

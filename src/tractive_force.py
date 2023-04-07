@@ -2,8 +2,7 @@ import matplotlib.pyplot as plt
 from classes.car_simple import Car
 from helper_functions_ev import motor_torque
 import math
-try: car = Car("data/rm26.json")
-except: car = Car("C:/Users/hlaval/Desktop/Lapsim Code/LapSim/src/data/rm26.json")
+car = Car("data/rm26.json")
 
 def plot_traction_force(car, maxv=100/3.6, step=0.01):
     from check_slip import calc_friction_force

@@ -2,8 +2,7 @@
 
 import math
 from classes.car_simple import Car
-try: car = Car("data/rm26.json")
-except: car = Car("C:/Users/hlaval/Desktop/Lapsim Code/LapSim/src/data/rm26.json")
+car = Car("data/rm26.json")
 
 def calc_vmax(r, car):
     """

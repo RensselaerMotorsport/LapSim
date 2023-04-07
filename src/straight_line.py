@@ -19,8 +19,7 @@ rpm_torque = pd.read_csv("./data/emrax_torque.csv")
 step = 0.1  # meters
 initial_velocity = 0.01  # meters per second
 
-try: car = Car("data/rm26.json")
-except: car = Car("C:/Users/hlaval/Desktop/Lapsim Code/LapSim/src/data/rm26.json")
+car = Car("data/rm26.json")
 
 distance_travelled = 0
 total_distance = 500  # meters
