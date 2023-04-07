@@ -85,7 +85,7 @@ def runtrack(Car, track):
 
     return ("Lap Time is", np.sum(time, axis=None))
 
-#print(runtrack(Car, track))
+#print(runtrack(car, track))
 
 
 #plt.plot(forward_int(Car, 0,27,returnVal=0),forward_int(Car, 0,27,returnVal=1))

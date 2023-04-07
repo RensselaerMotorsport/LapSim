@@ -57,14 +57,8 @@ def calc_max_entry_v_for_brake(car, Vexit, r, d):
     rho = car.attrs["rho"]#Density of air for the car object
     A = car.attrs["A"] #Frontal wing area of the car object
     Cl = car.attrs["Cl"] #Coefficent of lift for the car object
-    mew = car.attrs["CoF"]
-    m = car.attrs["mass_car"] + car.attrs["mass_driver"]
-    Cd = car.attrs["Cd"]
-    rho = car.attrs["rho"]
-    A = car.attrs["A"]
-    Cl = car.attrs["Cl"]
 
-    friction_force = ((mew**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2)
+    friction_force = ((mu**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2)
     centripetal_force = ((m**2)*(Vexit**4))/(r**2)
 
     Drag = Cd*.5*rho*A*Vexit**2 #Calculate the drag of th car
