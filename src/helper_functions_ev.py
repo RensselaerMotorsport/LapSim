@@ -298,5 +298,3 @@ def forward_int(car, v0, d1, GR=0, mu=0, dstep=0.0001, peak=False):
         d.append(d[i] + v[i] * tstep)
         i += 1
     return v, d
-
-print(braking_length(car,22,0,returnVal=1))
