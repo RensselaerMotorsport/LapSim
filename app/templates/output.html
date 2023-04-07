@@ -9,12 +9,7 @@
 {% endblock head %}
 
 {% block content %}
-<form action="/output" method="GET">
-  <p> Times: </p>
-  {% for t in time_data %}
-    <p> {{ t }} seconds.</p>
-  {% endfor %}
-</form>
+
 
 <!-- Pass in varibles to js -->
 <script type="text/javascript">
@@ -23,5 +18,13 @@
   const values_data = {{ values | tojson }};
 </script>
 <div style="width: 800px;"><canvas id="sim_graph"></canvas></div>
+
+<form action="/output" method="GET">
+  <p> Times: </p>
+  {% for t in time_data %}
+    <p> {{ t }} seconds.</p>
+  {% endfor %}
+</form>
+
 
 {% endblock content %}
