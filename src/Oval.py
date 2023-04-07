@@ -72,8 +72,7 @@ def runtrack(Car, track):
                 velocity[i+1] = velocity[i]
             elif velocity > vmax:
                 for j in range(1,77):
-                    d = braking_length(Car,velocity(-j),vmax,returnVal=1)
-                    print(d)
+                    d = braking_length(Car,velocity[-j],vmax,returnVal=1)
                     if d - 77-j < 1:
                         velocity[j:] = braking_length(Car,velocity(-j),vmax,returnVal=2)
                         time[j:] = braking_length(Car,velocity(-j),vmax,returnVal=3)
