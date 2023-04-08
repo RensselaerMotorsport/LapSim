@@ -1,8 +1,7 @@
 """A module to simulate Oval"""
 
 from helper_functions_ev import calc_vmax
-from helper_functions_ev import line_segment_time
-from helper_functions_ev import calc_max_entry_v_for_brake
+from helper_functions_ev import forward_int
 from helper_functions_ev import braking_length
 from classes.car_simple import Car
 import numpy as np
@@ -31,7 +30,7 @@ track[(straight_d*2)+1,1] = corner_r
 track[(straight_d*2)+1,0] = 2*math.pi*corner_r
 track[n,0] = 0
 track[n,1] = 0
-#print(track)
+
 
 
 def runtrack(Car, track):
@@ -48,9 +47,6 @@ def runtrack(Car, track):
     time = np.zeros(track.size)
     velocity = np.zeros(track.size)
     velocity[0] = .0001
-
-    u = np.zeros(track.size)
-
     
     for i in range(track.size):
         iter = i+1
@@ -63,7 +59,8 @@ def runtrack(Car, track):
         #print("Distance=",track[i,0])
 
         if track[i,1] == 0:
-            time[i+1],velocity[i+1] = line_segment_time(Car,track[i,0], velocity[i], timestep=.001) #velocity[i+1] is the exit velocity
+            time[i+1],velocity[i+1] = forward_int(Car, velocity[i],track[i,0], dstep=0.0001)#velocity[i+1] is the exit velocity
+            print(velocity)
         else:
             vmax = calc_vmax(corner_r,Car)
             #print("Vmax=", vmax)
