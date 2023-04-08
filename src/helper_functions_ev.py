@@ -224,16 +224,16 @@ def braking_length(car, v0, v1, mu=0, dstep=0.1, returnVal=0):
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
     v= v0
     t = 0
-    t_V = []
+    T = []
     d = 0
-    V= []
+    V = []
     while v > v1:
         t += dstep/v
         t_seg = dstep/v
         d += dstep
         v -= braking_force(car, v, mu)/m*t_seg
         V.append(v)
-        t_V.append(t_seg)
+        T.append(t_seg)
     if returnVal == 0:
         return t
     elif returnVal == 1:
@@ -241,7 +241,7 @@ def braking_length(car, v0, v1, mu=0, dstep=0.1, returnVal=0):
     elif returnVal == 2:
         return V
     elif returnVal == 3:
-        return t_V
+        return T
     
 def forward_int(car, v0, d1, GR=0, mu=0, dstep=0.01, peak=False):
     """Forward integration to find a new velocity and the distance traveled over a specified time step.
@@ -275,7 +275,28 @@ def forward_int(car, v0, d1, GR=0, mu=0, dstep=0.01, peak=False):
             tstep = dstep / v[i]
         t.append(t[i] + tstep)
         d.append(d[i] + dstep)
-        #print(v[i])
-        print(tstep)
         i += 1
     return v, d
+
+def straight_line_segment(car, v0, v1, d1, GR=0, mu=0, dstep=0.01, peak=False):
+    """Incorporates braking & accelerating"""
+    v, d = forward_int(car, v0, d1, GR=GR, mu=mu, dstep=dstep, peak=peak)
+    if v[len(v)-1] < v1: # If the cornering speed is faster than the max possible speed in straight accel
+        raise ValueError
+    elif v[len(v)-1] > v1: # If the cornering speed is slower than the max possible speed in straight accel
+        dmin = braking_length(car, v0, v1, mu=mu, dstep=dstep, returnVal=1)
+        if d1 < dmin: # If the length to brake is greater than the length of the segment
+            raise ValueError
+        elif d1 == dmin: # The car should brake from start to finish
+            return braking_length(car, v0, v1, mu=mu, dstep=dstep, returnVal=2)
+        elif d1 > dmin: # The car should accelerate and then brake
+            L = len(d)
+            vb = v.copy() # Velocities to start braking at
+            vb.reverse()
+            db = [] # Distances to break from v to v1
+            for i in range(len(vb)):
+                db.append(braking_length(car, vb[i], v1, mu=mu, dstep=dstep, returnVal=1))
+            for i in range(L):
+                if abs(d[i] - db[i]) <= 1e-1:
+                    v[L-i:L] = braking_length(car, v[L-i], v1, mu=mu, dstep=dstep, returnVal=2)
+    return v
