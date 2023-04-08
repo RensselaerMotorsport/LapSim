@@ -142,34 +142,6 @@ def calc_t(v1, v2, d_step):
 #not sure how we should distinguish the difference between long and lat velocities
 #good thing is we know all long accel is caused by engine force and any lat accel is caused by curavture
 
-def line_segment_time(car, distance, GR=0, vinitial=0.001, timestep=.001, peak=False, mu=0):
-    """
-    Calculates the amount of time it takes to travel a straight line distance.
-
-    Inputs:
-    car- the car object with attributes
-    vinitial- the initial velocity into the segment
-    distance- how long the segment is
-
-    Outputs:
-    t- the amount of time it takes to complete the segment."""
-    d=0 #Set initial distance object
-    v=vinitial #initial velocity
-    time=0 #Set time variable
-    if GR == 0: GR = car.attrs["final_drive"]
-    if mu == 0: mu = car.attrs["CoF"]
-    r = car.attrs["tire_radius"]
-    m = car.attrs["mass_car"] + car.attrs["mass_driver"]
-    rho = car.attrs["rho"]
-    A = car.attrs["A"]
-    while d<distance: 
-        RPM = 60 * v / (2 * math.pi * r) * GR
-        acceleration = (min((motor_torque(car, RPM, peak=peak) * GR / (r), traction_force(car, v, mu))) - rho * A * v**2 / 2)/ m
-        time+=timestep
-        d+=v*timestep
-        v+=acceleration*timestep
-    return time, v
-
 def motor_torque(car, RPM, peak=False, voltage=-1, current=-1):
     """Calculates maximium motor torque. Torque = Current * Voltage / RPM.
     Given:
@@ -271,7 +243,7 @@ def braking_length(car, v0, v1, mu=0, dstep=0.1, returnVal=0):
     elif returnVal == 3:
         return t_V
     
-def forward_int(car, v0, d1, GR=0, mu=0, dstep=0.0001, peak=False):
+def forward_int(car, v0, d1, GR=0, mu=0, dstep=0.01, peak=False):
     """Forward integration to find a new velocity and the distance traveled over a specified time step.
     
     Given: car, the car object you are considering
@@ -293,11 +265,17 @@ def forward_int(car, v0, d1, GR=0, mu=0, dstep=0.0001, peak=False):
     t = [0]
     i = 0
     while d[i] < d1:
-        RPM = 60 * v[i] / (2 * math.pi * r)
+        RPM = GR * 60 * v[i] / (2 * math.pi * r)
         a = min((motor_torque(car, RPM, peak=peak) * GR / (r), traction_force(car, v[i], mu))) / m
-        tstep = dstep/v[i]
-        v.append(v[i] + a * tstep)
+        #tstep = dstep/v[i]
+        v.append((v[i]**2 + 2 * a * dstep)**0.5)
+        if a > 0:
+            tstep = (- v[i] + (v[i]**2 + 4 * a * dstep)**0.5) / (a)
+        else:
+            tstep = dstep / v[i]
         t.append(t[i] + tstep)
-        d.append(d[i] + v[i] * tstep)
+        d.append(d[i] + dstep)
+        #print(v[i])
+        print(tstep)
         i += 1
     return v, d
