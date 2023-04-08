@@ -3,6 +3,7 @@
 from helper_functions_ev import calc_vmax
 from helper_functions_ev import forward_int
 from helper_functions_ev import braking_length
+from helper_functions_ev import straight_line_segment
 from classes.car_simple import Car
 import numpy as np
 import math
@@ -80,9 +81,30 @@ def runtrack(Car, track):
 
     return ("Lap Time is", np.sum(time, axis=None))
 
-print(runtrack(car, track))
+#print(runtrack(car, track))
 
 
 #plt.plot(forward_int(Car, 0,27,returnVal=0),forward_int(Car, 0,27,returnVal=1))
 #plt.show
 
+def run_oval(car, x, r, GR=0, mu=0, dstep=0.01, peak=False):
+    d = [0] # Car distance travelled
+    v = [0] # Car speed
+    for i in range(len(x)):
+        if r[i] == 0: # Straight segment
+            v.append(straight_line_segment(car, v[len(v) - 1], calc_vmax(1 / r[i+1], car), x[i], GR=GR, mu=mu, dstep=dstep, peak=peak)[1:])
+            for j in range(1, len(v), 1):
+                d.append(dstep * j)
+    return d, v
+
+x = [10, 3]
+r = [0, 2]
+d, v = run_oval(car, x, r)
+
+import matplotlib.pyplot as plt
+print(d)
+print(v)
+print(len(d))
+print(len(v))
+plt.plot(v)
+#plt.show()
