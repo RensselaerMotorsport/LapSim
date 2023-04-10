@@ -276,8 +276,8 @@ def forward_int(car, v0, d1, GR=0, mu=0, dstep=0.01, peak=False):
 def straight_line_segment(car, v0, v1, d1, GR=0, mu=0, dstep=0.01, peak=False):
     """Incorporates braking & accelerating"""
     v, d = forward_int(car, v0, d1, GR=GR, mu=mu, dstep=dstep, peak=peak)
-    if v[len(v)-1] < v1: # If the cornering speed is faster than the max possible speed in straight accel
-        raise ValueError
+    if v[len(v)-1] < v1: # If the cornering speed is faster than the max possible speed in straight accel:
+        print("Max corner speed > max accelerating velocity")
     elif v[len(v)-1] > v1: # If the cornering speed is slower than the max possible speed in straight accel
         dmin = braking_length(car, v0, v1, mu=mu, dstep=dstep, returnVal=1)
         if d1 < dmin: # If the length to brake is greater than the length of the segment
