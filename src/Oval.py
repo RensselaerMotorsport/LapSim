@@ -5,6 +5,7 @@ from helper_functions_ev import forward_int
 from helper_functions_ev import braking_length
 from helper_functions_ev import straight_line_segment
 from classes.car_simple import Car
+from random import random
 import numpy as np
 import math
 car = Car("data/rm26.json")
@@ -92,19 +93,89 @@ def run_oval(car, x, r, GR=0, mu=0, dstep=0.01, peak=False):
     v = [0] # Car speed
     for i in range(len(x)):
         if r[i] == 0: # Straight segment
-            v.append(straight_line_segment(car, v[len(v) - 1], calc_vmax(1 / r[i+1], car), x[i], GR=GR, mu=mu, dstep=dstep, peak=peak)[1:])
-            for j in range(1, len(v), 1):
-                d.append(dstep * j)
+            v1 = straight_line_segment(car, v[len(v) - 1], calc_vmax(1 / r[i+1], car), x[i], GR=GR, mu=mu, dstep=dstep, peak=peak)
+            for j in range(1, len(v1), 1):
+                v.append(v1[j])
+                d.append(dstep + d[len(d) - 1])
+        else:
+            v1 = min(calc_vmax(1 / r[i], car), v[len(v) - 1])
+            for j in np.arange(0, x[i], dstep):
+                v.append(v1)
+                d.append(dstep + d[len(d) - 1])
     return d, v
 
-x = [10, 3]
-r = [0, 2]
-d, v = run_oval(car, x, r)
+def s_pin():
+    return 10 + random() * 50
 
-import matplotlib.pyplot as plt
-print(d)
-print(v)
-print(len(d))
-print(len(v))
-plt.plot(v)
-#plt.show()
+def s_wide():
+    return 10 + random() * 35
+
+def r_const():
+    return 1 / (23/2 + random() * 11)
+
+def r_pin():
+    return 1 / (4.5 + random() * 4.5)
+
+def construct_track(dist):
+    """
+    The Autocross course will be designed with the following specifications. Average speeds
+    should be 40 km/hr to 48 km/hr
+        a. Straights: No longer than 60 m with hairpins at both ends
+        b. Straights: No longer than 45 m with wide turns on the ends
+        c. Constant Turns: 23 m to 45 m diameter
+        d. Hairpin Turns: 9 m minimum outside diameter (of the turn)
+        e. Slaloms: Cones in a straight line with 7.62 m to 12.19 m spacing
+        f. Miscellaneous: Chicanes, multiple turns, decreasing radius turns, etc.
+        g. Minimum track width: 3.5 m
+        h. Length of each run should be approximately 0.80 km
+    """
+    x = []
+    r = []
+    i = 0
+    while sum(x) < dist or i % 2 != 0:
+        if i % 2 != 0:
+            # Assume turns are between 100 & 170 degree turns
+            r.append(r_const())
+            x.append(2 * math.pi / r[i] * (100 + 70 * random()) / 360)
+        else:
+            x.append(s_wide())
+            r.append(0)
+        i += 1
+    return x, r
+
+x, r = construct_track(800)
+
+
+from time import perf_counter
+def plot_graph(GR):
+    t0 = perf_counter()
+    d, v = run_oval(car, x, r, GR=GR)
+
+    t = 0
+    for i in range(1, len(d), 1):
+        t += (d[i] - d[i - 1]) / v[i]
+
+    import matplotlib.pyplot as plt
+    import warnings
+    warnings.filterwarnings("ignore")
+
+    for i in range(len(v)):
+        v[i] *= 2.237
+
+    plt.figure(figsize=(9,6))
+    plt.grid()
+    plt.xlim(0, d[len(d) - 1] * 1.01)
+    plt.ylim(0, max(v) * 1.05)
+
+    plt.plot(d, v)
+    plt.title(str(round(t,3)) + " seconds; " + str(round(d[len(d) - 1] / t * 2.237, 1)) + " mph average")
+    plt.suptitle(str(round(GR,2)) + " Gear ratio")
+    plt.xlabel("Distance (m)")
+    plt.ylabel("Velocity (mph)")
+    plt.show()
+    t1 = perf_counter()
+    return t1 - t0
+
+print(round(plot_graph(33/12), 5))
+print(round(plot_graph(38/12), 5))
+print(round(plot_graph(42/12), 5))
