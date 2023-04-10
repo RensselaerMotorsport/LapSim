@@ -186,3 +186,5 @@ def plot_graph(GR):
 print(round(plot_graph(33/12), 5))
 print(round(plot_graph(38/12), 5))
 print(round(plot_graph(42/12), 5))
+print(round(plot_graph(48/12), 5))
+print(round(plot_graph(52/12), 5))
