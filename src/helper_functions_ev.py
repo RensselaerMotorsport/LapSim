@@ -1,8 +1,8 @@
 """A module to calculate intermediate steps in the lapsim for an ev car"""
 
 import math
-from classes.car_simple import Car
-car = Car("data/rm26.json")
+#from classes.car_simple import Car
+#car = Car("data/rm26.json")
 
 def calc_vmax(r, car):
     """
@@ -74,9 +74,7 @@ def calc_max_entry_v_for_brake(car, Vexit, r, d):
 
     u = math.sqrt(Vexit**2+(2*d*Fs)/m) #Calculate the maximium entry velocity
 
-    return u 
-
-
+    return u
 
 def calculate_velocity_new(engine_force, drag_force, car, step=1, initial_velocity=0.001):
     """
@@ -138,9 +136,6 @@ def calc_t(v1, v2, d_step):
     """
     return 1/(((v1+v2)/2)/d_step)
 
-
-#not sure how we should distinguish the difference between long and lat velocities
-#good thing is we know all long accel is caused by engine force and any lat accel is caused by curavture
 
 def motor_torque(car, RPM, peak=False, voltage=-1, current=-1):
     """Calculates maximium motor torque. Torque = Current * Voltage / RPM.
