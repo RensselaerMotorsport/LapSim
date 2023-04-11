@@ -2,7 +2,7 @@
 
 import math
 from classes.car_simple import Car
-car = Car("data/rm26.json")
+# car = Car("data/rm26.json")
 
 def calc_vmax(r, car):
     """
@@ -298,4 +298,4 @@ def forward_int(car, v0, d1, GR=0, mu=0, dstep=0.0001, peak=False):
         i += 1
     return v, d
 
-print(braking_length(car,22,0,returnVal=1))
+# print(braking_length(car,22,0,returnVal=1))

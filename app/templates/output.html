@@ -28,7 +28,7 @@
 <form action="/output" method="GET">
   <p> Times: </p>
   {% for t in time_data %}
-    <p> {{ t }} seconds.</p>
+    <p> {{ "{:.3f}".format(t) }} seconds.</p>
   {% endfor %}
 </form>
 {% endblock content %}

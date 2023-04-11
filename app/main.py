@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, make_response, flash, redirect, url_for #basic flask modules
+from flask import Flask, render_template, request, make_response, flash, redirect, url_for, session #basic flask modules
 from forms import rm_25_form, rm_26_form #, straightLineForm26 #classes from forms.py
 import itertools #for looping through all possible combinations of sweep values
 import numpy as np#for generating range of sweep values
 import plotly.graph_objs as go
 import plotly.express as px
+from decimal import Decimal
 import json
 import os
 import sys
@@ -17,17 +18,13 @@ from classes.car_simple import Car
 from skidpad import test_skidpad
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
-app.config['SECRET_KEY'] = '5993b6512522aa93a5306dd25249a174'
-
-MAX_REQUEST_SIZE = 65500
-MAX_COOKIE_SIZE = (MAX_REQUEST_SIZE - 100) // 100
-COOKIE_OVERHEAD = 100
-
-#home page
-@app.route('/')
-def homepage():
-    return render_template('home.html')
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, Decimal):
+            return str(o)
+        return super().default(o)
 
 def fill_blank_with_default(i, car):
         if request.form[i] != '':
@@ -40,28 +37,10 @@ def fill_blank_with_default(i, car):
                     if car[i][j] == '':
                         car[i].remove('')
                     else:
-                        car[i][j] = float(car[i][j])
+                        car[i][j] = Decimal(car[i][j])
             else:
-                #otherwise, we can just convert to float
-                car[i] = float(request.form[i])
-
-def request_size_exceeded(request_headers):
-    total_request_size = sum(sys.getsizeof(v) for k, v in request_headers.items())
-    return total_request_size >= MAX_REQUEST_SIZE
-
-def cookie_size_exceeded(request_cookies, new_cookie_key, new_cookie_value):
-    total_cookie_size = sum(sys.getsizeof(k) + sys.getsizeof(v) + COOKIE_OVERHEAD for k, v in request_cookies.items())
-    total_cookie_size += sys.getsizeof(new_cookie_key) + sys.getsizeof(new_cookie_value) + COOKIE_OVERHEAD
-    return total_cookie_size >= MAX_COOKIE_SIZE
-
-def can_add_cookie(request_cookies, request_headers, new_cookie_key, new_cookie_value):
-    total_request_size = sum(sys.getsizeof(v) for k, v in request_headers.items())
-    total_cookie_size = sum(sys.getsizeof(k) + sys.getsizeof(v) + COOKIE_OVERHEAD for k, v in request_cookies.items())
-    total_cookie_size += sys.getsizeof(new_cookie_key) + sys.getsizeof(new_cookie_value) + COOKIE_OVERHEAD
-    if total_request_size + total_cookie_size > MAX_REQUEST_SIZE:
-        return False
-    else:
-        return True
+                #otherwise, we can just convert to decimal
+                car[i] = Decimal(request.form[i])
 
 def generate_isocontour_data(time_data, sweep_combos, value_names):
     # Convert sweep_combos to a NumPy array
@@ -141,46 +120,71 @@ def generate_isocontour_data(time_data, sweep_combos, value_names):
         },
     }
 
-
     return [contour_dict], layout_dict  # Return a list of dictionaries and layout dictionary
+
+MAX_TOTAL_COOKIE_SIZE = 100000 # Arbutary number tht can be changed later
+COOKIE_OVERHEAD = 100
+
+def cookie_size_exceeded(session, new_cookie_key, new_cookie_value):
+    total_cookie_size = sum(sys.getsizeof(k) + sys.getsizeof(v) + COOKIE_OVERHEAD for k, v in session.items())
+    total_cookie_size += sys.getsizeof(new_cookie_key) + sys.getsizeof(new_cookie_value) + COOKIE_OVERHEAD
+    return total_cookie_size >= MAX_TOTAL_COOKIE_SIZE
+
+def new_session_size(session, new_cookie_key, new_cookie_value):
+    total_cookie_size = sum(sys.getsizeof(k) + sys.getsizeof(v) + COOKIE_OVERHEAD for k, v in session.items())
+    total_cookie_size += sys.getsizeof(new_cookie_key) + sys.getsizeof(new_cookie_value) + COOKIE_OVERHEAD
+    return total_cookie_size
+
+def can_add_cookie(session, new_cookie_key, new_cookie_value):
+    new_size = new_session_size(session, new_cookie_key, new_cookie_value)
+    return new_size <= MAX_TOTAL_COOKIE_SIZE
+
+
 
 @app.route('/output', methods=['GET', 'POST'])
 def output():
-    # Retrive args
+    # Retrieve args
     sweep_toggled = request.args.get('sweep_toggled')
     # Might be a security risk
     operation = globals()[request.args.get('operation')]
 
-    if (sweep_toggled):
-        # Retrive args
-        values = json.loads(request.args.get('values_str'))
+    if sweep_toggled:
+        # Retrieve args
+        values = json.loads(session.get('values_str'))
         value_names = list(values.keys())
-        sweep_combos = tuple(tuple(x) for x in json.loads(request.args.get('sweep_combos_str')))
+        sweep_combos = tuple(tuple(x) for x in json.loads(session.get('sweep_combos_str')))
         time_data = []
 
         for combo in sweep_combos:
-            data = request.cookies.get('data' + str(combo))
+            data = session.get('data' + str(combo))
             if data:
                 car = Car(data)
-                time_data.append(float(round(operation(car), 3)))
+                time_data.append(Decimal(round(operation(car), 3)))
 
         if len(value_names) == 2:
             isocontour_data, layout = generate_isocontour_data(time_data, sweep_combos, value_names)
-            isocontour_data_json = json.dumps(isocontour_data)
-            layout_json = json.dumps(layout)
+            isocontour_data_json = json.dumps(isocontour_data, cls=DecimalEncoder)
+            layout_json = json.dumps(layout, cls=DecimalEncoder)
         else:
             isocontour_data_json = None
             layout_json = None
 
+        response = make_response(render_template('output.html', time_data=time_data, sweep_combos=sweep_combos, values=values, isocontour_data=isocontour_data_json, layout=layout_json))
 
-        return render_template('output.html', time_data=time_data, sweep_combos=sweep_combos, values=values, isocontour_data=isocontour_data_json, layout=layout_json)
+        for combo in sweep_combos:
+            session.pop('data' + str(combo), None)
     else:
-        data = request.cookies.get('data')
+        data = session.get('data')
         car = Car(data)
         time_data = []
-        time_data.append(float(round(operation(car), 3)))
-        # Pass an empty list for sweep_combos when sweep is not toggled
-        return render_template('output.html', time_data=time_data, sweep_combos=[], values={})
+        time_data.append(Decimal(round(operation(car), 3)))
+
+        response = make_response(render_template('output.html', time_data=time_data, sweep_combos=[], values={}))
+
+        session.pop('data', None)
+
+    return response
+
 
 def create_25_form(form_name, operation):
 
@@ -234,7 +238,7 @@ def create_25_form(form_name, operation):
             #generate list of all possible combinations of sweep values
             sweep_values = []
             for key in values:
-                sweep_values.append(list(np.arange(float(values[key][0]), float(values[key][2])+1, float(values[key][1]))))
+                sweep_values.append(list(np.arange(Decimal(values[key][0]), Decimal(values[key][2])+1, Decimal(values[key][1]))))
             sweep_combos = list(itertools.product(*sweep_values))
 
             resp = make_response(redirect('/output'))
@@ -317,13 +321,22 @@ def create_26_form(form_name, operation):
             # generate list of all possible combinations of sweep values
             sweep_values = []
             for key in values:
-                sweep_values.append(list(np.arange(float(values[key][0]), float(values[key][2])+1, float(values[key][1]))))
+                start = Decimal(values[key][0])
+                stop = Decimal(values[key][2])
+                step = Decimal(values[key][1])
+
+                decimal_array = np.arange(start, stop + step, step)
+                sweep_values.append([float(d) for d in decimal_array])
+
             sweep_combos = list(itertools.product(*sweep_values))
 
-            values_str = json.dumps(values)
-            sweep_combos_str = json.dumps(sweep_combos)
-            resp = make_response(redirect(url_for('output', operation=operation, sweep_toggled=sweep_toggled,
-                                                sweep_combos_str=sweep_combos_str, values_str=values_str)))
+            values_str = json.dumps(values, cls=DecimalEncoder)
+            sweep_combos_str = json.dumps(sweep_combos, cls=DecimalEncoder)
+            session['sweep_combos_str'] = sweep_combos_str
+            session['values_str'] = values_str
+
+            resp = make_response(redirect(url_for('output', operation=operation, sweep_toggled=sweep_toggled)))
+
             # loop through all possible combinations of sweep values
             for combo in sweep_combos:
                 index = 0
@@ -333,28 +346,33 @@ def create_26_form(form_name, operation):
                         index += 1
                     else:
                         if request.form[filtered_keys[i]] != '':
-                            car[filtered_keys[i]] = float(request.form[filtered_keys[i]])
+                            car[filtered_keys[i]] = Decimal(request.form[filtered_keys[i]])
 
-                json_str = json.dumps(car, indent=2)
+                json_str = json.dumps(car, cls=DecimalEncoder, indent=2)
 
                 new_cookie_key = f"data{combo}"
-                if can_add_cookie(request.cookies, request.headers, new_cookie_key, json_str):
-                    resp.set_cookie(new_cookie_key, json_str, samesite="Strict")
-                else:
-                    flash("Cookie size limit exceeded. Please remove some cookies.")
+                if not can_add_cookie(session, new_cookie_key, json_str):
+                    flash("Data limit exceeded. Please reduce the amount of data.")
                     return render_template('form.html', title=formatted_title, form=form, length=length)
+
+                session[new_cookie_key] = json_str
 
         else:
             for i in filtered_keys:
                 if request.form[i] != '':
-                    car[i] = float(request.form[i])
+                    car[i] = Decimal(request.form[i])
 
-            json_obj = json.dumps(car, indent=2)
+            json_obj = json.dumps(car, cls=DecimalEncoder, indent=2)
             resp = make_response(redirect(url_for('output', operation=operation)))
-            resp.set_cookie('data', json_obj, samesite="Strict")
+            session['data'] = json_obj
         return resp
 
     return render_template('form.html', title=formatted_title, form=form, length=length)
+
+#home page
+@app.route('/')
+def homepage():
+    return render_template('home.html')
 
 #straight line simulation page
 @app.route('/rm25_straight_line_sim', methods=['GET', 'POST'])
