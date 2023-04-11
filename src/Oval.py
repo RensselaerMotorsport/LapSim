@@ -8,6 +8,9 @@ from classes.car_simple import Car
 from random import random
 import numpy as np
 import math
+import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings("ignore")
 car = Car("data/rm26.json")
 
 
@@ -35,8 +38,8 @@ track[n,1] = 0
 
 
 
-def runtrack(Car, track):
-    """
+"""def runtrack(Car, track):
+    
     A function to run the oval track given the car object, straight distance, and corner radius and output a time. 
     
     Parameters:
@@ -44,7 +47,7 @@ def runtrack(Car, track):
     track - 2-D array of distance and radius
 
     Return - Track Time
-    """
+    
     #Initialize time and velocity arrays, time will be output and velocity can be conditional output (In future)
     time = np.zeros(track.size)
     velocity = np.zeros(track.size)
@@ -80,7 +83,7 @@ def runtrack(Car, track):
 
 
 
-    return ("Lap Time is", np.sum(time, axis=None))
+    return ("Lap Time is", np.sum(time, axis=None))"""
 
 #print(runtrack(car, track))
 
@@ -91,17 +94,20 @@ def runtrack(Car, track):
 def run_oval(car, x, r, GR=0, mu=0, dstep=0.01, peak=False):
     d = [0] # Car distance travelled
     v = [0] # Car speed
-    for i in range(len(x)):
-        if r[i] == 0: # Straight segment
-            v1 = straight_line_segment(car, v[len(v) - 1], calc_vmax(1 / r[i+1], car), x[i], GR=GR, mu=mu, dstep=dstep, peak=peak)
-            for j in range(1, len(v1), 1):
-                v.append(v1[j])
-                d.append(dstep + d[len(d) - 1])
-        else:
-            v1 = min(calc_vmax(1 / r[i], car), v[len(v) - 1])
-            for j in np.arange(0, x[i], dstep):
-                v.append(v1)
-                d.append(dstep + d[len(d) - 1])
+    try:
+        for i in range(len(x)):
+            if r[i] == 0: # Straight segment
+                v1 = straight_line_segment(car, v[len(v) - 1], calc_vmax(1 / r[i+1], car), x[i], GR=GR, mu=mu, dstep=dstep, peak=peak)
+                for j in range(1, len(v1), 1):
+                    v.append(v1[j])
+                    d.append(dstep + d[len(d) - 1])
+            else:
+                v1 = min(calc_vmax(1 / r[i], car), v[len(v) - 1])
+                for j in np.arange(0, x[i], dstep):
+                    v.append(v1)
+                    d.append(dstep + d[len(d) - 1])
+    except:
+        print("error")
     return d, v
 
 def s_pin():
@@ -160,10 +166,6 @@ def plot_graph(GR):
     for i in range(1, len(d), 1):
         t += (d[i] - d[i - 1]) / v[i]
 
-    import matplotlib.pyplot as plt
-    import warnings
-    warnings.filterwarnings("ignore")
-
     for i in range(len(v)):
         v[i] *= 2.237
 
@@ -183,8 +185,30 @@ def plot_graph(GR):
     t1 = perf_counter()
     return t1 - t0
 
-print(round(plot_graph(33/12), 5))
-print(round(plot_graph(38/12), 5))
-print(round(plot_graph(42/12), 5))
-print(round(plot_graph(48/12), 5))
-print(round(plot_graph(52/12), 5))
+def plot_GRs(LGR, UGR, count=60):
+    T = []
+    GR = np.linspace(LGR, UGR, count)
+    for i in range(len(GR)):
+        t = 0
+        d, v = run_oval(car, x, r, GR=GR[i], peak=True)
+        for j in range(1, len(d), 1):
+            t += (d[j] - d[j - 1]) / v[j]
+        T.append(t)
+
+    plt.figure(figsize=(9,6))
+    plt.grid()
+    plt.xlim(min(GR), max(GR))
+    plt.ylim(min(T) / 1.005, max(T) * 1.005)
+
+    plt.plot(GR, T)
+    plt.xlabel("Gear ratio")
+    plt.ylabel("Autocross time (s)")
+    plt.show()
+plot_GRs(2.5, 4, count=25)
+
+
+#print(round(plot_graph(33/12), 5))
+#print(round(plot_graph(38/12), 5))
+#print(round(plot_graph(42/12), 5))
+#print(round(plot_graph(48/12), 5))
+#print(round(plot_graph(52/12), 5))
