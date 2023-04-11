@@ -1,7 +1,9 @@
 from flask import Flask, render_template, request, make_response, flash, redirect, url_for #basic flask modules
 from forms import rm_25_form, rm_26_form #, straightLineForm26 #classes from forms.py
 import itertools #for looping through all possible combinations of sweep values
-import numpy #for generating range of sweep values
+import numpy as np#for generating range of sweep values
+import plotly.graph_objs as go
+import plotly.express as px
 import json
 import os
 import sys
@@ -61,6 +63,86 @@ def can_add_cookie(request_cookies, request_headers, new_cookie_key, new_cookie_
     else:
         return True
 
+def generate_isocontour_data(time_data, sweep_combos, value_names):
+    # Convert sweep_combos to a NumPy array
+    sweep_combos = np.array(sweep_combos)
+    # Convert time_data to a NumPy array
+    time_data = np.array(time_data)
+
+    # Create a grid of values for the axes
+    x_values = np.unique(sweep_combos[:, 0])
+    y_values = np.unique(sweep_combos[:, 1])
+
+    # Create a 2D array of time_data
+    time_data_grid = time_data.reshape(len(x_values), len(y_values))
+
+    # Create the contour plot
+    contour = go.Contour(
+        x=x_values,
+        y=y_values,
+        z=time_data_grid.T,
+        colorscale=px.colors.sequential.Viridis,
+        showscale=True,
+        colorbar=dict(title="Time (s)"),
+    )
+
+    layout = go.Layout(
+        xaxis=dict(title=value_names[0].replace('_', ' ').title()),
+        yaxis=dict(title=value_names[1].replace('_', ' ').title()),
+    )
+
+    # Convert Contour object and NumPy arrays to a dictionary
+    contour_dict = {
+        "type": "contour",
+        "x": contour.x.tolist(),  # Convert the NumPy array to a list
+        "y": contour.y.tolist(),  # Convert the NumPy array to a list
+        "z": contour.z.tolist(),  # Convert the NumPy array to a list
+        "colorscale": contour.colorscale,
+        "colorbar": {
+            "title": {
+                "text": contour.colorbar.title.text,
+                "font": {
+                    "color": "white",
+                },
+            },
+            "tickfont": {
+                "color": "white",
+            },
+        },
+    }
+
+
+    layout_dict = {
+        "xaxis": {
+            "title": {
+                "text": layout.xaxis.title.text,
+            },
+            "tickfont": {
+                "color": "white",
+            },
+            "titlefont": {
+                "color": "white",
+            },
+            "linecolor": "white",
+            "gridcolor": "white",
+        },
+        "yaxis": {
+            "title": {
+                "text": layout.yaxis.title.text,
+            },
+            "tickfont": {
+                "color": "white",
+            },
+            "titlefont": {
+                "color": "white",
+            },
+            "linecolor": "white",
+            "gridcolor": "white",
+        },
+    }
+
+
+    return [contour_dict], layout_dict  # Return a list of dictionaries and layout dictionary
 
 @app.route('/output', methods=['GET', 'POST'])
 def output():
@@ -72,6 +154,7 @@ def output():
     if (sweep_toggled):
         # Retrive args
         values = json.loads(request.args.get('values_str'))
+        value_names = list(values.keys())
         sweep_combos = tuple(tuple(x) for x in json.loads(request.args.get('sweep_combos_str')))
         time_data = []
 
@@ -80,7 +163,17 @@ def output():
             if data:
                 car = Car(data)
                 time_data.append(float(round(operation(car), 3)))
-        return render_template('output.html', time_data=time_data, sweep_combos=sweep_combos, values=values)
+
+        if len(value_names) == 2:
+            isocontour_data, layout = generate_isocontour_data(time_data, sweep_combos, value_names)
+            isocontour_data_json = json.dumps(isocontour_data)
+            layout_json = json.dumps(layout)
+        else:
+            isocontour_data_json = None
+            layout_json = None
+
+
+        return render_template('output.html', time_data=time_data, sweep_combos=sweep_combos, values=values, isocontour_data=isocontour_data_json, layout=layout_json)
     else:
         data = request.cookies.get('data')
         car = Car(data)
@@ -88,8 +181,6 @@ def output():
         time_data.append(float(round(operation(car), 3)))
         # Pass an empty list for sweep_combos when sweep is not toggled
         return render_template('output.html', time_data=time_data, sweep_combos=[], values={})
-
-
 
 def create_25_form(form_name, operation):
 
@@ -143,7 +234,7 @@ def create_25_form(form_name, operation):
             #generate list of all possible combinations of sweep values
             sweep_values = []
             for key in values:
-                sweep_values.append(list(numpy.arange(float(values[key][0]), float(values[key][2])+1, float(values[key][1]))))
+                sweep_values.append(list(np.arange(float(values[key][0]), float(values[key][2])+1, float(values[key][1]))))
             sweep_combos = list(itertools.product(*sweep_values))
 
             resp = make_response(redirect('/output'))
@@ -226,7 +317,7 @@ def create_26_form(form_name, operation):
             # generate list of all possible combinations of sweep values
             sweep_values = []
             for key in values:
-                sweep_values.append(list(numpy.arange(float(values[key][0]), float(values[key][2])+1, float(values[key][1]))))
+                sweep_values.append(list(np.arange(float(values[key][0]), float(values[key][2])+1, float(values[key][1]))))
             sweep_combos = list(itertools.product(*sweep_values))
 
             values_str = json.dumps(values)

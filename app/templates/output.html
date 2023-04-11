@@ -3,21 +3,27 @@
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/rm25_SLS.css') }}">
 <script src="{{ url_for('static', filename='javascript/toggle_sweep.js') }}"></script>
-<!-- For chart -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="{{ url_for('static', filename='javascript/chart.js') }}"></script>
+<!-- For Graph -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 {% endblock head %}
 
 {% block content %}
+{% if isocontour_data %}
+  <div id="isocontour"></div>
+  <script>
+    var data = '{{ isocontour_data|safe }}' ? JSON.parse('{{ isocontour_data|safe }}') : null;
+    var layout = '{{ layout|safe }}' ? JSON.parse('{{ layout|safe }}') : null;
 
+    // Add these lines to make the background transparent
+    layout.plot_bgcolor = 'rgba(0,0,0,0)';
+    layout.paper_bgcolor = 'rgba(0,0,0,0)';
 
-<!-- Pass in varibles to js -->
-<script type="text/javascript">
-  const timeData = {{ time_data | tojson }};
-  const sweepCombos = {{ sweep_combos | tojson }};
-  const values_data = {{ values | tojson }};
-</script>
-<div style="width: 800px;"><canvas id="sim_graph"></canvas></div>
+    // Add this line to make the colorbar text white
+    layout.colorbar = { "title": { "text": "Time (s)", "font": { "color": "white" } }, "tickfont": { "color": "white" } };
+
+    Plotly.newPlot('isocontour', data, layout);
+  </script>
+{% endif %}
 
 <form action="/output" method="GET">
   <p> Times: </p>
@@ -25,6 +31,4 @@
     <p> {{ t }} seconds.</p>
   {% endfor %}
 </form>
-
-
 {% endblock content %}
