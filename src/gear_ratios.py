@@ -128,3 +128,32 @@ def display_specs(car, GR, mu=0):
 
 #display_specs(car, 38/12, mu=1.7)
 #plot_accel(car, 2.5, 4, [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0], plotPoints=True, peak=True)
+
+def test_accel(car, LG, UG, n=100, returnPoints=False, peak=False):
+    # THIS FUNCTION IS BROKEN RIGHT NOW
+    """A function for testing the response of our run_accel function.
+
+    Inputs: car, the car object we are working with
+    LG, the car's lower bound gear ratio
+    UG, the car's upper bound gear ratio
+    n, this equals the number of gear ratios that we want to test, default is 100
+    returnPoints, this determines if the function returns point values or time values for accleration, default is False which returns time values
+
+    Returns: A plot of gear ratios tried to point values achieved if returnPoints=False, or to time is returnPoints=True"""
+    car.attrs["gear_ratios"] = LG  # This is the lowest gear ratio we are going to try
+    step = (UG - LG) / n  # This calculates the change in the different gear ratios we are going to try
+    x = []
+    y = []
+    for i in range(n):  # iterate over all gear ratios
+        x.append(car.attrs["gear_ratios"])
+        y.append(run_accel(car, returnPoints=returnPoints, peak=peak))
+        car.attrs["gear_ratios"] += step 
+    # Create the plot of gear ratio versus time
+    plt.title("Acceleration event times", fontsize=18, y=1.04)
+    plt.xlabel("Gear Ratio", fontsize=12)
+    plt.ylabel("Time elapsed (s)", fontsize=12)
+    plt.plot(x, y, '-g')
+    plt.show()
+
+
+#test_accel(car, 0.1, 1, n=1, returnPoints=False)

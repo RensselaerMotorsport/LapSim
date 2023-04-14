@@ -1,8 +1,8 @@
 """A module to calculate intermediate steps in the lapsim for an ev car"""
 
 import math
-from classes.car_simple import Car
-car = Car("data/rm26.json")
+#from classes.car_simple import Car
+#car = Car("data/rm26.json")
 
 def calc_vmax(r, car):
     """
@@ -74,9 +74,7 @@ def calc_max_entry_v_for_brake(car, Vexit, r, d):
 
     u = math.sqrt(Vexit**2+(2*d*Fs)/m) #Calculate the maximium entry velocity
 
-    return u 
-
-
+    return u
 
 def calculate_velocity_new(engine_force, drag_force, car, step=1, initial_velocity=0.001):
     """
@@ -138,37 +136,6 @@ def calc_t(v1, v2, d_step):
     """
     return 1/(((v1+v2)/2)/d_step)
 
-
-#not sure how we should distinguish the difference between long and lat velocities
-#good thing is we know all long accel is caused by engine force and any lat accel is caused by curavture
-
-def line_segment_time(car, distance, GR=0, vinitial=0.001, timestep=.001, peak=False, mu=0):
-    """
-    Calculates the amount of time it takes to travel a straight line distance.
-
-    Inputs:
-    car- the car object with attributes
-    vinitial- the initial velocity into the segment
-    distance- how long the segment is
-
-    Outputs:
-    t- the amount of time it takes to complete the segment."""
-    d=0 #Set initial distance object
-    v=vinitial #initial velocity
-    time=0 #Set time variable
-    if GR == 0: GR = car.attrs["final_drive"]
-    if mu == 0: mu = car.attrs["CoF"]
-    r = car.attrs["tire_radius"]
-    m = car.attrs["mass_car"] + car.attrs["mass_driver"]
-    rho = car.attrs["rho"]
-    A = car.attrs["A"]
-    while d<distance: 
-        RPM = 60 * v / (2 * math.pi * r) * GR
-        acceleration = (min((motor_torque(car, RPM, peak=peak) * GR / (r), traction_force(car, v, mu))) - rho * A * v**2 / 2)/ m
-        time+=timestep
-        d+=v*timestep
-        v+=acceleration*timestep
-    return time, v
 
 def motor_torque(car, RPM, peak=False, voltage=-1, current=-1):
     """Calculates maximium motor torque. Torque = Current * Voltage / RPM.
@@ -252,16 +219,16 @@ def braking_length(car, v0, v1, mu=0, dstep=0.1, returnVal=0):
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
     v= v0
     t = 0
-    t_V = []
+    T = []
     d = 0
-    V= []
+    V = []
     while v > v1:
         t += dstep/v
         t_seg = dstep/v
         d += dstep
         v -= braking_force(car, v, mu)/m*t_seg
         V.append(v)
-        t_V.append(t_seg)
+        T.append(t_seg)
     if returnVal == 0:
         return t
     elif returnVal == 1:
@@ -269,9 +236,9 @@ def braking_length(car, v0, v1, mu=0, dstep=0.1, returnVal=0):
     elif returnVal == 2:
         return V
     elif returnVal == 3:
-        return t_V
+        return T
     
-def forward_int(car, v0, d1, GR=0, mu=0, dstep=0.0001, peak=False):
+def forward_int(car, v0, d1, GR=0, mu=0, dstep=0.01, peak=False):
     """Forward integration to find a new velocity and the distance traveled over a specified time step.
     
     Given: car, the car object you are considering
@@ -293,11 +260,38 @@ def forward_int(car, v0, d1, GR=0, mu=0, dstep=0.0001, peak=False):
     t = [0]
     i = 0
     while d[i] < d1:
-        RPM = 60 * v[i] / (2 * math.pi * r)
+        RPM = GR * 60 * v[i] / (2 * math.pi * r)
         a = min((motor_torque(car, RPM, peak=peak) * GR / (r), traction_force(car, v[i], mu))) / m
-        tstep = dstep/v[i]
-        v.append(v[i] + a * tstep)
+        #tstep = dstep/v[i]
+        v.append((v[i]**2 + 2 * a * dstep)**0.5)
+        if a > 0:
+            tstep = (- v[i] + (v[i]**2 + 4 * a * dstep)**0.5) / (a)
+        else:
+            tstep = dstep / v[i]
         t.append(t[i] + tstep)
-        d.append(d[i] + v[i] * tstep)
+        d.append(d[i] + dstep)
         i += 1
     return v, d
+
+def straight_line_segment(car, v0, v1, d1, GR=0, mu=0, dstep=0.01, peak=False):
+    """Incorporates braking & accelerating"""
+    v, d = forward_int(car, v0, d1, GR=GR, mu=mu, dstep=dstep, peak=peak)
+    if v[len(v)-1] < v1: # If the cornering speed is faster than the max possible speed in straight accel:
+        print("Max corner speed > max accelerating velocity")
+    elif v[len(v)-1] > v1: # If the cornering speed is slower than the max possible speed in straight accel
+        dmin = braking_length(car, v0, v1, mu=mu, dstep=dstep, returnVal=1)
+        if d1 < dmin: # If the length to brake is greater than the length of the segment
+            raise ValueError
+        elif d1 == dmin: # The car should brake from start to finish
+            return braking_length(car, v0, v1, mu=mu, dstep=dstep, returnVal=2)
+        elif d1 > dmin: # The car should accelerate and then brake
+            L = len(d)
+            vb = v.copy() # Velocities to start braking at
+            vb.reverse()
+            db = [] # Distances to break from v to v1
+            for i in range(len(vb)):
+                db.append(braking_length(car, vb[i], v1, mu=mu, dstep=dstep, returnVal=1))
+            for i in range(L):
+                if abs(d[i] - db[i]) <= 1e-1:
+                    v[L-i:L] = braking_length(car, v[L-i], v1, mu=mu, dstep=dstep, returnVal=2)
+    return v
