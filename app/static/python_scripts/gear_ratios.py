@@ -1,11 +1,12 @@
 import math
-import numpy as np
 import matplotlib.pyplot as plt
-from helper_functions_ev import motor_torque
-from helper_functions_ev import traction_force
-from classes.car_simple import Car
-from acceleration import run_accel
+import numpy as np
 import warnings
+from classes.car_simple import Car
+
+from app.static.python_scripts.acceleration import run_accel
+from app.static.python_scripts.helper_functions_ev import motor_torque
+from app.static.python_scripts.helper_functions_ev import traction_force
 
 warnings.filterwarnings("ignore")
 car = Car("data/rm26.json")
@@ -22,13 +23,14 @@ def calc_tractive_force(car, GR, v, vMax, peak=False):
     
     Returns: V, a list of velocities
     F, a list of related tractive forces"""
-    r = car.attrs["tire_radius"] #gets the tire radius of the car
-    V = [] #sets the velocity array
-    F = [] #Sets the tractive force array
-    while v <= vMax: #Set up the loop over velocities
-        V.append(v) #adds the current velocity to the velocity list
-        F.append(motor_torque(car, v * 60 * GR / (2 * math.pi * r), peak=peak) * GR / r) #calculates the tractive force using the motor torque function
-        v += 0.01 #increases the velocity before the loop restarts
+    r = car.attrs["tire_radius"]  # gets the tire radius of the car
+    V = []  # sets the velocity array
+    F = []  # Sets the tractive force array
+    while v <= vMax:  # Set up the loop over velocities
+        V.append(v)  # adds the current velocity to the velocity list
+        F.append(motor_torque(car, v * 60 * GR / (2 * math.pi * r),
+                              peak=peak) * GR / r)  # calculates the tractive force using the motor torque function
+        v += 0.01  # increases the velocity before the loop restarts
     return V, F
 
 
@@ -42,12 +44,12 @@ def calc_traction_force(car, v, vMax, mu):
     
     Returns: V, the array of velocities considered
     F, the related Traction Forces"""
-    V = [] #sets the velocity array
-    F = [] #sets the tractive force array
-    while v <= vMax: #Set up the loop over velocities
-        V.append(v) #adds the current velocity to the velocity array
-        F.append(traction_force(car, v, mu)) #Calculates the traction force using the traction force function
-        v += 0.01 #Increases the velocity before the loop restarts
+    V = []  # sets the velocity array
+    F = []  # sets the tractive force array
+    while v <= vMax:  # Set up the loop over velocities
+        V.append(v)  # adds the current velocity to the velocity array
+        F.append(traction_force(car, v, mu))  # Calculates the traction force using the traction force function
+        v += 0.01  # Increases the velocity before the loop restarts
     return V, F
 
 
@@ -60,12 +62,12 @@ def plot_tfd(car, GR, mu):
     
     Returns: A plot of the tractive force versus velocity at the specified gear ratio and coefficent of friction. Includes a plot of both peak and continuous torque as well as traction force
     Tractive force is what the motor can output, traction force is what the car can handle in real space, what the traction ability of the car is"""
-    vMax = 35 #maximum velocity we are considering
-    v = 0.01 #minimum velocity we are considering
+    vMax = 35  # maximum velocity we are considering
+    v = 0.01  # minimum velocity we are considering
 
-    Ptractive = calc_tractive_force(car, GR, v, vMax, peak=True) #tractive force at peak torque
-    Ctractive = calc_tractive_force(car, GR, v, vMax) #tractive force at continuous torque
-    traction = calc_traction_force(car, v, vMax, mu) #traction force
+    Ptractive = calc_tractive_force(car, GR, v, vMax, peak=True)  # tractive force at peak torque
+    Ctractive = calc_tractive_force(car, GR, v, vMax)  # tractive force at continuous torque
+    traction = calc_traction_force(car, v, vMax, mu)  # traction force
     plt.plot(Ptractive[0], Ptractive[1], '-g')
     plt.plot(Ctractive[0], Ctractive[1], '-b')
     plt.plot(traction[0], traction[1], '-r')
@@ -125,6 +127,5 @@ def display_specs(car, GR, mu=0):
     print("Peak acceleration (g's): " + str(230 * GR / (r * m * g)))
     print("Accel time (s): " + str(run_accel(car, GR=GR, peak=True, mu=mu)))
 
-
-#display_specs(car, 38/12, mu=1.7)
-#plot_accel(car, 2.5, 4, [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0], plotPoints=True, peak=True)
+# display_specs(car, 38/12, mu=1.7)
+# plot_accel(car, 2.5, 4, [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0], plotPoints=True, peak=True)

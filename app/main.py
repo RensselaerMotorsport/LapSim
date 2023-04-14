@@ -1,54 +1,49 @@
-from flask import Flask, render_template, request, make_response, flash, redirect, url_for #basic flask modules
-from forms import rm_25_form, rm_26_form #, straightLineForm26 #classes from forms.py
-import itertools #for looping through all possible combinations of sweep values
-import numpy #for generating range of sweep values
+from flask import Flask, render_template, request, make_response, flash, redirect, url_for  # basic flask modules
+from forms import rm_25_form, rm_26_form  # straightLineForm26 #classes from forms.py
+import itertools  # for looping through all possible combinations of sweep values
+import numpy  # for generating range of sweep values
 import json
-import os
-import sys
-import matplotlib
 
-directory = os.getcwd()
-sys.path.insert(1, directory+'\\src')
-
-# from test import test_func
-from acceleration import run_accel
-from classes.car_simple import Car
-from skidpad import test_skidpad
+from static.python_scripts.acceleration import run_accel
+from static.python_scripts.car_simple import Car
+from static.python_scripts.skidpad import test_skidpad
 
 app = Flask(__name__)
-
 app.config['SECRET_KEY'] = '5993b6512522aa93a5306dd25249a174'
 
-#home page
+
 @app.route('/')
 def homepage():
+    """The homepage of the app. This is where the user will select the event."""
     return render_template('home.html')
 
+
 def fill_blank_with_default(i, car):
-        if request.form[i] != '':
-            # because gear_ratios are stored as a list in the json file, we need a special case to split it by commas
-            if i == 'gear_ratios':
-                car[i] = request.form[i].replace(' ','').split(',')
-                #removing any blank values (in case multiple commas in a row: 1, 2, 3,,,, 4)
-                #goes backwards through list so we don't get insex out of range
-                for j in range(len(car[i])-1,-1,-1):
-                    if car[i][j] == '':
-                        car[i].remove('')
-                    else:
-                        car[i][j] = float(car[i][j])
-            else:
-                #otherwise, we can just convert to float
-                car[i] = float(request.form[i])
+    if request.form[i] != '':
+        # because gear_ratios are stored as a list in the json file, we need a special case to split it by commas
+        if i == 'gear_ratios':
+            car[i] = request.form[i].replace(' ','').split(',')
+            # removing any blank values (in case multiple commas in a row: 1, 2, 3,,,, 4)
+            # goes backwards through list so we don't get insex out of range
+            for j in range(len(car[i])-1,-1,-1):
+                if car[i][j] == '':
+                    car[i].remove('')
+                else:
+                    car[i][j] = float(car[i][j])
+        else:
+            # otherwise, we can just convert to float
+            car[i] = float(request.form[i])
+
 
 @app.route('/output', methods=['GET', 'POST'])
 def output():
-    # Retrive args
+    # Retrieve args
     sweep_toggled = request.args.get('sweep_toggled')
     # Might be a security risk
     operation = globals()[request.args.get('operation')]
 
-    if (sweep_toggled):
-        # Retrive args
+    if sweep_toggled:
+        # Retrieve args
         values = json.loads(request.args.get('values_str'))
         sweep_combos = tuple(tuple(x) for x in json.loads(request.args.get('sweep_combos_str')))
         time_data = []
@@ -62,11 +57,10 @@ def output():
     else:
         data = request.cookies.get('data')
         car = Car(data)
-        time_data = []
+        time_data = list()
         time_data.append(float(round(operation(car), 3)))
         # Pass an empty list for sweep_combos when sweep is not toggled
         return render_template('output.html', time_data=time_data, sweep_combos=[], values={})
-
 
 
 def create_25_form(form_name, operation):
@@ -78,11 +72,11 @@ def create_25_form(form_name, operation):
     # Submit Form
     if form.is_submitted():
 
-        #begins with default json data
+        # begins with default json data
         car = rm_25_form.rm25_data
-        #loops through returned form data
+        # loops through returned form data
 
-        #create list excluding csrf token and submit button and also begin, step, and end values
+        # create list excluding csrf token and submit button and also begin, step, and end values
         keys_to_exclude = ['_begin', '_end', '_step']  # define the suffixes to exclude
         filtered_keys = []  # create an empty list to store the filtered keys
         sweep_keys = []
@@ -98,12 +92,12 @@ def create_25_form(form_name, operation):
 
         for key in sweep_keys:
             if str(request.form[key]) != '':
-                #check if begin, step, and end are all filled out
+                # check if begin, step, and end are all filled out
                 if str(key).endswith('_begin'):
                     base_key = str(key)[:-6]
                     if request.form[base_key+'_step'] == '' or request.form[base_key+'_end'] == '':
                         flash(base_key + ' sweep fourm isn\'t filled out completly.', 'success')
-                        return render_template('form.htmml', title=formatted_title, form=form, length=length)
+                        return render_template('form.html', title=formatted_title, form=form, length=length)
                     values[base_key] = request.form[key], request.form[base_key+'_step'], request.form[base_key+'_end']
                     sweep_toggled = True
                 elif str(key).endswith('_end'):
@@ -117,17 +111,17 @@ def create_25_form(form_name, operation):
                         flash(base_key + ' sweep fourm isn\'t filled out completly.', 'success')
                         return render_template('form.html', title=formatted_title, form=form, length=length)
 
-        if sweep_toggled == True:
-            #generate list of all possible combinations of sweep values
-            sweep_values = []
+        if sweep_toggled:
+            # generate list of all possible combinations of sweep values
+            sweep_values = list()
             for key in values:
                 sweep_values.append(list(numpy.arange(float(values[key][0]), float(values[key][2])+1, float(values[key][1]))))
             sweep_combos = list(itertools.product(*sweep_values))
 
             resp = make_response(redirect('/output'))
-            #loop through all possible combinations of sweep values
+            # loop through all possible combinations of sweep values
             for combo in sweep_combos:
-                #ERROR: breaks here
+                # ERROR: breaks here
                 for i in range(min(len(filtered_keys), len(combo))):
                     if filtered_keys[i] in values:
                         car[filtered_keys[i]] = combo[i]
@@ -151,6 +145,7 @@ def create_25_form(form_name, operation):
 
     return render_template('form.html', title=formatted_title, form=form, length=length)
 
+
 # TODO: add RM_25 support and json
 # pass in json, form name, and function and it creates a form
 def create_26_form(form_name, operation):
@@ -161,11 +156,11 @@ def create_26_form(form_name, operation):
     # Submit Form
     if form.is_submitted():
 
-        #begins with default json data
+        # begins with default json data
         car = rm_26_form.data
-        #loops through returned form data
+        # loops through returned form data
 
-        #create list excluding csrf token and submit button and also begin, step, and end values
+        # create list excluding csrf token and submit button and also begin, step, and end values
         keys_to_exclude = ['_begin', '_end', '_step']  # define the suffixes to exclude
         filtered_keys = []  # create an empty list to store the filtered keys
         sweep_keys = []
@@ -181,7 +176,7 @@ def create_26_form(form_name, operation):
 
         for key in sweep_keys:
             if str(request.form[key]) != '':
-                #check if begin, step, and end are all filled out
+                # check if begin, step, and end are all filled out
                 if str(key).endswith('_begin'):
                     base_key = str(key)[:-6]
                     if request.form[base_key+'_step'] == '' or request.form[base_key+'_end'] == '':
@@ -200,8 +195,8 @@ def create_26_form(form_name, operation):
                         flash(base_key + ' sweep fourm isn\'t filled out completly.', 'success')
                         return render_template('form.html', title=formatted_title, form=form, length=length)
 
-        if sweep_toggled == True:
-            #generate list of all possible combinations of sweep values
+        if sweep_toggled:
+            # generate list of all possible combinations of sweep values
             sweep_values = []
             for key in values:
                 sweep_values.append(list(numpy.arange(float(values[key][0]), float(values[key][2])+1, float(values[key][1]))))
@@ -211,7 +206,7 @@ def create_26_form(form_name, operation):
             sweep_combos_str = json.dumps(sweep_combos)
             resp = make_response(redirect(url_for('output', operation=operation, sweep_toggled=sweep_toggled,
                                                   sweep_combos_str=sweep_combos_str, values_str=values_str)))
-            #loop through all possible combinations of sweep values
+            # loop through all possible combinations of sweep values
             for combo in sweep_combos:
                 index = 0
                 for i in range(len(filtered_keys)):
@@ -237,20 +232,23 @@ def create_26_form(form_name, operation):
 
     return render_template('form.html', title=formatted_title, form=form, length=length)
 
-#straight line simulation page
+
+# straight line simulation page
 @app.route('/rm25_straight_line_sim', methods=['GET', 'POST'])
 def rm25_straight_line_sim():
     return create_25_form('/rm25_straight_line_sim', '')
+
 
 @app.route('/rm26_acceleration', methods=['GET', 'POST'])
 def rm26_acceleration():
     return create_26_form('/rm26_acceleration', 'run_accel')
 
+
 @app.route('/rm26_skidpad', methods=['GET', 'POST'])
 def rm26_skidpad():
     return create_26_form('/rm26_skidpad', 'test_skidpad')
 
-#TODO: Make more forms!!!!!
 
+# TODO: Make more forms!!!!!
 if __name__ == "__main__":
     app.run(debug=False)

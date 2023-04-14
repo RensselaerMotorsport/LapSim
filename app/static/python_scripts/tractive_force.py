@@ -1,10 +1,13 @@
+import math
 import matplotlib.pyplot as plt
 from classes.car_simple import Car
-from helper_functions_ev import motor_torque
-import math
+
+from app.static.python_scripts.helper_functions_ev import motor_torque
+
 car = Car("data/rm26.json")
 
-def plot_traction_force(car, maxv=100/3.6, step=0.01):
+
+def plot_traction_force(car, maxv=100 / 3.6, step=0.01):
     from check_slip import calc_friction_force
     v = step
     ax = step
@@ -12,7 +15,7 @@ def plot_traction_force(car, maxv=100/3.6, step=0.01):
     V = []
     while v < maxv:
         ax = calc_friction_force(2, ax, v)
-        #while ax != calc_friction_force(2, ax, v):
+        # while ax != calc_friction_force(2, ax, v):
         #    ax = calc_friction_force(2, ax, v)
         #    print(ax)
         V.append(v)
@@ -26,7 +29,8 @@ def plot_traction_force(car, maxv=100/3.6, step=0.01):
     plt.plot(V, F)
     plt.show()
 
-def plot_tractive_force(car, gear=3, maxv=200/3.6, step=1):
+
+def plot_tractive_force(car, gear=3, maxv=200 / 3.6, step=1):
     RPM = step
     V = []
     F = []
@@ -39,5 +43,6 @@ def plot_tractive_force(car, gear=3, maxv=200/3.6, step=1):
     plt.ylabel("Tractive Force (N)")
     plt.plot(V, F)
     plt.show()
+
 
 plot_traction_force(car)

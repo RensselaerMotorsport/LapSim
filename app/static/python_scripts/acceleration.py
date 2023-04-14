@@ -1,9 +1,9 @@
 """A module to simulate the acceleration event."""
-
-from classes.car_simple import Car
-from helper_functions_ev import line_segment_time
+from car_simple import Car
+from helper_functions_ev import straight_line_segment
 
 car = Car("data/rm26.json")
+
 
 def run_accel(car, GR=0, tmin=4.113, returnPoints=False, peak=False, mu=0):
     """ Calculates the amount of time it takes to run accel. Can return an approximate point value for the event instead of time elapsed.
@@ -20,12 +20,18 @@ def run_accel(car, GR=0, tmin=4.113, returnPoints=False, peak=False, mu=0):
     """
     if GR == 0: GR = car.attrs["final_drive"]
 
-    t = line_segment_time(car, 75, GR=GR, vinitial= 0.001, peak=peak, mu=mu) #Call the helper function that runs a straight line segment
+    t = straight_line_segment(car, 75, GR=GR, vinitial=0.001, peak=peak,
+                          mu=mu)  # Call the helper function that runs a straight line segment
     if returnPoints:
-        if t[0] >= 1.5 * tmin: return 4.5 #The time specified is below 150% of the fastest achieved accleration time, so the point value returned is 4.5 points
-        elif t[0] <= tmin: return 100 #The time specified is faster or equal to the fasted achieved accleration time, maxiumum points have been achieved
-        else: return 4.5 + 95.5 * 2 * (1.5 * tmin/t[0] - 1) #The time specfied is slower than the fastest time, but faster than 150% of it, so the stupid equation is used 
-    else: return t[0]
+        if t[0] >= 1.5 * tmin:
+            return 4.5  # The time specified is below 150% of the fastest achieved accleration time, so the point value returned is 4.5 points
+        elif t[0] <= tmin:
+            return 100  # The time specified is faster or equal to the fasted achieved accleration time, maxiumum points have been achieved
+        else:
+            return 4.5 + 95.5 * 2 * (1.5 * tmin / t[
+                0] - 1)  # The time specfied is slower than the fastest time, but faster than 150% of it, so the stupid equation is used
+    else:
+        return t[0]
 
 
 def test_accel(car, LG, UG, n=100, returnPoints=False, peak=False):
@@ -54,5 +60,4 @@ def test_accel(car, LG, UG, n=100, returnPoints=False, peak=False):
     plt.plot(x, y, '-g')
     plt.show()
 
-
-#test_accel(car, 0.1, 10, returnPoints=True)
+# test_accel(car, 0.1, 10, returnPoints=True)

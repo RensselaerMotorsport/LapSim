@@ -1,10 +1,12 @@
 """A module to calculate the velocities and time for a Skid Pad"""
 
-from classes.car_simple import Car
-from helper_functions_ev import calc_vmax
 import numpy as np
+from classes.car_simple import Car
 
-#car = Car("data/rm26.json")
+from app.static.python_scripts.helper_functions_ev import calc_vmax
+
+
+# car = Car("data/rm26.json")
 
 
 ### Below is a troubleshooting script ###
@@ -37,7 +39,6 @@ import numpy as np
 # #This model will likely predict a slower skidpad time than in real life because the tire model is basically non existent.
 
 
-
 def skidpad(r, car):
     """
     A function that takes the radius of the skidpad course and a car object to calculate the amount of time it will take to complete a skipad run.
@@ -47,9 +48,9 @@ def skidpad(r, car):
 
     Output: t, the amount of time skipad takes
     """
-    v = calc_vmax(r,car)
-    circum = 2*3.14*r
-    t = circum/v
+    v = calc_vmax(r, car)
+    circum = 2 * 3.14 * r
+    t = circum / v
 
     return t, v
 
@@ -73,13 +74,11 @@ def test_skidpad(car, step=1000, returnPoints=False):
         elif t > 1.25 * 5.046:
             y = 3.5
         else:
-            p = 3.5 + 71.5 * 16/9 * ((1.25 * 5.046 / t)**2 - 1)
+            p = 3.5 + 71.5 * 16 / 9 * ((1.25 * 5.046 / t) ** 2 - 1)
             y = p
     else:
         y = t
     return y
 
-
-#print(test_skidpad(car, returnPoints=False))
-#print(skidpad(IR,car))
-
+# print(test_skidpad(car, returnPoints=False))
+# print(skidpad(IR,car))
