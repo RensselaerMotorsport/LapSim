@@ -299,7 +299,6 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
     OUTPUTS:
         TBD
     """
-    
     requiredTorqueFront, requiredTorqueRear = RequiredTorque(wheelbase, frontTireDiameter, rearTireDiameter, vehicleWeight, forwardWeightDistribution, centerOfGravityHeight, acceleration)
 
     """ Setting Up Arrays Of Values To Iterate Through"""
@@ -347,7 +346,7 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
     # if rear pads are not set by user
     if (rearPad == -1):
         rearPadIndex = padCoefficientOfFrictionMin
-    else: 
+    else:
         rearPadIndex = np.array(padCoefficientOfFrictionMin[rearPad])
     
     # if front rotor size is not set by user
@@ -371,7 +370,6 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
     idealBalance = requiredTorqueFront/requiredTorqueRear
     print("\n")
     
-    
     #TBD, make more efficent by preventing repeat calculations
     #iterates through front and rear calipers and pads
     for c in range(frontCaliperIndex.size):
@@ -382,20 +380,18 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
             bestDifference = -1
             for d in range(frontPadIndex.size):
                 #makes sure front pad and caliper are compatible 
-                #front caliper is not set
-                print(frontCaliper)
-                print(frontCaliperIndex.size)
+                #front caliper is set
                 caseF1 = (frontCaliperIndex.size != 1) and ((padType[d] == caliperPadType[c]))
-                #front caliper is  set
-                caseF2 = (frontCaliperIndex.size == 1) and ((padType[frontPad] == caliperPadType[frontCaliper]))
+                #front caliper is not set
+                caseF2 = (frontCaliperIndex.size == 1) and ((padType[d] == caliperPadType[frontCaliper]))
                 if (caseF1 or caseF2):
                     #iterates through rear calipers and pads
                     for d1 in range(rearPadIndex.size):
                         #makes sure rear pad and caliper are compatible 
-                        #rear caliper not set
+                        #front caliper is set
                         caseR1 = (rearCaliperIndex.size != 1) and ((padType[d1] == caliperPadType[c1]))
-                        #rear caliper is set
-                        caseR2 = (rearCaliperIndex.size == 1) and ((padType[rearPad] == caliperPadType[rearCaliper]))
+                        #front caliper is not set
+                        caseR2 = (rearCaliperIndex.size == 1) and ((padType[d1] == caliperPadType[rearCaliper]))
                         if (caseR1 or caseR2):
                             #iterates through front master cylinders
                             for b in range(frontMasterCylinderSizes.size):
@@ -417,7 +413,7 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
                                                         #checks if the torque is greater than the required torque and less than 2 times the required torque
                                                         frontTorque = TorqueAtCombination(brakePedalRatios[a],frontMasterCylinderSizes[b],frontCaliperIndex[c],frontPadIndex[d],frontRotorOuterRadises[e],caliperNumberOfPistons[c])
                                                         if (frontTorque >= requiredTorqueFront*factorOfSafety and frontTorque <= 2*requiredTorqueFront*factorOfSafety):
-                                                            rearTorque = TorqueAtCombination(brakePedalRatios[a],rearMasterCylinderSizes[b1],rearCaliperIndex[c1],rearPadIndex[d1],rearRotorOuterRadises[e1],caliperNumberOfPistons[c1])
+                                                            rearTorque = TorqueAtCombination(brakePedalRatios[a],rearMasterCylinderSizes[b1],rearCaliperIndex[c1],frontPadIndex[d1],rearRotorOuterRadises[e1],caliperNumberOfPistons[c1])
                                                             if (rearTorque >= requiredTorqueRear*factorOfSafety and rearTorque <= 2*requiredTorqueRear*factorOfSafety):
                                                                 # checks if the torque balance is closer to the ideal balance than the previous best
                                                                 if (abs((frontTorque/rearTorque) - idealBalance)<bestDifference  or bestDifference==-1):
@@ -561,10 +557,11 @@ def TorqueAtCombination(brakePedalRatio, masterCylinderSize, caliperPistonArea, 
 #BrakeSystem(700, 8, 8, 10, 10, 60.5, 0.49, 13, 5.25, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1.3)
 
 #TBD: Calculating RM26 Master Cylinder Size (use to debug)
-BrakeSystem(600, 8, 8, 10, 10, 60.5, 0.49, 13, 5.25, -1, -1, -1 , 2, 0, 2, 3, 8/2, 7.5/2, 1.0, 3)
+BrakeSystem(600, 8, 8, 10, 10, 60.5, 0.49, 13, 5.25, -1, -1, -1 ,2, 0, -1, -1, 8/2, 7.5/2, 1.0, 3)
 
 #brakePedalRatio, brakeBias, frontMasterCylinder, rearMasterCylinder, frontCaliper, rearCaliper, frontPad, rearPad, frontRotorOuter, rearRotorOuter, factorOfSafety, priority
 
+#FUNCTION TO CALL 
 #BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelShellDiameter, rearWheelShellDiameter, wheelbase, forwardWeightDistribution, centerOfGravityHeight, brakePedalRatio, brakeBias, frontMasterCylinder, rearMasterCylinder, frontCaliper, rearCaliper, frontPad, rearPad, frontRotorOuter, rearRotorOuter, factorOfSafety)
 
 stop = timeit.default_timer()
