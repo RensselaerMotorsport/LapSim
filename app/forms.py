@@ -1,7 +1,10 @@
-from flask_wtf import FlaskForm
-from wtforms import StringField, DecimalField, SubmitField
-import json #car data
-import os #get current working directory for json file
+# Standard library imports
+import json  # Used for loading car data from JSON files
+import os    # Used for getting the current working directory to locate JSON files
+
+# Related third-party imports
+from flask_wtf import FlaskForm  # Used for creating Flask form classes
+from wtforms import StringField, DecimalField, SubmitField  # Used for creating form fields
 
 #each perimeter from the json file if the user wants to change them
 #no data is required, a blank field should use the json data
