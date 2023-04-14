@@ -93,6 +93,19 @@ track[n,1] = 0
 Vsum = 0
 Dsum = 0
 def run_oval(car, x, r, GR=0, mu=0, dstep=0.01, peak=False):
+    """A function for testing the car on an oval track
+    
+    Given: car, the car object we are considering
+    x, the the distance of the straightaway
+    r, the radius of the corner
+    GR, the gear ratio we are considering
+    mu, the friction factor we are considering
+    dstep, the distance step we are sweeping over, default is .01 meters
+    peak, a boolean representing whether or not we are running at peak torque, default is False and we are not
+    
+    Returns:
+    d, a vector that represents the distance traveled in each step
+    v, a vector that represents the car speed in each step"""
     d = [0] # Car distance travelled
     v = [0] # Car speed
     try:
@@ -116,24 +129,30 @@ def run_oval(car, x, r, GR=0, mu=0, dstep=0.01, peak=False):
     return d, v
 
 def s_pin(autoX=True):
+    """A straight into a harpin turn."""
     if autoX:
         return 10 + random() * 50
     else:
         return 10 + random() * 67
 
 def s_wide(autoX=False):
+    """A straight into a wide turn"""
     if autoX:
         return 10 + random() * 35
     else:
         return 10 + random() * 51
 
 def r_const(autoX=False):
+    """Defines a random constant radius corner.
+    """
     if autoX:
         return 1 / (23 / 2 + random() * 11)
     else:
         return 1 / (15 + random() * 12)
 
 def r_pin(autoX=False):
+    """Defines a random harpin corner.
+    """
     if autoX:
         return 1 / (4.5 + random() * 4.5)
     else:
@@ -151,6 +170,12 @@ def construct_track(dist, autoX=True):
         f. Miscellaneous: Chicanes, multiple turns, decreasing radius turns, etc.
         g. Minimum track width: 3.5 m
         h. Length of each run should be approximately 0.80 km
+
+    Inputs: dist, the overall distance of the track
+    autoX, a boolean representing whether we are testing autocross or endurance
+
+    Returns: x, a vector of segment distances
+    r, a vector of corner radi for each segment
     """
     x = []
     r = []
