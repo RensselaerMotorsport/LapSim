@@ -93,6 +93,19 @@ track[n,1] = 0
 Vsum = 0
 Dsum = 0
 def run_oval(car, x, r, GR=0, mu=0, dstep=0.01, peak=False):
+    """A function for testing the car on an oval track
+    
+    Given: car, the car object we are considering
+    x, the the distance of the straightaway
+    r, the radius of the corner
+    GR, the gear ratio we are considering
+    mu, the friction factor we are considering
+    dstep, the distance step we are sweeping over, default is .01 meters
+    peak, a boolean representing whether or not we are running at peak torque, default is False and we are not
+    
+    Returns:
+    d, a vector that represents the distance traveled in each step
+    v, a vector that represents the car speed in each step"""
     d = [0] # Car distance travelled
     v = [0] # Car speed
     try:
