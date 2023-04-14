@@ -1,0 +1,12 @@
+body {
+    /* background-blend-mode: lighten;
+    background-image: url(RM-LOGO-3-blk-08.jpg);
+    background-size: contain;
+    background-repeat: no-repeat; */
+    background-color: rgb(44, 41, 41);
+    color: rgb(224, 229, 235);
+}
+
+.form-control-sm {
+    background-color: rgb(219, 219, 219);
+}
