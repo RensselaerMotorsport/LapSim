@@ -2,7 +2,7 @@
 from flask import (flash, make_response, redirect, render_template,
                    request, session, url_for, Blueprint)
 # Local classes
-from forms import rm_25_form, rm_26_form
+from forms import rm_25_form, rm_26_form,  brakes_form
 from cookie_utils import can_add_cookie
 from graph import generate_graph
 # Looping through all possible combinations of sweep values
@@ -18,6 +18,7 @@ import sys
 
 directory = os.getcwd()
 sys.path.insert(1, directory+'\\src')
+sys.path.insert(1, directory+'\\src\\brakes')
 from classes.car_simple import Car
 
 output_bp = Blueprint('output_bp', __name__)
@@ -52,6 +53,8 @@ def create_form(form_name, module, operation, json_file):
         form = rm_25_form(form_name)
     elif json_file == 'rm26.json':
         form = rm_26_form(form_name)
+    elif json_file == 'brakes.json':
+        form = brakes_form(form_name)
     else:
         raise ValueError(f"Unsupported json_file: {json_file}")
 
@@ -172,32 +175,44 @@ def output():
         value_names = list(values.keys())
         sweep_combos = tuple(tuple(x) for x in json.loads(session.get('sweep_combos_str')))
         time_data = []
+        brake_info = []
 
         for combo in sweep_combos:
             data = session.get('data' + str(combo))
-            if data:
-                car = Car(data)
+            car = Car(data)
+            if operation.__name__ == 'brake_input':
+                brake_info.append(operation(car).tolist())
+            else:
                 time_data.append(Decimal(round(operation(car), 3)))
 
-        if len(value_names) == 2:
-            isocontour_data, layout = generate_graph(time_data, sweep_combos, value_names)
-            isocontour_data_json = json.dumps(isocontour_data, cls=DecimalEncoder)
-            layout_json = json.dumps(layout, cls=DecimalEncoder)
+        if operation.__name__ == 'brake_input':
+            response = make_response(render_template('brake_output.html', brake_info=brake_info, sweep_combos=sweep_combos,
+                                                     values=values))
         else:
-            isocontour_data_json = None
-            layout_json = None
+            if len(value_names) == 2:
+                isocontour_data, layout = generate_graph(time_data, sweep_combos, value_names)
+                isocontour_data_json = json.dumps(isocontour_data, cls=DecimalEncoder)
+                layout_json = json.dumps(layout, cls=DecimalEncoder)
+            else:
+                isocontour_data_json = None
+                layout_json = None
 
-        response = make_response(render_template('output.html', time_data=time_data, sweep_combos=sweep_combos, values=values, isocontour_data=isocontour_data_json, layout=layout_json))
+            response = make_response(render_template('output.html', time_data=time_data, sweep_combos=sweep_combos,
+                                                     values=values, isocontour_data=isocontour_data_json, layout=layout_json))
 
         for combo in sweep_combos:
             session.pop('data' + str(combo), None)
     else:
         data = session.get('data')
         car = Car(data)
-        time_data = []
-        time_data.append(Decimal(round(operation(car), 3)))
-
-        response = make_response(render_template('output.html', time_data=time_data, sweep_combos=[], values={}))
+        if operation.__name__ == 'brake_input':
+            brake_info = []
+            brake_info.append(operation(car).tolist())
+            response = make_response(render_template('brake_output.html', brake_info=brake_info))
+        else:
+            time_data = []
+            time_data.append(Decimal(round(operation(car), 3)))
+            response = make_response(render_template('output.html', time_data=time_data, sweep_combos=[], values={}))
 
         session.pop('data', None)
 

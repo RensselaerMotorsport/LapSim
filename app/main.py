@@ -29,7 +29,11 @@ def rm26_acceleration():
 def rm26_skidpad():
     return create_form('/rm26_skidpad', 'skidpad', 'test_skidpad', 'rm26.json')
 
-#TODO: Make more forms!!!!!
+@app.route('/brakes', methods=['GET', 'POST'])
+def brakes():
+    return create_form('/brakes', 'brake_form', 'brake_input', 'brakes.json')
+
+# TODO: Make more forms!!!!!
 
 if __name__ == "__main__":
     app.run(debug=False)
