@@ -2,7 +2,7 @@
 from flask import (flash, make_response, redirect, render_template,
                    request, session, url_for, Blueprint)
 # Local classes
-from forms import rm_25_form, rm_26_form,  brakes_form
+from forms import rm_25_form, rm_26_form, brakes_form
 from cookie_utils import can_add_cookie
 from graph import generate_graph
 # Looping through all possible combinations of sweep values
@@ -176,18 +176,28 @@ def output():
         sweep_combos = tuple(tuple(x) for x in json.loads(session.get('sweep_combos_str')))
         time_data = []
         brake_info = []
+        caliperBrands = []
+        padBrand = []
+        caliperModel = []
+        padModel = []
 
         for combo in sweep_combos:
             data = session.get('data' + str(combo))
             car = Car(data)
             if operation.__name__ == 'brake_input':
-                brake_info.append(operation(car).tolist())
+                brake_info_data, caliperBrands_np, padBrand_np, caliperModel_np, padModel_np = operation(car)
+                brake_info.append(brake_info_data.tolist())
+                caliperBrands = caliperBrands_np.tolist()
+                padBrand = padBrand_np.tolist()
+                caliperModel = caliperModel_np.tolist()
+                padModel = padModel_np.tolist()
             else:
                 time_data.append(Decimal(round(operation(car), 3)))
 
         if operation.__name__ == 'brake_input':
             response = make_response(render_template('brake_output.html', brake_info=brake_info, sweep_combos=sweep_combos,
-                                                     values=values))
+                                         values=values, caliperBrands=caliperBrands, padBrand=padBrand, caliperModel=caliperModel,
+                                         padModel=padModel))
         else:
             if len(value_names) == 2:
                 isocontour_data, layout = generate_graph(time_data, sweep_combos, value_names)
@@ -206,9 +216,14 @@ def output():
         data = session.get('data')
         car = Car(data)
         if operation.__name__ == 'brake_input':
-            brake_info = []
-            brake_info.append(operation(car).tolist())
-            response = make_response(render_template('brake_output.html', brake_info=brake_info))
+            brake_info, caliperBrands_np, padBrand_np, caliperModel_np, padModel_np = operation(car)
+            brake_info = [brake_info.tolist()]
+            caliperBrands = caliperBrands_np.tolist()
+            padBrand = padBrand_np.tolist()
+            caliperModel = caliperModel_np.tolist()
+            padModel = padModel_np.tolist()
+            response = make_response(render_template('brake_output.html', brake_info=brake_info, caliperBrands=caliperBrands,
+                                                     padBrand=padBrand, caliperModel=caliperModel, padModel=padModel))
         else:
             time_data = []
             time_data.append(Decimal(round(operation(car), 3)))

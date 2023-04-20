@@ -4,7 +4,7 @@ import os    # Used for getting the current working directory to locate JSON fil
 
 # Related third-party imports
 from flask_wtf import FlaskForm  # Used for creating Flask form classes
-from wtforms import StringField, DecimalField, SubmitField  # Used for creating form fields
+from wtforms import StringField, DecimalField, SubmitField, RadioField  # Used for creating form fields
 
 #each perimeter from the json file if the user wants to change them
 #no data is required, a blank field should use the json data
@@ -16,7 +16,7 @@ class rm_25_form(FlaskForm):
     fields = {}
     for key, value in list(data.items()):
         label = key.replace('_', ' ').title() + ' ({})'.format(value)
-        if label == "gear ratios":
+        if key == "gear_ratios":
             fields[key] = StringField(label=label)
             fields[key+'_begin'] = StringField('Begin Sweep')
             fields[key+'_end'] = StringField('End Sweep')
@@ -70,4 +70,5 @@ class brakes_form(FlaskForm):
     # set fields as class attributes
     locals().update(fields)
 
+    # priority = RadioField('Priority', choices=[('1', 'Cost'), ('2', 'Weight'), ('3', 'Performance')])
     submit = SubmitField('Calculate')

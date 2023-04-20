@@ -1,4 +1,4 @@
-from brakeCalcs import BrakeSystem
+from brakeCalcs import BrakeSystem, caliperBrands, padBrand, caliperModel, padModel
 
 # User Input
 def brake_input(car):
@@ -23,7 +23,8 @@ def brake_input(car):
     factorOfSafety = float(car.attrs["factor_of_safety"])
     priority = int(car.attrs["priority"])
 
-    return BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelShellDiameter,
+    return (BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelShellDiameter,
                        rearWheelShellDiameter, wheelbase, forwardWeightDistribution, centerOfGravityHeight,
                        brakePedalRatio, brakeBias, frontMasterCylinder, rearMasterCylinder, frontCaliper,
-                       rearCaliper, frontPad, rearPad, frontRotorOuter, rearRotorOuter, factorOfSafety, priority)
+                       rearCaliper, frontPad, rearPad, frontRotorOuter, rearRotorOuter, factorOfSafety, priority),
+                       caliperBrands, padBrand, caliperModel, padModel)
