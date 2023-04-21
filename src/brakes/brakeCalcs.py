@@ -50,7 +50,7 @@ padType = padData[:, [2]]
 padArea = np.asarray(padData[:, [4]], dtype = float)
 padCoefficientOfFrictionMin = np.asarray(padData[:, [5]], dtype = float)
 padCoefficientOfFrictionMax = np.asarray(padData[:, [6]], dtype = float)
-padIdealTemperature = np.asarray(padData[:, [7]], dtype = float)
+padIdealTemperature = padData[:, [7]]
 padPricePer = np.asarray(padData[:, [8]], dtype = float)
 padCompatableMaterial = padData[:, [9]]
 
@@ -295,7 +295,7 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
         frontRotorOuter: float, the outer radius of the front rotor in inches
         rearRotorOuter: float, the outer radius of the rear rotor in inches
         factorOfSafety: float, the factor of safety of the brake system
-        priority: float, the priority of the brake system
+        priority: float, the priority of the brake system (cost, weight, performance)
     OUTPUTS:
         TBD
     """
@@ -383,8 +383,6 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
             for d in range(frontPadIndex.size):
                 #makes sure front pad and caliper are compatible 
                 #front caliper is not set
-                print(frontCaliper)
-                print(frontCaliperIndex.size)
                 caseF1 = (frontCaliperIndex.size != 1) and ((padType[d] == caliperPadType[c]))
                 #front caliper is  set
                 caseF2 = (frontCaliperIndex.size == 1) and ((padType[frontPad] == caliperPadType[frontCaliper]))
@@ -468,10 +466,6 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
                                                               
     """Filtering and Displaying Results"""      
     
-    
-
-
-
     #delete duplicate entries and zeros
     posibleCombinations = np.unique(posibleCombinations, axis=0)    
 
@@ -558,10 +552,10 @@ def TorqueAtCombination(brakePedalRatio, masterCylinderSize, caliperPistonArea, 
     return torque
 
 #Calculating all RM26 Possible Combinations
-#BrakeSystem(700, 8, 8, 10, 10, 60.5, 0.49, 13, 5.25, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1.3)
+BrakeSystem(700, 8, 8, 10, 10, 60.5, 0.49, 13, 5.25, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1.3, 2)
 
-#TBD: Calculating RM26 Master Cylinder Size (use to debug)
-BrakeSystem(600, 8, 8, 10, 10, 60.5, 0.49, 13, 5.25, -1, -1, -1 , 2, 0, 2, 3, 8/2, 7.5/2, 1.0, 3)
+#TBD: Calculating RM26 Master Cylinder Size (broken)
+#BrakeSystem(600, 8, 8, 10, 10, 60.5, 0.49, 13, 5.25, -1, -1, -1 , 2, -1, -1, -1, 8/2, 7.5/2, 1.0, 3)
 
 #brakePedalRatio, brakeBias, frontMasterCylinder, rearMasterCylinder, frontCaliper, rearCaliper, frontPad, rearPad, frontRotorOuter, rearRotorOuter, factorOfSafety, priority
 
