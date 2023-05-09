@@ -123,8 +123,8 @@ def display_specs(car, GR, mu=0):
     print("Top speed (km/hr): " + str(voltage * Kv * 2 * math.pi * r * 3.6 / (60 * GR)))
     print("Top speed (mph): " + str(voltage * Kv * 2 * math.pi * r * 3.6 / (60 * 1.609 * GR)))
     print("Peak acceleration (g's): " + str(230 * GR / (r * m * g)))
-    print("Accel time (s): " + str(run_accel(car, GR=GR, peak=True, mu=mu)))
+    print("Accel time (s): " + str(run_accel(car, GR=GR, peak=True, mu=mu, returnPoints=False)))
 
 
-#display_specs(car, 38/12, mu=1.7)
-#plot_accel(car, 2.5, 4, [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0], plotPoints=True, peak=True)
+display_specs(car, 38/12, mu=1.7)
+#plot_accel(car, 2.5, 4, [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0], plotPoints=False, peak=False)
