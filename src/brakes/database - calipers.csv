@@ -1,10 +1,31 @@
 Brand,Model,Part Number,Piston Area (in^2),# of Pistons,Weight (lb) (including pads),"Price (from manufacturer, as of spring 23)",Min Rotor Diameter (in),Max Rotor Diameter (in),Min Rotor Thickness (in),Max Rotor Thickness (in),Pad Type,Link
-ISR,2-piston caliper,22-049,0.7609,2,0.6393,266.86,5.90551,9.84252,0.181102,0.19685,29-002,https://www.isrbrakes.se/products/calipers/22-049.html
-ISR,4-piston caliper,22-048,0.7609,4,1.014,412.89,5.90551,9.84252,0.181102,0.19685,29-002,https://www.isrbrakes.se/products/calipers/22-048.html
-Wilwood,GP200,120-12178,1.23,2,0.9,128.64,8,11,0.19,0.25,4908,https://www.wilwood.com/Calipers/CaliperProd?itemno=120-12178
-Wilwood,PS1,120-5453,0.79,2,1.1,105.96,6,9,0.15,0.2,4108,https://www.wilwood.com/Calipers/CaliperProd?itemno=120-5453
-Wilwood,GP320,120-15752,1.227,4,2.1,212.01,9,11.5,0.24,0.81,6211,https://www.wilwood.com/calipers/CaliperList?subname=GP320
-Wilwood,Billet Dynalite Side Inlet,120-5082,2.4,4,2.4,168.54,10,13,0.75,0.83,7812,https://www.wilwood.com/calipers/caliperprod?itemno=120-5082
-Wilwood,Billet Dynalite Single,120-4062,1.2,2,1.8,125.02,6,13,0.25,0.38,6812,https://www.wilwood.com/calipers/caliperprod?itemno=120-4060
-AP Racing,CP4226,CP4226-2S0,0.7853981634,2,0.5291094,525,8.66142,8.66142,0.15748,0.15748,CP4226D27,https://apracing.com/special-vehicles/motorcycle/brake-calipers/cp4226-2s0
-AP Racing,CP4227,CP4227-2S0,0.7853981634,4,1.102,774.8,8.66142,8.66142,0.15748,0.15748,CP4226D27,https://apracing.com/special-vehicles/motorcycle/brake-calipers/cp4227-2s0
+ISR,2-piston caliper,22-049,0.761,2,0.64,266.86,5.91,9.84,0.18,0.20,29-002,https://www.isrbrakes.se/products/calipers/22-049.html
+ISR,4-piston caliper,22-048,0.761,4,1.01,412.89,5.91,9.84,0.18,0.20,29-002,https://www.isrbrakes.se/products/calipers/22-048.html
+Wilwood,GP200,120-12178,1.230,2,0.90,128.64,8.00,11.00,0.19,0.25,4908,https://www.wilwood.com/Calipers/CaliperProd?itemno=120-12178
+Wilwood,PS1,120-5453,0.790,2,1.10,105.96,6.00,9.00,0.15,0.20,4108,https://www.wilwood.com/Calipers/CaliperProd?itemno=120-5453
+Wilwood,GP320,120-15752,1.227,4,2.10,212.01,9.00,11.50,0.24,0.81,6211,https://www.wilwood.com/calipers/CaliperList?subname=GP320
+Wilwood,GP310,120-7736,1.227,4,2.00,247.28,11.00,11.50,0.18,0.25,6209,https://www.wilwood.com/Calipers/CaliperProd?itemno=120-7736%20%20%20%20%20%20%20&appid=0
+Wilwood,Go-Kart Caliper,120-5750,0.785,2,1.50,164.59,8.00,8.75,0.16,0.19,4308,https://www.wilwood.com/Calipers/CaliperProd?itemno=120-5750
+Wilwood,Billet Go-Kart Caliper,120-5498,0.785,2,1.20,164.5,8.00,8.75,0.10,0.12,4308,https://www.wilwood.com/calipers/caliperprod?itemno=120-5498
+Wilwood,Billet Dynalite Single,120-4062,1.200,2,1.80,125.02,6.00,13.00,0.25,0.38,6812,https://www.wilwood.com/calipers/caliperprod?itemno=120-4060
+Wilwood,Dynalite Single Floater,120-2498,2.400,1,1.60,148.63,6.00,13.00,0.18,0.25,6812,https://www.wilwood.com/Calipers/CaliperProd?itemno=120-2498%20%20%20%20%20%20%20&appid=0
+Wilwood,Dynalite Single IIIA,120-3842,1.200,2,2.00,102.22,6.00,13.00,0.18,0.25,6812,https://www.wilwood.com/Calipers/CaliperProd?itemno=120-3842
+Wilwood,Dynapro Single,120-9688,1.496,2,2.30,148.92,6.00,13.00,0.15,0.25,6812,https://www.wilwood.com/Calipers/CaliperProd?itemno=120-9688-LP%20%20%20%20&appid=0
+Wilwood,Dynapro Single LP,120-9688,1.496,2,1.10,148.92,6.00,13.00,0.15,0.25,6812,https://www.wilwood.com/Calipers/CaliperProd?itemno=120-9688-LP%20%20%20%20&appid=0
+Wilwood,Dynapro Single LW,120-10188,2.405,2,2.20,138.52,6.00,13.00,0.25,0.38,6812,https://www.wilwood.com/Calipers/CaliperProd?itemno=120-10188&appid=0
+Wilwood,Dynapro Single VW,120-16070,2.061,2,2.30,169.77,6.00,13.00,0.25,0.38,6812,https://www.wilwood.com/Calipers/CaliperProd?itemno=120-16070%20%20%20%20%20%20&appid=0
+Wilwood,SC 10 ,120-11644,0.882,2,1.80,121.2,6.50,9.00,0.15,0.25,10008,https://www.wilwood.com/Calipers/CaliperProd?itemno=120-11644
+Wilwood,SC 1 ,120-9851,1.230,1,1.30,72.75,6.50,9.00,0.15,0.25,6407,https://www.wilwood.com/Calipers/CaliperProd?itemno=120-9851
+Wilwood,SC 3,120-8787,0.870,1,1.00,72.75,6.50,9.00,0.15,0.25,6407,https://www.wilwood.com/calipers/CaliperProd?itemno=120-8787&appid=0
+Wilwood,SC 2,120-8691,1.060,1,1.00,66.69,6.50,9.00,0.15,0.25,6407,https://www.wilwood.com/Calipers/CaliperProd?itemno=120-8691
+Wilwood,DH4 Dual Hydraulic,120-8476,1.770,1,1.30,111.21,9.00,9.00,0.19,0.19,4508,https://www.wilwood.com/calipers/caliperprod?itemno=120-8476
+AP Racing,CP4226,CP4226-2S0,0.785,2,0.53,525,8.66,8.66,0.16,0.16,CP4226D27,https://apracing.com/special-vehicles/motorcycle/brake-calipers/cp4226-2s0
+AP Racing,CP4227,CP4227-2S0,0.785,4,1.10,774.8,8.66,8.66,0.16,0.16,CP4226D27,https://apracing.com/special-vehicles/motorcycle/brake-calipers/cp4227-2s0
+AP Racing,Aluminium - Lug Mount,CP2576,2.076454489,2,1.10,342.53,10.50,10.50,0.38,0.38,CP2399D43,https://apracing.com/race-car/brake-calipers/2-piston-range/aluminium-lug-mount-cp2576-cp2577-cp3176-cp3177-cp3178
+AP Racing,Aluminium - Lug Mount,CP2577,2.410697492,2,1.10,372.15,10.50,10.50,0.38,0.38,CP2399D43,https://apracing.com/race-car/brake-calipers/2-piston-range/aluminium-lug-mount-cp2576-cp2577-cp3176-cp3177-cp3179
+AP Racing,Aluminium - Lug Mount,CP3176,1.767145868,2,1.10,342.53,10.50,10.50,0.38,0.38,CP2399D43,https://apracing.com/race-car/brake-calipers/2-piston-range/aluminium-lug-mount-cp2576-cp2577-cp3176-cp3177-cp3180 
+AP Racing,Aluminium - Lug Mount,CP3177 ,1.577704675,2,1.10,347.69,10.50,10.50,0.38,0.38,CP2399D43,https://apracing.com/race-car/brake-calipers/2-piston-range/aluminium-lug-mount-cp2576-cp2577-cp3176-cp3177-cp3181 
+AP Racing,Aluminium - Lug Mount,CP3178,1.231053798,2,1.10,347.69,10.50,10.50,0.38,0.38,CP2399D43,https://apracing.com/race-car/brake-calipers/2-piston-range/aluminium-lug-mount-cp2576-cp2577-cp3176-cp3177-cp3182 
+AP Racing,CP2696-38E0,CP2696-38E0,2.077,2,4.154008,0,11.9685,11.9685,0.251969,0.251969,CP2195D38,https://apracing.com/special-vehicles/motorcycle/brake-calipers/cp2696-38e0
+Brembo,P34C,BRMB-1003-BLK-L,1.407,2,1.32,129.99,0.00,0.00,0.00,0.00,0,https://www.steadygarage.com/products/brembo-p34-brake-caliper?variant=40823397777467
+Brembo,34G,0,1.407,2,1.32,149.86,7.09,11.02,0.00,0.00,0,https://motowheels.com/i-23900708-brembo-34mm-caliper-34g-rear-side-inlet-and-bleed-gold-color.html

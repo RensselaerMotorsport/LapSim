@@ -1,15 +1,11 @@
 """
 BreakCalcs.py
-This file contains the functions used to calculate the configuration of the braking system
+This file contains the functions used to calculate the configuration of the braking system 
 """
 
-import math
+import math 
 import numpy as np
 import timeit
-
-# Web page imports
-import os
-directory = os.path.dirname(os.path.abspath(__file__))
 
 #start timer to calculate total time to run program
 start = timeit.default_timer()
@@ -31,8 +27,7 @@ sampleSize = 10 #number of samples to take for each brake system configuration, 
 #imports caliper data from csv files into numpy arrays
 
 #Brake Caliper Constants
-# caliperData = np.loadtxt(open("database - calipers.csv", "rb"), delimiter=",", skiprows=1, dtype=str)
-caliperData = np.loadtxt(open(os.path.join(directory, '../brakes/database - calipers.csv'), "rb"), delimiter=",", skiprows=1, dtype=str)
+caliperData = np.loadtxt(open("database - calipers.csv", "rb"), delimiter=",", skiprows=1, dtype=str)
 caliperBrands = caliperData[:, [0]]
 caliperModel = caliperData[:, [1]]
 caliperPartNumber = caliperData[:, [2]]
@@ -47,8 +42,7 @@ caliperMaxRotorThickness = np.asanyarray(caliperData[:, [10]], dtype = float)
 caliperPadType = caliperData[:, [11]]
 
 #Brake Pad Constants
-# padData = np.loadtxt(open("database - pads.csv", "rb"), delimiter=",", skiprows=1, dtype=str)
-padData = np.loadtxt(open(os.path.join(directory, '../brakes/database - pads.csv'), "rb"), delimiter=",", skiprows=1, dtype=str)
+padData = np.loadtxt(open("database - pads.csv", "rb"), delimiter=",", skiprows=1, dtype=str)
 padBrand = padData[:, [0]]
 padModel = padData[:, [1]]
 padPartNumber = padData[:, [3]]
@@ -56,17 +50,19 @@ padType = padData[:, [2]]
 padArea = np.asarray(padData[:, [4]], dtype = float)
 padCoefficientOfFrictionMin = np.asarray(padData[:, [5]], dtype = float)
 padCoefficientOfFrictionMax = np.asarray(padData[:, [6]], dtype = float)
-padIdealTemperature = padData[:, [7]]
+padIdealTemperature = np.asarray(padData[:, [7]], dtype = float)
 padPricePer = np.asarray(padData[:, [8]], dtype = float)
 padCompatableMaterial = padData[:, [9]]
 
 #Master Cylinder Sizes
 masterCylinderSizes = np.array([5/8,7/10,3/4,13/16,7/8,15/16,1])
 
+#User Input
+
 def UserInput():
     """
     This function takes user input for the vehicle and brake system
-    INPUTS:
+    INPUTS: 
         none
     OUTPUTS:
         vehicleWeight: weight of vehicle (lbs)
@@ -90,22 +86,22 @@ def UserInput():
         factorOfSafety: factor of safety for brake system
         priority: priority for brake system (cost, weight, performance)
     """
-
+    
     #TBD: add priority as input: cost, weight, performance, etc.
 
     # User inputs vehicle data (required for all calculations)
     vehicleWeight = float(input("Please enter the weight of your vehicle (with driver) in pounds. ")) #selects vehicle weight
-    frontTireDiameter = 2*float(input("Please enter the diameter of your front tires in inches. ")) #selects front tires
+    frontTireDiameter = 2*float(input("Please enter the diameter of your front tires in inches. ")) #selects front tires 
     rearTireDiameter = 2*float(input("Please enter the diameter of your rear tires in inches. ")) #selects rear tires
     frontWheelShellDiameter = float(input("Please enter the diameter of your front wheel shells in inches. ")) #selects front wheel shells
     rearWheelShellDiameter = float(input("Please enter the diameter of your rear wheel shells in inches. ")) #selects rear wheel shells
     wheelbase = float(input("Please enter the wheelbase of your vehicle in inches. ")) #selects wheelbase
     forwardWeightDistribution = float(input("Please enter the forward weight distribution of your vehicle in inches. ")) #selects front weight distribution
     centerOfGravityHeight = float(input("Please enter the center of gravity height of your vehicle in inches. ")) #selects center of gravity height
-
+    
     factorOfSafety = float(input("Please enter your desired factor of safety. ")) #selects factor of safety
     priority = float(input("Please enter your priority: cost(1), weight(2), or performance(3). ")) #selects priority
-
+    
     # User inputs brake data
     brakePedalRatio = SelectBrakePedalRatio() #selects brake pedal ratio
     brakeBias = SelectBrakeBias() #selects brake bias
@@ -151,7 +147,7 @@ def UserInput():
 #User Input Functions
 def SelectCalipers(frontOrRear):
     """ Allows user to select calipers
-    INPUTS:
+    INPUTS: 
         frontOrRear: string, either "front" or "rear"
     OUTPUTS:
         caliperNumber: int, the number of the caliper selected (can be used to refrence caliper data arrays). = -1 if no caliper is selected
@@ -299,21 +295,20 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
         frontRotorOuter: float, the outer radius of the front rotor in inches
         rearRotorOuter: float, the outer radius of the rear rotor in inches
         factorOfSafety: float, the factor of safety of the brake system
-        priority: float, the priority of the brake system (cost, weight, performance)
+        priority: float, the priority of the brake system
     OUTPUTS:
         TBD
     """
-    
     requiredTorqueFront, requiredTorqueRear = RequiredTorque(wheelbase, frontTireDiameter, rearTireDiameter, vehicleWeight, forwardWeightDistribution, centerOfGravityHeight, acceleration)
 
     """ Setting Up Arrays Of Values To Iterate Through"""
     # if pedal ratio is not set by user
     if (brakePedalRatio == -1):
         #make 100 evenly spaced points between 1 and 10
-        brakePedalRatios = np.linspace(5, 6, sampleSize)
+        brakePedalRatios = np.linspace(5, 6, sampleSize)        
     else:
         brakePedalRatios = np.array([brakePedalRatio])
-
+    
     # if front master cylinder is not set by user
     if (frontMasterCylinder == -1):
         frontMasterCylinderSizes = masterCylinderSizes
@@ -325,7 +320,7 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
         rearMasterCylinderSizes = masterCylinderSizes
     else:
         rearMasterCylinderSizes = np.array([rearMasterCylinder])
-
+    
     # if front caliper is not set by user
     if (frontCaliper == -1):
         # front caliper index array is set to the total number of possible calipers
@@ -333,7 +328,7 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
     else:
         # front caliper index array is set to the user selected caliper
         frontCaliperIndex = np.array(caliperPistonArea[frontCaliper])
-
+    
     # if rear caliper is not set by user
     if (rearCaliper == -1):
         # rear caliper index array is set to the total number of possible calipers
@@ -347,19 +342,19 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
         frontPadIndex = padCoefficientOfFrictionMin
     else:
         frontPadIndex = np.array(padCoefficientOfFrictionMin[frontPad])
-
+    
     # if rear pads are not set by user
     if (rearPad == -1):
         rearPadIndex = padCoefficientOfFrictionMin
-    else: 
+    else:
         rearPadIndex = np.array(padCoefficientOfFrictionMin[rearPad])
-
+    
     # if front rotor size is not set by user
     if (frontRotorOuter == -1):
-        frontRotorOuterRadises = np.linspace(np.min(caliperMinRotorDiameter)/2, np.max(caliperMaxRotorDiameter)/2, sampleSize)
+        frontRotorOuterRadises = np.linspace(np.min(caliperMinRotorDiameter)/2, np.max(caliperMaxRotorDiameter)/2, sampleSize)    
     else:
         frontRotorOuterRadises = np.array([frontRotorOuter])
-
+    
     # if rear rotor size is not set by user
     if (rearRotorOuter == -1):
         rearRotorOuterRadises = np.linspace(np.min(caliperMinRotorDiameter)/2, np.max(caliperMaxRotorDiameter)/2, sampleSize)
@@ -375,7 +370,6 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
     idealBalance = requiredTorqueFront/requiredTorqueRear
     print("\n")
     
-    
     #TBD, make more efficent by preventing repeat calculations
     #iterates through front and rear calipers and pads
     for c in range(frontCaliperIndex.size):
@@ -386,18 +380,18 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
             bestDifference = -1
             for d in range(frontPadIndex.size):
                 #makes sure front pad and caliper are compatible 
-                #front caliper is not set
+                #front caliper is set
                 caseF1 = (frontCaliperIndex.size != 1) and ((padType[d] == caliperPadType[c]))
-                #front caliper is  set
-                caseF2 = (frontCaliperIndex.size == 1) and ((padType[frontPad] == caliperPadType[frontCaliper]))
+                #front caliper is not set
+                caseF2 = (frontCaliperIndex.size == 1) and ((padType[d] == caliperPadType[frontCaliper]))
                 if (caseF1 or caseF2):
                     #iterates through rear calipers and pads
                     for d1 in range(rearPadIndex.size):
                         #makes sure rear pad and caliper are compatible 
-                        #rear caliper not set
+                        #front caliper is set
                         caseR1 = (rearCaliperIndex.size != 1) and ((padType[d1] == caliperPadType[c1]))
-                        #rear caliper is set
-                        caseR2 = (rearCaliperIndex.size == 1) and ((padType[rearPad] == caliperPadType[rearCaliper]))
+                        #front caliper is not set
+                        caseR2 = (rearCaliperIndex.size == 1) and ((padType[d1] == caliperPadType[rearCaliper]))
                         if (caseR1 or caseR2):
                             #iterates through front master cylinders
                             for b in range(frontMasterCylinderSizes.size):
@@ -419,7 +413,7 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
                                                         #checks if the torque is greater than the required torque and less than 2 times the required torque
                                                         frontTorque = TorqueAtCombination(brakePedalRatios[a],frontMasterCylinderSizes[b],frontCaliperIndex[c],frontPadIndex[d],frontRotorOuterRadises[e],caliperNumberOfPistons[c])
                                                         if (frontTorque >= requiredTorqueFront*factorOfSafety and frontTorque <= 2*requiredTorqueFront*factorOfSafety):
-                                                            rearTorque = TorqueAtCombination(brakePedalRatios[a],rearMasterCylinderSizes[b1],rearCaliperIndex[c1],rearPadIndex[d1],rearRotorOuterRadises[e1],caliperNumberOfPistons[c1])
+                                                            rearTorque = TorqueAtCombination(brakePedalRatios[a],rearMasterCylinderSizes[b1],rearCaliperIndex[c1],frontPadIndex[d1],rearRotorOuterRadises[e1],caliperNumberOfPistons[c1])
                                                             if (rearTorque >= requiredTorqueRear*factorOfSafety and rearTorque <= 2*requiredTorqueRear*factorOfSafety):
                                                                 # checks if the torque balance is closer to the ideal balance than the previous best
                                                                 if (abs((frontTorque/rearTorque) - idealBalance)<bestDifference  or bestDifference==-1):
@@ -432,7 +426,7 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
                                                                     posibleCombinations[i,3] = frontMasterCylinderSizes[b] # record front master cylinder size
                                                                     posibleCombinations[i,4] = rearMasterCylinderSizes[b1] # record rear master cylinder size
                                                                     if(frontCaliperIndex.size ==1):
-                                                                        posibleCombinations[i,5] = frontCaliper
+                                                                        posibleCombinations[i,5] = frontCaliper 
                                                                     else:
                                                                         posibleCombinations[i,5] = c # record front caliper size
                                                                     if(rearCaliperIndex.size == 1):
@@ -453,7 +447,7 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
                                                                     posibleCombinations[i,11] = bestDifference
                                                                     posibleCombinations[i,12] = 100*bestDifference/idealBalance
                                                                     i+=1
-
+            
             #if best difference is not the min for a calipers selection, delete the combination
             for j in range(posibleCombinations.shape[0]):
                 if(frontCaliperIndex.size ==1):
@@ -470,8 +464,12 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
                                                               
     """Filtering and Displaying Results"""      
     
+    
+
+
+
     #delete duplicate entries and zeros
-    posibleCombinations = np.unique(posibleCombinations, axis=0)
+    posibleCombinations = np.unique(posibleCombinations, axis=0)    
 
     #delete first row if it is all zeros
     if (posibleCombinations[0,0] == 0):
@@ -505,11 +503,11 @@ def BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelSh
         print("Percent off ideal balance: ", posibleCombinations[i,12])
         print("Total Cost: ", posibleCombinations[i,13])
         print("Total Weight: ", posibleCombinations[i,14] , "lbs")
-        print("\n")
-
+        print("\n")   
+    
     #print number of combinations
-    print("Number of combinations: ", i+1)
-
+    print("Number of combinations: ", i+1)    
+    
 
     return posibleCombinations
 
@@ -546,24 +544,25 @@ def TorqueAtCombination(brakePedalRatio, masterCylinderSize, caliperPistonArea, 
         rotorRadiusOuter: float, the outer radius of the rotor in inches
         caliperPistonArea: float, the area of the caliper piston in inches^2
     OUTPUTS:
-        torque: float, the torque at the combination.
+        torque: float, the torque at the combination. 
     """
     rotorEffectiveRadius = rotorRadiusOuter - math.sqrt(caliperPistonArea/math.pi)
     masterCylinderArea = math.pi*(masterCylinderSize**2)
     linePressure = (diverPedalForce*(brakePedalRatio/2))/(masterCylinderArea/2)
-    torque = numberOfPistons * padCoefficientOfFrictionMax * rotorEffectiveRadius * caliperPistonArea * linePressure
+    torque = numberOfPistons * padCoefficientOfFrictionMax * rotorEffectiveRadius * caliperPistonArea * linePressure 
 
     return torque
 
 #Calculating all RM26 Possible Combinations
-BrakeSystem(700, 8, 8, 10, 10, 60.5, 0.49, 13, 5.25, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1.3, 2)
+#BrakeSystem(700, 8, 8, 10, 10, 60.5, 0.49, 13, 5.25, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1.3)
 
-#TBD: Calculating RM26 Master Cylinder Size (broken)
-#BrakeSystem(600, 8, 8, 10, 10, 60.5, 0.49, 13, 5.25, -1, -1, -1 , 2, -1, -1, -1, 8/2, 7.5/2, 1.0, 3)
+#TBD: Calculating RM26 Master Cylinder Size (use to debug)
+BrakeSystem(600, 8, 8, 10, 10, 60.5, 0.49, 13, 5.25, -1, -1, -1 ,2, 0, -1, -1, 8/2, 7.5/2, 1.0, 3)
 
 #brakePedalRatio, brakeBias, frontMasterCylinder, rearMasterCylinder, frontCaliper, rearCaliper, frontPad, rearPad, frontRotorOuter, rearRotorOuter, factorOfSafety, priority
 
+#FUNCTION TO CALL 
 #BrakeSystem(vehicleWeight, frontTireDiameter, rearTireDiameter, frontWheelShellDiameter, rearWheelShellDiameter, wheelbase, forwardWeightDistribution, centerOfGravityHeight, brakePedalRatio, brakeBias, frontMasterCylinder, rearMasterCylinder, frontCaliper, rearCaliper, frontPad, rearPad, frontRotorOuter, rearRotorOuter, factorOfSafety)
 
 stop = timeit.default_timer()
-print('Time: ', stop - start)
+print('Time: ', stop - start)  

@@ -1,5 +1,34 @@
-Brand,Model,Pad Type,Part Number,Area (in^2),Coefficient of Friction (Min),Coefficient of Friction (Max),Ideal Temp (F),Price Per Pad,Compatible Rotor Material,Link
+Brand,Compound,Pad Type,Part Number,Area (in^2),Coefficient of Friction (Min Temp),Coefficient of Friction (Ideal Temp),Ideal Temp (F),Price Per Pad,Compatible Rotor Material,Link
 Wilwood,Purple Pad for Aluminum Rotor,4908,150-12270K,1.83,0.29,0.44,475,13.465,Aluminum,https://www.wilwood.com/BrakePads/BrakePadsProd?itemno=150-12270K
-Wilwood,BP 20,4908,150-14981K,1.83,0.4,0.45,850,18.63,"SteelStainless SteelIron",https://www.wilwood.com/BrakePads/BrakePadsProd?itemno=150-14981K
-Wilwood,Composite Metallic,4908,150-12128K,1.83,0.37,0.51,1250,17.0475,"SteelStainless SteelIronSuper AlloyTitanium",https://www.wilwood.com/brakepads/BrakePadsProd?itemno=150-12128K
+Wilwood,BP20,4908,150-14981K,1.83,0.4,0.45,450,18.63,"Steel Stainless Steel Iron",https://www.wilwood.com/BrakePads/BrakePadsProd?itemno=150-14981K
+Wilwood,Composite Metallic,4908,150-12128K,1.83,0.47,0.51,1250,17.0475,"Steel Stainless Steel Iron Super Alloy Titanium",https://www.wilwood.com/brakepads/BrakePadsProd?itemno=150-12128K
+Wilwood,High Friction Metallic BP10,4108,150-4091,2,0,0,0,0,0,0
+Wilwood,Sintered Metallic,4108,150-4091K,2,0,0,0,14.655,0,https://www.wilwood.com/BrakePads/BrakePadsProd?itemno=150-4091K
+SBS,Dual Carbon,29-002,655DC,2.17,0,0,0,0,0,0
 EBC,GPFAX EBC Sintered Brake Pads,29-002,GPFAX184HH,2.17,0.6,0.7,0,23.47,0,https://www.bikehps.com/ebc/EBC_GPFAX_Dyno.html
+Strange Engineering,Soft Metallic Brake Pad,B2510,B2510,0,0,0,0,0,,0
+Wilwood,Sintered Metallic,10008,150-10356K,0,0,0,0,15.4675,,https://www.wilwood.com/BrakePads/BrakePadsProd?itemno=150-10356K
+Wilwood,BP10,6407,150-8990K,1.7,0.43,0.43,200,10.345,,https://www.wilwood.com/BrakePads/BrakePadsProd?itemno=150-8990K
+Wilwood,Sintered Metallic,6407,150-15798K,1.7,0,0,0,11.685,,https://www.wilwood.com/brakepads/BrakePadsProd?itemno=150-15798K
+Wilwood,BP20,6812,150-9765K,1.5,0.4,0.45,450,18.63,,https://www.wilwood.com/brakepads/BrakePadsProd?itemno=150-9765K
+Wilwood,BP10,6812,150-9764K,1.5,0.43,0.43,200,13.8525,,https://www.wilwood.com/BrakePads/BrakePadsProd?itemno=150-9764K
+Wilwood,BP28,6812,150-28-6812K,1.5,0.4,0.48,850,27.97,,https://www.wilwood.com/BrakePads/BrakePadsProd?itemno=150-28-6812K
+Wilwood,BP30,6812,150-14770K,1.5,0.38,0.54,1200,28.98,,https://www.wilwood.com/brakepads/BrakePadsProd?itemno=150-14770K
+Wilwood,BP40,6812,150-12242K,1.5,0.43,0.53,800,26.32,,https://www.wilwood.com/brakepads/BrakePadsProd?itemno=150-12242K
+Wilwood,BPQ,6812,150-Q-6812K,1.5,0.5,0.5,300,26.8125,,https://www.wilwood.com/BrakePads/BrakePadsProd?itemno=150-Q-6812K
+Wilwood,Polymatrix A,6812,15A-10142K,1.5,0.43,0.57,700,32.1625,,https://www.wilwood.com/brakepads/BrakePadsProd?itemno=15A-10142K
+Wilwood,Polymatrix B,6812,15B-9819K,1.5,0.37,0.47,800,28.03,,https://www.wilwood.com/BrakePads/BrakePadsProd?itemno=15B-9819K
+Wilwood,Polymatrix E,6812,15E-9820K,1.5,0.46,0.46,200,24.075,,https://www.wilwood.com/BrakePads/BrakePadsProd?itemno=15E-9820K
+Wilwood,Purple,6812,150-9766K,1.5,0.28,0.44,475,22.5475,,https://www.wilwood.com/BrakePads/BrakePadsProd?itemno=150-9766K
+Wilwood,Sintered Metallic,4508,150-7192K,1.99,0,0,0,16.6225,,https://www.wilwood.com/BrakePads/BrakePadsProd?itemno=150-7192K
+AP Racing,APF403,CP2195D38,CP2195D38,3.47,0.38,0.47,700,0,,https://apracing.com/race-car/brake-pads/2-piston-caliper-pad-profiles/cp2195d38
+AP Racing,APF405,CP2195D38,CP2195D38,3.47,0.31,0.42,850,0,,https://apracing.com/race-car/brake-pads/2-piston-caliper-pad-profiles/cp2195d39
+Ferodo Racing,4003F ,CP2195D38,11 FRP3056C-N,3.47,0.34,0.5,850,47.7825,,https://www.essexparts.com/ferodo-4003-brake-pads925
+AP Racing,APH420 ,CP2195D38,CP2195D38,3.47,0,0,0,0,,https://apracing.com/race-car/brake-pads/2-piston-caliper-pad-profiles/cp2195d41
+AP Racing,M1144 ,CP2195D38,CP2195D38,3.47,0,0,0,0,,https://apracing.com/race-car/brake-pads/2-piston-caliper-pad-profiles/cp2195d42
+Ferodo Racing,DS2500,CP2195D38,11 FCP0002H-N,3.47,0.4,0.42,570,35,,https://www.essexparts.com/ferodo-ds2500-brake-pads
+Carbon Lorraine ,RQ3,CP4226D27,CP4226D27-RQ3,1.45,0.41,0.41,N/A used average mu,0,0,0
+SBS,APH420 ,CP4226D27,CP4226D27-APH420,1.45,0.39,0.39,N/A used average mu,0,0,0
+AP Racing,APF403,CP2399D43,CP2399D43-APF403,4.29,0.38,0.47,700,0,,https://apracing.com/race-car/brake-pads/2-piston-caliper-pad-profiles/cp2399d43
+AP Racing,APF405,CP2399D43,CP2399D43-APF405,4.29,0.31,0.42,850,0,,https://apracing.com/race-car/brake-pads/2-piston-caliper-pad-profiles/cp2399d43
+Ferodo Racing,DS2500,CP2399D43,CP2399D43-DS2500,4.29,0.4,0.42,570,35,,https://www.essexparts.com/ferodo-ds2500-brake-pads
