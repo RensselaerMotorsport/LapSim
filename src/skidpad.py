@@ -54,7 +54,7 @@ def skidpad(r, car):
     return t, v
 
 
-def test_skidpad(car, step=1000, returnPoints=False):
+def test_skidpad(car, step=1000, returnPoints=False, printStats=False):
     """A function to calculate the time elapsed or points earned at the skidpad dynamic event.
 
     :param car: Car dictionary
@@ -67,6 +67,16 @@ def test_skidpad(car, step=1000, returnPoints=False):
     for i in range(radii.size):
         times[i] = skidpad(radii[i], car)[0]
     t = times.min()
+    if printStats:
+        for k, j in np.ndenumerate(times):
+            if j == t:
+                indx = k
+        r = radii[indx]
+        print(r)
+        v = calc_vmax(radii[indx], car)
+        print(v)
+        print(v ** 2 / r / 9.81)
+        print(times[indx])
     if returnPoints:
         if t <= 5.046:
             y = 75
@@ -78,7 +88,6 @@ def test_skidpad(car, step=1000, returnPoints=False):
     else:
         y = t
     return y
-
 
 #print(test_skidpad(car, returnPoints=False))
 #print(skidpad(IR,car))
