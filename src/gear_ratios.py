@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from helper_functions_ev import motor_torque
 from helper_functions_ev import traction_force
 from classes.car_simple import Car
-from acceleration import run_accel
+#from acceleration import run_accel
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -125,6 +125,16 @@ def display_specs(car, GR, mu=0):
     print("Peak acceleration (g's): " + str(230 * GR / (r * m * g)))
     print("Accel time (s): " + str(run_accel(car, GR=GR, peak=True, mu=mu, returnPoints=False)))
 
+def display_wvs():
+    x, y = traction = calc_traction_force(car, 0.01, 35, 1.4)
+    for i in range(len(y)):
+        y[i] /= 1.4
+    print(y[0])
+    plt.plot(x, y)
+    plt.title("Weight (N) vs. Speed (m/s)", fontsize=18, y=1.04)
+    plt.grid()
+    plt.show()
 
-display_specs(car, 38/12, mu=1.7)
+#display_specs(car, 33/12, mu=1.4)
 #plot_accel(car, 2.5, 4, [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0], plotPoints=False, peak=False)
+
