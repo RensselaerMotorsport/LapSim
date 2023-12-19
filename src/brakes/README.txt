@@ -1,3 +1,7 @@
+NOTICE: THIS PROJECT HAS BEEN MOVED TO ITS OWN REPOSITORY, AT https://github.com/RensselaerMotorsport/BrakesSystemConfigurator
+THIS FOLDER IS NOW OUT OF DATE AS OF 9/1/2023
+
+
 Bridget will put things here
 
 commit at the end of each class

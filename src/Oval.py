@@ -37,59 +37,6 @@ track[n,0] = 0
 track[n,1] = 0
 
 
-
-"""def runtrack(Car, track):
-    
-    A function to run the oval track given the car object, straight distance, and corner radius and output a time. 
-    
-    Parameters:
-    Car - car object
-    track - 2-D array of distance and radius
-
-    Return - Track Time
-    
-    #Initialize time and velocity arrays, time will be output and velocity can be conditional output (In future)
-    time = np.zeros(track.size)
-    velocity = np.zeros(track.size)
-    velocity[0] = .0001
-    
-    for i in range(track.size):
-        iter = i+1
-        if iter == n:
-            break
-
-        #print("Iter =",iter)
-        #print("Velocity =",velocity[i])
-        #print("Radius =",track[i,1])
-        #print("Distance=",track[i,0])
-
-        if track[i,1] == 0:
-            time[i+1],velocity[i+1] = forward_int(Car, velocity[i],track[i,0], dstep=0.0001)#velocity[i+1] is the exit velocity
-            print(velocity)
-        else:
-            vmax = calc_vmax(corner_r,Car)
-            #print("Vmax=", vmax)
-            if velocity[i] < vmax or velocity[i] == vmax:
-                time[i+1] = (math.pi*corner_r)/velocity[i]
-                velocity[i+1] = velocity[i]
-            elif velocity > vmax:
-                for j in range(1,77):
-                    d = braking_length(Car,velocity[-j],vmax,returnVal=1)
-                    if d - 77-j < 1:
-                        velocity[j:] = braking_length(Car,velocity(-j),vmax,returnVal=2)
-                        time[j:] = braking_length(Car,velocity(-j),vmax,returnVal=3)
-                time[i+1] = (math.pi*corner_r)/vmax
-                velocity[i+1] = vmax
-
-
-
-    return ("Lap Time is", np.sum(time, axis=None))"""
-
-#print(runtrack(car, track))
-
-
-#plt.plot(forward_int(Car, 0,27,returnVal=0),forward_int(Car, 0,27,returnVal=1))
-#plt.show
 Vsum = 0
 Dsum = 0
 def run_oval(car, x, r, GR=0, mu=0, dstep=0.01, peak=False):
@@ -106,26 +53,38 @@ def run_oval(car, x, r, GR=0, mu=0, dstep=0.01, peak=False):
     Returns:
     d, a vector that represents the distance traveled in each step
     v, a vector that represents the car speed in each step"""
-    d = [0] # Car distance travelled
+    d = [0] # Car distance traveled
     v = [0] # Car speed
     try:
         for i in range(len(x)):
             if r[i] == 0: # Straight segment
-                v1 = straight_line_segment(car, v[len(v) - 1], calc_vmax(1 / r[i+1], car), x[i], GR=GR, mu=mu, dstep=dstep, peak=peak)
-                for j in range(1, len(v1), 1):
-                    v.append(v1[j])
-                    d.append(dstep + d[len(d) - 1])
+                try:
+                    v1 = straight_line_segment(car, v[len(v) - 1], calc_vmax(1 / r[i + 1], car), x[i], GR=GR, mu=mu, dstep=dstep, peak=peak)
+                    for j in range(1, len(v1), 1):
+                        v.append(v1[j])
+                        d.append(dstep + d[len(d) - 1])
+                except:
+                    print("Straight line error")
+                    print("Cornering speed: ")
+                    print(calc_vmax(1 / r[i + 1], car))
+                    print("Initial speed: ")
+                    print(v[len(v) - 1])
+                    print("Distance: ")
+                    print(x[i])
+                    v1 = straight_line_segment(car, v[len(v) - 1], calc_vmax(1 / r[i + 1], car), x[i], GR=GR, mu=mu, dstep=dstep, peak=peak)
+                    print(v1)
             else: # Cornering
-                v1 = min(calc_vmax(1 / r[i], car), v[len(v) - 1])
-                global Vsum
-                global Dsum
-                Vsum += v1 * x[i]
-                Dsum += x[i]
-                for j in np.arange(0, x[i], dstep):
-                    v.append(v1)
-                    d.append(dstep + d[len(d) - 1])
-    except:
-        print("error")
+                try:
+                    v1 = min(calc_vmax(1 / r[i], car), v[len(v) - 1])
+                    # global Vsum
+                    # global Dsum
+                    # Vsum += v1 * x[i]
+                    # Dsum += x[i]
+                    for j in np.arange(0, x[i], dstep):
+                        v.append(v1)
+                        d.append(dstep + d[len(d) - 1])
+                except: print("Cornering error")
+    except: print("run_oval error")
     return d, v
 
 def s_pin(autoX=True):
@@ -207,6 +166,7 @@ else:
     print(r)
 
 from time import perf_counter
+
 def plot_graph(GR):
     t0 = perf_counter()
     d, v = run_oval(car, x, r, GR=GR, peak=True)
@@ -257,8 +217,9 @@ def plot_GRs(LGR, UGR, count=60):
 
 
 #print(round(plot_graph(33/12), 5))
-print(round(plot_graph(38/12), 5))
-print(Vsum / Dsum)
+#print(round(plot_graph(38/12), 5))
+plot_graph(38/12)
+#print(Vsum / Dsum)
 #print(round(plot_graph(42/12), 5))
 #print(round(plot_graph(48/12), 5))
 #print(round(plot_graph(52/12), 5))

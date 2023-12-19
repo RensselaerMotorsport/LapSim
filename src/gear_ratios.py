@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from helper_functions_ev import motor_torque
 from helper_functions_ev import traction_force
 from classes.car_simple import Car
-from acceleration import run_accel
+#from acceleration import run_accel
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -123,37 +123,18 @@ def display_specs(car, GR, mu=0):
     print("Top speed (km/hr): " + str(voltage * Kv * 2 * math.pi * r * 3.6 / (60 * GR)))
     print("Top speed (mph): " + str(voltage * Kv * 2 * math.pi * r * 3.6 / (60 * 1.609 * GR)))
     print("Peak acceleration (g's): " + str(230 * GR / (r * m * g)))
-    print("Accel time (s): " + str(run_accel(car, GR=GR, peak=True, mu=mu)))
+    print("Accel time (s): " + str(run_accel(car, GR=GR, peak=True, mu=mu, returnPoints=False)))
 
-
-#display_specs(car, 38/12, mu=1.7)
-#plot_accel(car, 2.5, 4, [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0], plotPoints=True, peak=True)
-
-def test_accel(car, LG, UG, n=100, returnPoints=False, peak=False):
-    # THIS FUNCTION IS BROKEN RIGHT NOW
-    """A function for testing the response of our run_accel function.
-
-    Inputs: car, the car object we are working with
-    LG, the car's lower bound gear ratio
-    UG, the car's upper bound gear ratio
-    n, this equals the number of gear ratios that we want to test, default is 100
-    returnPoints, this determines if the function returns point values or time values for accleration, default is False which returns time values
-
-    Returns: A plot of gear ratios tried to point values achieved if returnPoints=False, or to time is returnPoints=True"""
-    car.attrs["gear_ratios"] = LG  # This is the lowest gear ratio we are going to try
-    step = (UG - LG) / n  # This calculates the change in the different gear ratios we are going to try
-    x = []
-    y = []
-    for i in range(n):  # iterate over all gear ratios
-        x.append(car.attrs["gear_ratios"])
-        y.append(run_accel(car, returnPoints=returnPoints, peak=peak))
-        car.attrs["gear_ratios"] += step 
-    # Create the plot of gear ratio versus time
-    plt.title("Acceleration event times", fontsize=18, y=1.04)
-    plt.xlabel("Gear Ratio", fontsize=12)
-    plt.ylabel("Time elapsed (s)", fontsize=12)
-    plt.plot(x, y, '-g')
+def display_wvs():
+    x, y = traction = calc_traction_force(car, 0.01, 35, 1.4)
+    for i in range(len(y)):
+        y[i] /= 1.4
+    print(y[0])
+    plt.plot(x, y)
+    plt.title("Weight (N) vs. Speed (m/s)", fontsize=18, y=1.04)
+    plt.grid()
     plt.show()
 
+#display_specs(car, 33/12, mu=1.4)
+#plot_accel(car, 2.5, 4, [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0], plotPoints=False, peak=False)
 
-#test_accel(car, 0.1, 1, n=1, returnPoints=False)
