@@ -1,6 +1,6 @@
 import sys
 
-MAX_TOTAL_COOKIE_SIZE = 100000 # Arbutary number tht can be changed later
+MAX_TOTAL_COOKIE_SIZE = 10000000 # Arbutary number tht can be changed later
 COOKIE_OVERHEAD = 100
 
 def cookie_size_exceeded(session, new_cookie_key, new_cookie_value):
