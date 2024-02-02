@@ -1,8 +1,8 @@
 """A module to calculate intermediate steps in the lapsim for an ev car"""
 
 import math
-from classes.car_simple import Car
-# car = Car("data/rm26.json")
+#from classes.car_simple import Car
+#car = Car("data/rm27.json")
 
 def calc_vmax(r, car):
     """
@@ -154,8 +154,8 @@ def motor_torque(car, RPM, peak=False, voltage=-1, current=-1):
     backemf = car.attrs["induced_voltage"] * RPM
     voltage -= backemf # Accounts for back emf at higher RPM
     bPower = voltage * current
-    maxCTorque = 130 # Emrax 228 HV
-    maxPTorque = 230 # Emrax 228 HV
+    maxCTorque = car.attrs['max_cont_torque']
+    maxPTorque = car.attrs['max_peak_torque']
     efficiency = car.attrs["tractive_efficiency"] * car.attrs["drivetrain_efficiency"]
     w = RPM * (2*math.pi) / 60
     Kv = car.attrs["constant_kv"]
@@ -176,13 +176,15 @@ def traction_force(car, v, mu):
     Returns: traction force"""
     g = 9.80665  # m/s^2
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
+    pr = 1 - car.attrs["proportion_front"]
     rho = car.attrs["rho"]
     A = car.attrs["A"]
     Cl = car.attrs["Cl"]
     Cd = car.attrs["Cl"]
     h = car.attrs["CG_height"]
     l = car.attrs["wheelbase"]
-    return ((rho * A * v**2 * Cl / 2 + m * g) / 2 * mu) / (1 - (h * mu) / l)# - rho * A * v**2 * Cd / 2
+
+    return ((rho * A * v**2 * Cl / 2 + m * g * pr) * mu) / (1 - (h * mu) / l)# - rho * A * v**2 * Cd / 2
 
 def braking_force(car, v, mu):
     """Calculates the braking force with a given velocity and coefficent of friction.
@@ -273,9 +275,13 @@ def forward_int(car, v0, d1, GR=0, mu=0, dstep=0.01, peak=False):
         i += 1
     return v, d
 
-def straight_line_segment(car, v0, v1, d1, GR=0, mu=0, dstep=0.01, peak=False):
+def straight_line_segment(car, v0, v1, d1, GR=0, mu=0, dstep=0.01, peak=False, returnV=True):
     """Incorporates braking & accelerating"""
+    if mu == 0: mu = car.attrs('CoF')
     v, d = forward_int(car, v0, d1, GR=GR, mu=mu, dstep=dstep, peak=peak)
+    t=0
+    for i in range(1,len(v)):
+        t += (d[i] - d[i-1]) / v[i]
     if v[len(v)-1] < v1: # If the cornering speed is faster than the max possible speed in straight accel:
         print("Max corner speed > max accelerating velocity")
     elif v[len(v)-1] > v1: # If the cornering speed is slower than the max possible speed in straight accel
@@ -294,4 +300,5 @@ def straight_line_segment(car, v0, v1, d1, GR=0, mu=0, dstep=0.01, peak=False):
             for i in range(L):
                 if abs(d[i] - db[i]) <= 1e-1:
                     v[L-i:L] = braking_length(car, v[L-i], v1, mu=mu, dstep=dstep, returnVal=2)
-    return v
+    if returnV: return v
+    else: return t
