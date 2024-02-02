@@ -1,0 +1,22 @@
+{
+  "vehicle_weight": 600,
+  "front_tire_diameter": 8,
+  "rear_tire_diameter": 8,
+  "front_wheel_shell_diameter": 10,
+  "rear_wheel_shell_diameter": 10,
+  "wheelbase": 60.5,
+  "forward_weight_distribution": 0.49,
+  "center_of_gravity_height": 13,
+  "brake_pedal_ratio": 5.25,
+  "brake_bias": -1,
+  "front_master_cylinder": -1,
+  "rear_master_cylinder": -1,
+  "front_caliper": 2,
+  "rear_caliper": 0,
+  "front_pad": -1,
+  "rear_pad": -1,
+  "front_rotor_outer": 4,
+  "rear_rotor_outer": 3.75,
+  "factor_of_safety": 1.0,
+  "priority": 1
+}

@@ -1,9 +1,15 @@
-from flask import Flask, redirect, render_template, url_for
-from forms import straightLineForm25#, straightLineForm26
+# Basic Flask modules
+from flask import Flask, render_template
+# Local classes
+from form_creator import create_form, output_bp
+# Additional imports
+import os
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
-app.config['SECRET_KEY'] = '5993b6512522aa93a5306dd25249a174'
+# Blueprints
+app.register_blueprint(output_bp)
 
 #home page
 @app.route('/')
@@ -11,10 +17,23 @@ def homepage():
     return render_template('home.html')
 
 #straight line simulation page
-@app.route('/rm25_straight_line_sim')
+@app.route('/rm25_straight_line_sim', methods=['GET', 'POST'])
 def rm25_straight_line_sim():
-    form = straightLineForm25('/rm25_straight_line_sim')
-    return render_template('rm25_straight_line_sim.html', title="RM25 Staight Line Sim", form=form)
+    return create_form('/rm25_straight_line_sim', '', '', 'rm25.json')
+
+@app.route('/rm26_acceleration', methods=['GET', 'POST'])
+def rm26_acceleration():
+    return create_form('/rm26_acceleration', 'acceleration', 'run_accel', 'rm26.json')
+
+@app.route('/rm26_skidpad', methods=['GET', 'POST'])
+def rm26_skidpad():
+    return create_form('/rm26_skidpad', 'skidpad', 'test_skidpad', 'rm26.json')
+
+@app.route('/brakes', methods=['GET', 'POST'])
+def brakes():
+    return create_form('/brakes', 'brake_form', 'brake_input', 'brakes.json')
+
+# TODO: Make more forms!!!!!
 
 if __name__ == "__main__":
     app.run(debug=False)

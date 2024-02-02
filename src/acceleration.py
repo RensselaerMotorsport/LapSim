@@ -3,7 +3,7 @@
 from classes.car_simple import Car
 from helper_functions_ev import line_segment_time
 
-car = Car("data/rm26.json")
+# car = Car("data/rm26.json")
 
 def run_accel(car, GR=0, tmin=4.113, returnPoints=False, peak=False, mu=0):
     """ Calculates the amount of time it takes to run accel. Can return an approximate point value for the event instead of time elapsed.

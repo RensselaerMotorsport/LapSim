@@ -1,8 +1,8 @@
 """A module to calculate intermediate steps in the lapsim for an ev car"""
 
 import math
-#from classes.car_simple import Car
-#car = Car("data/rm26.json")
+from classes.car_simple import Car
+# car = Car("data/rm26.json")
 
 def calc_vmax(r, car):
     """

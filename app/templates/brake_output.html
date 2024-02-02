@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/rm25_SLS.css') }}">
+<script src="{{ url_for('static', filename='javascript/toggle_sweep.js') }}"></script>
+<!-- For Graph -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+{% endblock head %}
+
+{% block content %}
+{% if isocontour_data %}
+  <div id="isocontour"></div>
+  <script>
+    var data = '{{ isocontour_data|safe }}' ? JSON.parse('{{ isocontour_data|safe }}') : null;
+    var layout = '{{ layout|safe }}' ? JSON.parse('{{ layout|safe }}') : null;
+
+    // Add these lines to make the background transparent
+    layout.plot_bgcolor = 'rgba(0,0,0,0)';
+    layout.paper_bgcolor = 'rgba(0,0,0,0)';
+
+    // Add this line to make the colorbar text white
+    layout.colorbar = { "title": { "text": "Time (s)", "font": { "color": "white" } }, "tickfont": { "color": "white" } };
+
+    Plotly.newPlot('isocontour', data, layout);
+  </script>
+{% endif %}
+
+{% for i in range(brake_info|length) %}
+    <p><strong>
+    {% if values %}
+    {% for key, value in values.items() %}
+      {{ key|replace("_", " ")|title }}: {{ sweep_combos[i][loop.index0]|float }}
+      {% if not loop.last %},{% endif %}
+    {% endfor %}
+    {% endif %}
+    </strong></p>
+    {% for combination in brake_info[i] %}
+        <p>Front Torque: {{ combination[0] }}</p>
+        <p>Rear Torque: {{ combination[1] }}</p>
+        <p>Brake Pedal Ratio: {{ combination[2] }}</p>
+        <p>Front Master Cylinder Size: {{ combination[3] }}</p>
+        <p>Rear Master Cylinder Size: {{ combination[4] }}</p>
+        <p>Front Caliper: {{ caliperBrands[(combination[5]|int)][0] }}, {{ caliperModel[(combination[5]|int)][0] }}</p>
+        <p>Rear Caliper: {{ caliperBrands[(combination[6]|int)][0] }}, {{ caliperModel[(combination[6]|int)][0] }}</p>
+        <p>Front Pad: {{ padBrand[(combination[7]|int)][0] }}, {{ padModel[(combination[7]|int)][0] }}</p>
+        <p>Rear Pad: {{ padBrand[(combination[8]|int)][0] }}, {{ padModel[(combination[8]|int)][0] }}</p>
+        <p>Front Rotor Radius: {{ combination[9] }}</p>
+        <p>Rear Rotor Radius: {{ combination[10] }}</p>
+        <p>Percent off ideal balance: {{ combination[12] }}</p>
+        <p>Total Cost: {{ combination[13] }}</p>
+        <p>Total Weight: {{ combination[14] }} lbs</p>
+        <hr>
+    {% endfor %}
+{% endfor %}
+{% endblock content %}

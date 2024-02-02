@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/rm25_SLS.css') }}">
+<script src="{{ url_for('static', filename='javascript/toggle_sweep.js') }}"></script>
+<!-- For Graph -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+{% endblock head %}
+
+{% block content %}
+{% if isocontour_data %}
+  <div id="isocontour"></div>
+  <script>
+    var data = '{{ isocontour_data|safe }}' ? JSON.parse('{{ isocontour_data|safe }}') : null;
+    var layout = '{{ layout|safe }}' ? JSON.parse('{{ layout|safe }}') : null;
+
+    // Add these lines to make the background transparent
+    layout.plot_bgcolor = 'rgba(0,0,0,0)';
+    layout.paper_bgcolor = 'rgba(0,0,0,0)';
+
+    // Add this line to make the colorbar text white
+    layout.colorbar = { "title": { "text": "Time (s)", "font": { "color": "white" } }, "tickfont": { "color": "white" } };
+
+    Plotly.newPlot('isocontour', data, layout);
+  </script>
+{% endif %}
+
+<form action="/output" method="GET">
+  <p> Times: </p>
+  <p>
+  {% for t in time_data %}
+    {{ "{:.3f}".format(t) }} seconds,
+  {% endfor %}
+  </p>
+</form>
+{% endblock content %}
