@@ -1,8 +1,6 @@
 """A module to simulate Oval"""
 
 from helper_functions_ev import calc_vmax
-from helper_functions_ev import forward_int
-from helper_functions_ev import braking_length
 from helper_functions_ev import straight_line_segment
 from classes.car_simple import Car
 from random import random
@@ -11,7 +9,7 @@ import math
 import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings("ignore")
-car = Car("data/rm26.json")
+car = Car("data/rm27.json")
 
 
 
@@ -151,7 +149,7 @@ def construct_track(dist, autoX=True):
     return x, r
 
 default = True
-AutoX = False
+AutoX = True
 
 if default:
     if AutoX:
@@ -213,12 +211,13 @@ def plot_GRs(LGR, UGR, count=60):
     plt.xlabel("Gear ratio")
     plt.ylabel("Autocross time (s)")
     plt.show()
-#plot_GRs(2.5, 4, count=25)
+
+plot_GRs(2.5, 7, count=2)
 
 
 #print(round(plot_graph(33/12), 5))
 #print(round(plot_graph(38/12), 5))
-plot_graph(38/12)
+#plot_graph(38/12)
 #print(Vsum / Dsum)
 #print(round(plot_graph(42/12), 5))
 #print(round(plot_graph(48/12), 5))
