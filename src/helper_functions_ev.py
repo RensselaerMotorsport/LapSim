@@ -1,8 +1,6 @@
 """A module to calculate intermediate steps in the lapsim for an ev car"""
 
 import math
-#from classes.car_simple import Car
-#car = Car("data/rm27.json")
 
 def calc_vmax(r, car):
     """
@@ -22,7 +20,7 @@ def calc_vmax(r, car):
     A = car.attrs["A"] #Frontal wing area of the car object
     Cl = car.attrs["Cl"] #coefficent of lift for the car object
 
-    g = 9.8 #Assign the acclertion due to gravity
+    g = 9.8  #Assign the accelertion due to gravity
 
 
     num = (-m*g*Cl*A*(mu**2)*rho*r) - (g*m*mu*(math.sqrt((Cd**2)*(rho**2)*(A**2)*(r**2)+(4*(m**2)))))
@@ -34,7 +32,6 @@ def calc_vmax(r, car):
     #The negative sign was chosen as the only real solution because this yields real results when changing Cl on skidpad. 
     #It is possible that this solution does not always yield a real result and the other solutions are real but this will be something we come back to. 
     
-    #This model includes 
 
 def calc_max_entry_v_for_brake(car, Vexit, r, d):
     """
@@ -62,7 +59,7 @@ def calc_max_entry_v_for_brake(car, Vexit, r, d):
     centripetal_force = ((m**2)*(Vexit**4))/(r**2)
 
     Drag = Cd*.5*rho*A*Vexit**2 #Calculate the drag of th car
-    if r < 1e-6: #for really small radi
+    if r < 1e-6: #for really small radii
         Fb = math.sqrt((mu**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2) #Calculate the breaking force
     else:
         Fb = math.sqrt(((mu**2)*(m*g + .5*rho*Cl*A*Vexit**2)**2) - ((m**2)*(Vexit**4))/(r**2)) #Calculate the braking force
@@ -219,7 +216,7 @@ def braking_length(car, v0, v1, mu=0, dstep=0.1, returnVal=0):
     if mu == 0: mu = car.attrs["CoF"]
 
     m = car.attrs["mass_car"] + car.attrs["mass_driver"]
-    v= v0
+    v = v0
     t = 0
     T = []
     d = 0
@@ -264,7 +261,6 @@ def forward_int(car, v0, d1, GR=0, mu=0, dstep=0.01, peak=False):
     while d[i] < d1:
         RPM = GR * 60 * v[i] / (2 * math.pi * r)
         a = min((motor_torque(car, RPM, peak=peak) * GR / (r), traction_force(car, v[i], mu))) / m
-        #tstep = dstep/v[i]
         v.append((v[i]**2 + 2 * a * dstep)**0.5)
         if a > 0:
             tstep = (- v[i] + (v[i]**2 + 4 * a * dstep)**0.5) / (a)
