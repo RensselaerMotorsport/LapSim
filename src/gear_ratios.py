@@ -135,6 +135,42 @@ def display_wvs():
     plt.grid()
     plt.show()
 
+def plot_traction_force(car, maxv=100/3.6, step=0.01):
+    from check_slip import calc_friction_force
+    v = step
+    ax = step
+    F = []
+    V = []
+    while v < maxv:
+        ax = calc_friction_force(2, ax, v)
+        #while ax != calc_friction_force(2, ax, v):
+        #    ax = calc_friction_force(2, ax, v)
+        #    print(ax)
+        V.append(v)
+        F.append(ax * car.attrs["mass_car"])
+        ax = step
+        v += step
+
+    plt.title("Traction Force Diagram")
+    plt.xlabel("Velocity (m/s)")
+    plt.ylabel("Traction Force (N)")
+    plt.plot(V, F)
+    plt.show()
+
+def plot_tractive_force(car, gear=3, maxv=200/3.6, step=1):
+    RPM = step
+    V = []
+    F = []
+    while RPM * 2 * math.pi * car.attrs["tire_radius"] / (60 * gear) < maxv:
+        V.append(RPM * 2 * math.pi * car.attrs["tire_radius"] * 3.6 / (60 * gear))
+        F.append(motor_torque(car, RPM, peak=True))
+        RPM += step
+    plt.title("Tractive Force Diagram")
+    plt.xlabel("Velocity (km/hr)")
+    plt.ylabel("Tractive Force (N)")
+    plt.plot(V, F)
+    plt.show()
+
 #display_specs(car, 33/12, mu=1.4)
 #plot_accel(car, 2.5, 4, [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0], plotPoints=False, peak=False)
 
