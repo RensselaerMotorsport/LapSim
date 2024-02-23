@@ -2,7 +2,7 @@
 
 import numpy as np
 import weight_transfer as wt
-import helper_functions as h
+from src.archive import helper_functions as h
 import traction_circle_plot as tc
 
 g = 9.8 #m/s^2

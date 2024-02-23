@@ -4,9 +4,8 @@ import numpy as np
 import math 
 from math import pi
 from weight_transfer import calc_total_weight_transfer
-from weight_transfer import add_aero_loads
 from matplotlib import pyplot as plt
-import helper_functions as h
+
 # from classes.car_simple import Car
 # car = Car("data/rm26.json")
 
