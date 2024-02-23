@@ -136,13 +136,13 @@ def display_wvs():
     plt.show()
 
 def plot_traction_force(car, maxv=100/3.6, step=0.01):
-    from check_slip import calc_friction_force
     v = step
     ax = step
+    mu = car.attrs["CoF"]
     F = []
     V = []
     while v < maxv:
-        ax = calc_friction_force(2, ax, v)
+        calc_traction_force(car, v, maxV, mu)
         #while ax != calc_friction_force(2, ax, v):
         #    ax = calc_friction_force(2, ax, v)
         #    print(ax)
