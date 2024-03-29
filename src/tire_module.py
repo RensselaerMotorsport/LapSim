@@ -1,3 +1,16 @@
+"""
+GOALS:
+Interpret TTC data
+Produce tire plots (additional plots for tire pressure)
+ - Lateral Force (FY) vs. Slip Angle (SA)
+ - Lateral Force (FY) vs. Tire Temperature (T) vs. Slip Angle (SA)
+ - Aligning Torque (MZ) vs. Slip Angle (SA)
+ - Lateral Force (FY) vs. Normal Force (FZ) - load sensitivity
+ - FY vs. SR
+ - RM26: https://docs.google.com/document/d/1RiBCi_AwGDYZcIdQq6tsntvr8MlopEIcqNSumrCd7W0/edit
+ - RM26: https://docs.google.com/document/d/1vXJgkuCZN1qB4e_nFj_hRyvR1lSjqEdBzcHVih0J7Bg/edit
+"""
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
