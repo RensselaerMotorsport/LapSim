@@ -1,10 +1,23 @@
+"""
+COEFFICIENTS
+ J: Inertia (kgm^2)
+ k: Spring constant (N/m)
+ b: Damping coefficient (and Viscous Friction) (Ns/m)
+ N: Number of teeth
+ r: Radius (m)
+ KT: Motor torque constant (Nm/ARMS)
+VARIABLES
+ T: Torque (Nm)
+ θ: Angular position (rad)
+ ω: Angular velocity (rad/s)
+ α: Angular acceleration (rad/s^2)
+ F: Force (N)
+ x: Linear position (m)
+ v: Linear velocity (m/s)
+ a: Linear acceleration (m/s^2)
+"""
 class Drivetrain:
-    def __init__(self, Tmotor, ωwheel):
-        # J: Inertia (kgm^2)
-        # k: Spring constant (N/m)
-        # b: Damping coefficient (and Viscous Friction) (Ns/m)
-        # N: Number of teeth
-        # r: Radius (m)
+    def __init__(self, Imotor):
         self.J1 = 0.02521  # Motor
         self.J2a = 0.0001141295  # Motor Cover shaft
         self.J2b = 0.0000632043  # Motor Internal shaft
@@ -33,27 +46,13 @@ class Drivetrain:
         self.r2 = 0.1941806998 / 2  # Diff sprocket
         self.r3 = 0.2032  #
 
-        self.T1 = Tmotor
-        self.ω4 = ωwheel
+        self.KT = 0.94
 
-    def transfer_function(self):
-        # T: Torque (Nm)
-        # θ: Angular position (rad)
-        # ω: Angular velocity (rad/s)
-        # α: Angular acceleration (rad/s^2)
-        # F: Force (N)
-        # x: Linear position (m)
-        # v: Linear velocity (m/s)
-        # a: Linear acceleration (m/s^2)
+        self.T1 = Imotor * self.KT
+
+    def tf(self):
         F1 = (self.T1 * self.r2 * (self.J6 + self.J7 + self.J9)) / (self.r2 * self.r1 * (self.J1 + self.J2) + self.r2 * self.r2 * (self.J6 + self.J7 + self.J9))
         α1 = (self.T1 - F1 * self.r1) / (self.J1 + self.J2)
         α4 = α1 * self.r2 / self.r1
         T4 = α4 * (self.J6 + self.J7 + self.J9 + (self.N2 / self.N1) ** 2 * (self.J1 + self.J2))
-        print(T4)
         return T4
-
-Tin = 230
-w = 0
-
-Drivetrain(Tin,w).transfer_function()
-print(Tin * 42 / 12)
