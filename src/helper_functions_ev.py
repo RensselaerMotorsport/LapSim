@@ -156,6 +156,7 @@ def motor_torque(car, RPM, peak=False, voltage=-1, current=-1):
     efficiency = car.attrs["tractive_efficiency"] * car.attrs["drivetrain_efficiency"]
     w = RPM * (2*math.pi) / 60
     Kv = car.attrs["constant_kv"]
+    if w == 0: w = 0.00000000000000000000000000000000000000000000000000000001
     if RPM < (voltage + backemf) * Kv:
         if peak:
             return min(bPower * efficiency / w, maxPTorque) # Accounts for drivetrain & tractive efficiencies
