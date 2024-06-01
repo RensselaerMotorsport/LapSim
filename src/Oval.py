@@ -224,7 +224,7 @@ else:
 #plot_GRs(2, 5.45, count=25)
 
 default = True
-AutoX = False
+AutoX = True
 
 if default:
     if AutoX:
@@ -238,7 +238,13 @@ else:
     print(x)
     print(r)
 
-plot_GRs(2, 5.45, count=25)
+v, d = run_oval(car, x, r, GR=3.5)
+t = 0
+for i in range(len(d)):
+    if v[i] != 0: t += d[i] / v[i]
+print(t)
+plot_graph(3.75)
+#plot_GRs(2, 5.45, count=25)
 
 #print(round(plot_graph(33/12), 5))
 #print(round(plot_graph(38/12), 5))

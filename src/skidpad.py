@@ -4,13 +4,13 @@ from classes.car_simple import Car
 from helper_functions_ev import calc_vmax
 import numpy as np
 
-#car = Car("data/rm26.json")
+car = Car("data/rm27.json")
 
 
 ### Below is a troubleshooting script ###
 
 # OR = 18.25   #Outer radius
-# IR = 15.25   #Inner radius
+IR = 15.25   #Inner radius
 # Mid = 16.75  #Middle radius
 
 # V_O = calc_vmax(OR, car) #Calculate maximum possible velocity traveling the outer corner radius
@@ -89,6 +89,6 @@ def test_skidpad(car, step=1000, returnPoints=False, printStats=False):
         y = t
     return y
 
-#print(test_skidpad(car, returnPoints=False))
+print(test_skidpad(car, returnPoints=True))
 #print(skidpad(IR,car))
 
