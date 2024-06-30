@@ -18,13 +18,16 @@
   "brake_bias": 0.6,
   "tire_radius": 0.2032,
   "gear_ratios": 2.9,
-  "max_current": 90,
+  "max_current": 135,
   "max_voltage": 399,
-  "max_cont_torque": 58.9,
-  "max_peak_torque": 84.6,
-  "final_drive": 2.9,
+  "max_cont_torque": 112,
+  "max_peak_torque": 230,
+  "final_drive": 3.75,
   "tractive_efficiency": 0.85,
   "drivetrain_efficiency": 0.9,
   "induced_voltage": 0.07348,
-  "constant_kv": 10.12
+  "constant_kv": 10.14,
+  "constant_kt": 0.94,
+  "main_i2t": 720,
+  "cell_i2t": 10
 }

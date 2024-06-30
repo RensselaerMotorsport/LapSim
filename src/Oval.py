@@ -37,20 +37,7 @@ track[n,1] = 0
 
 Vsum = 0
 Dsum = 0
-def run_oval(car, x, r, GR=0, mu=0, dstep=0.01, peak=False):
-    """A function for testing the car on an oval track
-    
-    Given: car, the car object we are considering
-    x, the the distance of the straightaway
-    r, the radius of the corner
-    GR, the gear ratio we are considering
-    mu, the friction factor we are considering
-    dstep, the distance step we are sweeping over, default is .01 meters
-    peak, a boolean representing whether or not we are running at peak torque, default is False and we are not
-    
-    Returns:
-    d, a vector that represents the distance traveled in each step
-    v, a vector that represents the car speed in each step"""
+def run_oval(car, x, r, gr=0, mu=0, dstep=0.01):
     d = [0] # Car distance traveled
     v = [0] # Car speed
     if mu == 0: mu = car.attrs["CoF"]
@@ -58,7 +45,7 @@ def run_oval(car, x, r, GR=0, mu=0, dstep=0.01, peak=False):
         for i in range(len(x)):
             if r[i] == 0: # Straight segment
                 try:
-                    v1 = straight_line_segment(car, v[len(v) - 1], calc_vmax(1 / r[i + 1], car), x[i], GR=GR, mu=mu, dstep=dstep, peak=peak)
+                    v1 = straight_line_segment(car, v[len(v) - 1], calc_vmax(1 / r[i + 1], car), x[i], gr=gr, mu=mu, dstep=dstep)
                     for j in range(1, len(v1), 1):
                         v.append(v1[j])
                         d.append(dstep + d[len(d) - 1])
@@ -70,7 +57,7 @@ def run_oval(car, x, r, GR=0, mu=0, dstep=0.01, peak=False):
                     print(v[len(v) - 1])
                     print("Distance: ")
                     print(x[i])
-                    v1 = straight_line_segment(car, v[len(v) - 1], calc_vmax(1 / r[i + 1], car), x[i], GR=GR, mu=mu, dstep=dstep, peak=peak)
+                    v1 = straight_line_segment(car, v[len(v) - 1], calc_vmax(1 / r[i + 1], car), x[i], gr=gr, mu=mu, dstep=dstep)
                     print(v1)
             else: # Cornering
                 try:
@@ -153,9 +140,9 @@ def construct_track(dist, autoX=True):
 
 from time import perf_counter
 
-def plot_graph(GR):
+def plot_graph(gr):
     t0 = perf_counter()
-    d, v = run_oval(car, x, r, GR=GR, peak=True)
+    d, v = run_oval(car, x, r, gr=gr)
 
     t = 0
     for i in range(1, len(d), 1):
@@ -173,30 +160,30 @@ def plot_graph(GR):
     tav = round(t,3)
     vav = round(d[len(d) - 1] / t * 2.237, 1)
     plt.title(str(tav) + " seconds; " + str(vav) + " mph average")
-    plt.suptitle(str(round(GR,2)) + " Gear ratio")
+    plt.suptitle(str(round(gr,2)) + " Gear ratio")
     plt.xlabel("Distance (m)")
     plt.ylabel("Velocity (mph)")
     plt.show()
     t1 = perf_counter()
     return t1 - t0
 
-def plot_GRs(LGR, UGR, count=60):
+def plot_grs(Lgr, Ugr, count=60):
     T = []
-    GR = np.linspace(LGR, UGR, count)
-    for i in range(len(GR)):
+    gr = np.linspace(Lgr, Ugr, count)
+    for i in range(len(gr)):
         t = 0
-        d, v = run_oval(car, x, r, GR=GR[i], peak=True)
+        d, v = run_oval(car, x, r, gr=gr[i])
         for j in range(1, len(d), 1):
             t += (d[j] - d[j - 1]) / v[j]
         T.append(t)
 
     plt.figure(figsize=(9,6))
     plt.grid()
-    plt.xlim(min(GR), max(GR))
+    plt.xlim(min(gr), max(gr))
     plt.ylim(min(T) / 1.005, max(T) * 1.005)
 
-    if AutoX: plt.plot(GR, T, color='tab:blue')
-    else: plt.plot(GR, T, color='tab:red')
+    if AutoX: plt.plot(gr, T, color='tab:blue')
+    else: plt.plot(gr, T, color='tab:red')
     plt.xlabel("Gear ratio")
     if AutoX:
         plt.ylabel("Autocross time (s)")
@@ -221,10 +208,6 @@ else:
     print(x)
     print(r)
 
-#plot_GRs(2, 5.45, count=25)
-
-default = True
-AutoX = True
 
 if default:
     if AutoX:
@@ -238,13 +221,17 @@ else:
     print(x)
     print(r)
 
-v, d = run_oval(car, x, r, GR=3.5)
-t = 0
-for i in range(len(d)):
-    if v[i] != 0: t += d[i] / v[i]
-print(t)
-plot_graph(3.75)
-#plot_GRs(2, 5.45, count=25)
+#v, d = run_oval(car, x, r, gr=3.5)
+#t = 0
+#for i in range(len(d)):
+#    if v[i] != 0: t += d[i] / v[i]
+#print(t)
+#plot_graph(3.75)
+
+default = True
+AutoX = True
+
+plot_grs(2.5, 5.5, count=25)
 
 #print(round(plot_graph(33/12), 5))
 #print(round(plot_graph(38/12), 5))
