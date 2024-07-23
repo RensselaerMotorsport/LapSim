@@ -9,7 +9,7 @@ import math
 import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings("ignore")
-car = Car("data/rm27.json")
+car = Car("data/rm28.json")
 
 
 
@@ -194,7 +194,7 @@ def plot_grs(Lgr, Ugr, count=60):
     plt.show()
 
 default = True
-AutoX = True
+AutoX = False
 
 if default:
     if AutoX:
@@ -228,10 +228,8 @@ else:
 #print(t)
 #plot_graph(3.75)
 
-default = True
-AutoX = True
 
-plot_grs(2.5, 5.5, count=25)
+#plot_grs(2.5, 5.5, count=25)
 
 #print(round(plot_graph(33/12), 5))
 #print(round(plot_graph(38/12), 5))
@@ -240,3 +238,12 @@ plot_grs(2.5, 5.5, count=25)
 #print(round(plot_graph(42/12), 5))
 #print(round(plot_graph(48/12), 5))
 #print(round(plot_graph(52/12), 5))
+
+
+
+d, v = run_oval(car, x, r, gr=3.75)
+
+
+
+#plt.plot(v)
+#plt.show()

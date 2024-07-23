@@ -104,6 +104,8 @@ def forward_int(car, v0, d1, gr=0, mu=0, dstep=0.01):
             tstep = (- v[i] + (v[i]**2 + 4 * a * dstep)**0.5) / (a)
         else:
             tstep = dstep / v[i]
+        print(motor_torque(car, RPM) / car.attrs["constant_kt"] * RPM / 5.65)
+        #print(tstep)
         t.append(t[i] + tstep)
         d.append(d[i] + dstep)
         i += 1

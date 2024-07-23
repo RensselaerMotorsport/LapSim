@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+import openpyxl
 
 
 
@@ -31,35 +33,39 @@ class Cell():
         na1[6] = self.vmin * (na1[2] - self.vmin) / na1[3]
         na1[1] = min(p,na1[6])
         na1[4] = na1[2] / 2 / na1[3] - (na1[2] ** 2 / (4 * na1[3] ** 2) - p / na1[3]) ** 0.5
-        na1[5] = p / na1[4]
+        if na1[4] != 0:
+            na1[5] = p / na1[4]
+        else:
+            na1[5] = na1[2]
         # skip 6
         na1[7] = p * dt
         # skip 8
         na1[9] = self.soee(na1[8])
         na1[10] = na1[4] ** 2 * na1[3]
-        na1[11] = na0[11] + na0[10]
-        na1[12] = na1[10] / (self.m * self.cp)
+        na1[11] = na0[11] + na0[10] * dt
+        na1[12] = na1[10] / (self.m * self.cp) * dt
         na1[13] = na0[13] + na0[12]
         return [na1]
 
-    def pwr_cycle(self, p, T0, v0, t1, dt=1):
+    def pwr_cycle(self, p, T0, v0, t1, dt=0.0004):
         t = 0
-        na = np.array([[0, 0, v0, self.dcr, 0, v0, self.vmin * (v0 - self.vmin) / self.dcr, 0, self.soev(v0) * self.e, self.soev(v0), 0, 0, 0, T0]])
+        na = np.array([[0, 0, v0, self.dcr, 0, v0, self.vmin * (v0 - self.vmin) / self.dcr, 0, self.soev(v0) * self.e,
+                        self.soev(v0), 0, 0, 0, T0]])
         # t, P, Voc, dcr, I, Vcc, PPk, dE, E, SOE, Qgen, Q, dT, T
-        while t < t1 + dt:
-            na = np.append(na, self.pwr_iter(na[np.shape(na)[0]-1], p, dt),axis=0)
-            t += dt
+        for i in range(p.size):
+            t = 0
+            while t < t1[i] + dt:
+                na = np.append(na, self.pwr_iter(na[np.shape(na)[0]-1], p[i], dt),axis=0)
+                t += dt
         return na
 
-
-
-class Pack(Cell):
+class Pack():
     def __init__(self):
         Cell.__init__(self,T0,v0,Pavg)
         self.S = 144  # 95 # Series
         self.P = 3  # 6 # Parallel
         self.N = self.S * self.P
-        self.C = self.N * self.c
+        #self.C = self.N * self.c
         self.E = self.N * self.e
         self.Vmax = self.S * self.vmax
         self.Vmin = self.S * self.vmin
@@ -103,15 +109,30 @@ def plot_var(cell, x, y1, y2):
 
 
 # Model
-p = 48.6    # Constant power, W
+#p = 48.6    # Constant power, W
 T0 = 25     # Initial cell temperature, °C
 v0 = 4.2    # Initial cell voltage, V
 t1 = 750   # Total time elapsed, s
-P28A = Cell().pwr_cycle(p, T0, v0, t1)
 
+
+df = pd.read_excel('Book1.xlsx')
+t = df["Time step (s)"]
+t = t.to_numpy()
+p = df["Power per cell (W)"]
+p = p.to_numpy()
+
+P28A = Cell().pwr_cycle(p, T0, v0, t)
+
+cell_df = pd.DataFrame(P28A, columns = ['t (s)','P (W)','Voc','Impedance (Ω)','I (A)','Vcc','Ppk (W)','dE (J)','E (J)','SOE (%)','Qgen (W)','Q (J)','dT (C)','T (C)'])
+with pd.ExcelWriter("Cell output data.xlsx") as writer:
+    cell_df.to_excel(writer, index=False)
 
 # Use index table to find variable indices (numbers)
 # x: shared x-axis
 # y1: y-variables on first axis; ex 5 & 2 are Vcc and Voc
 # y2: y-variable on second axis; ex 4 & 9 are current and SOE
-plot_var(P28A, 0, [5,2],[4,9])
+#plot_var(P28A, 0, [5,2],[4,9])
+plot_var(P28A, 0, [5,2],[9])
+plot_var(P28A, 0, [1,6,10],[])
+plot_var(P28A, 0, [9],[])
+plot_var(P28A, 0, [13],[])
