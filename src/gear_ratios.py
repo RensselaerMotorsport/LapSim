@@ -8,7 +8,7 @@ from acceleration import run_accel
 import warnings
 
 warnings.filterwarnings("ignore")
-Car = Car("data/rm27.json")
+Car = Car("data/rm28.json")
 
 
 def calc_tractive_force(car, gr, v, vmax):
