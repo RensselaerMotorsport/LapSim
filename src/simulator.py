@@ -1,6 +1,7 @@
 from track_solver import Track
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from classes.car_simple import Car
 car = Car("data/rm28.json")
 
@@ -15,10 +16,7 @@ class Competition:
         self.Autocross = Track(autox_df[0].to_numpy(),autox_df[1].to_numpy())
         self.Endurance = Track(endurance_df[0].to_numpy(), endurance_df[1].to_numpy())
 
-    def plot(self, car, track):
-        import matplotlib.pyplot as plt
-        track.draw()
-        solution = track.solve(car)
+    def plot_velocity(self, solution):
         x = solution[:, 0]
         v = solution[:, 2]
         t = 0
@@ -28,16 +26,14 @@ class Competition:
         plt.title("Time elapsed (s): "+ str(round(t,2)))
         plt.show()
 
-        pwr = solution[:, 4]
-        plt.plot(x,pwr)
-        plt.title("Time elapsed (s): "+ str(round(t,2)))
-        plt.show()
+        #pwr = solution[:, 4]
+        #plt.plot(x,pwr)
+        #plt.title("Time elapsed (s): "+ str(round(t,2)))
+        #plt.show()
 
     def draw_plots(self, car):
-        self.plot(car, self.Acceleration)
-        #self.plot(car, self.Skidpad)
-        #self.plot(car, self.Autocross)
-        self.plot(car, self.Endurance)
+        self.Endurance.draw()
+        self.plot(self.Endurance.solve(car))
 
 MIS_2019 = Competition('data/2018MichiganAXTrack_new.csv', 'data/2019MichiganEnduranceTrack.csv')
 MIS_2019.draw_plots(car)
