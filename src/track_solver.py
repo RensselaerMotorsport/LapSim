@@ -6,6 +6,9 @@ from tires import calc_max_lateral_force
 from tires import calc_rolling_resistance
 from aerodynamics import calc_drag_force
 from drivetrain import calc_wheel_force
+from hvbattery import calc_peak_power
+from hvbattery import calc_Voc
+from hvbattery import calc_heat_gen
 
 
 def list_apexes(car, ir):
@@ -17,7 +20,7 @@ def list_apexes(car, ir):
 
 
 def calc_max_decel(car, ir, v):
-    m = car.attrs['mass_car'] + car.attrs['mass_driver']
+    m = car.attrs['mass_car'] + car.attrs['mass_battery'] + car.attrs['mass_driver']
     if ir == 0: ir = 1E-10
 
     Fym = calc_max_lateral_force(car, v)
@@ -28,9 +31,8 @@ def calc_max_decel(car, ir, v):
     return (-Fx - calc_drag_force(car, v) - calc_rolling_resistance(car, v)) / m
 
 
-def calc_max_accel(car, ir, v):
-    m = car.attrs['mass_car'] + car.attrs['mass_driver']
-    pbm = 80000 # IN FUTURE CALL FROM BATTERY MODEL
+def calc_max_accel(car, ir, v, pbm):
+    m = car.attrs['mass_car'] + car.attrs['mass_battery'] + car.attrs['mass_driver']
 
     Fym = calc_max_lateral_force(car, v)
     Fy = m * v ** 2 * ir
@@ -56,10 +58,28 @@ class Track:
         2: v (m/s) - Forward velocity
         3: t (s) - Time elapsed
         4: p (J/s) - Power drawn
+        5: E
+        6: SOE
+        7: Voc
+        8: Pbm
+        9: Q
+        10: T
         """
-        self.solution = np.zeros((np.shape(self.x)[0],5))
+        self.solution = np.zeros((np.shape(self.x)[0],11))
         self.solution[:, 0] = self.x
         self.solution[:, 1] = self.ir
+        series = car.attrs['cells_series']
+        parallel = car.attrs['cells_parallel']
+        capacity = car.attrs['cell_capacity']
+        Cp = car.attrs['cell_thermal_capacity']
+        cell_mass = series * parallel * car.attrs['cell_mass']
+        self.solution[0, 5] = series * parallel * capacity * 3600
+        self.solution[0, 6] = self.solution[0, 5] / (series * parallel * capacity * 3600)
+        self.solution[0, 7] = series * 4.5
+        self.solution[0, 8] = calc_peak_power(car, self.solution[0, 7])
+        self.solution[0, 9] = cell_mass * Cp * (273 + 35)
+        self.solution[0, 10] = self.solution[0, 9] / (cell_mass * Cp) - 273
+
         self.apexes = list_apexes(car, self.ir)
         self.dx = self.x[1] - self.x[0]
 
@@ -88,12 +108,17 @@ class Track:
             self.solution[apex_index1:apex_index2 + 1, 2] = v
             self.solution[apex_index1:apex_index2 + 1, 3] = t
             self.solution[apex_index1:apex_index2 + 1, 4] = p
+
+            for i in range(apex_index1, apex_index2 + 1):
+                self.iter_battery(car, i)
         last_apex = int(self.apexes[np.shape(self.apexes)[0] - 1,0])
         last_index = np.shape(self.solution)[0]
         v, t, p = self.fwd_int(car, last_apex, last_index - 1)
         self.solution[last_apex:last_index, 2] = v
         self.solution[last_apex:last_index, 3] = t
         self.solution[last_apex:last_index, 4] = p
+        for i in range(last_apex, last_index):
+            self.iter_battery(car, i)
         return self.solution
 
     def back_int(self, car, apex_index1, apex_index2, j):
@@ -114,13 +139,33 @@ class Track:
         p = [0]
         HVeff = car.attrs['tractive_efficiency']
         DTeff = car.attrs['drivetrain_efficiency']
+        Voc = self.solution[apex_index1, 7]
+        E = self.solution[apex_index1, 5]
+        Pbm = calc_peak_power(car, Voc)
 
         for i in range(apex_index1, apex_index2):
-            v.append((v[len(v) - 1] ** 2 + 2 * self.dx * calc_max_accel(car, self.ir[i], v[len(v) - 1])[0]) ** 0.5)
+            v.append((v[len(v) - 1] ** 2 + 2 * self.dx * calc_max_accel(car, self.ir[i], v[len(v) - 1], Pbm)[0]) ** 0.5)
             if v[len(v) - 1] != 0: t.append(self.dx / v[len(v) - 1])
             else: t.append(0)
-            p.append(calc_max_accel(car, self.ir[i], v[len(v) - 1])[1] / (HVeff * DTeff))
+            p.append(calc_max_accel(car, self.ir[i], v[len(v) - 1], Pbm)[1] / (HVeff * DTeff))
+            E -= p[len(v) - 1] * t[len(v) - 1]
+            Voc = calc_Voc(car, E)
+            Pbm = calc_peak_power(car, Voc)
         return v, t, p
+
+    def iter_battery(self, car, i):
+        if i == 0: return
+        series = car.attrs['cells_series']
+        parallel = car.attrs['cells_parallel']
+        capacity = car.attrs['cell_capacity']
+        Cp = car.attrs['cell_thermal_capacity']
+        cell_mass = series * parallel * car.attrs['cell_mass']
+        self.solution[i, 5] = self.solution[i - 1, 5] - self.solution[i - 1, 4] * self.solution[i - 1, 3]
+        self.solution[i, 6] = self.solution[i, 5] / (series * parallel * capacity * 3600)
+        self.solution[i, 7] = calc_Voc(car, self.solution[i, 5])
+        self.solution[i, 8] = calc_peak_power(car, self.solution[0, 7])
+        self.solution[i, 9] = self.solution[i - 1, 9] + calc_heat_gen(car, self.solution[i - 1, 7], self.solution[i - 1, 4]) * self.solution[i - 1, 3]
+        self.solution[i, 10] = self.solution[i, 9] / (cell_mass * Cp) - 273
 
     def draw(self):
         with np.errstate(divide='ignore', invalid='ignore'):

@@ -13,6 +13,7 @@ def calc_heat_gen(car, Voc, P):
     R = car.attrs['cell_resistance']
     series = car.attrs['cells_series']
     parallel = car.attrs['cells_parallel']
+    Voc /= series
     P /= series * parallel
 
     I = Voc / (2 * R) - (Voc**2 / (4 * R**2) - P / R)**0.5
