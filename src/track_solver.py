@@ -163,7 +163,7 @@ class Track:
         self.solution[i, 5] = self.solution[i - 1, 5] - self.solution[i - 1, 4] * self.solution[i - 1, 3]
         self.solution[i, 6] = self.solution[i, 5] / (series * parallel * capacity * 3600)
         self.solution[i, 7] = calc_Voc(car, self.solution[i, 5])
-        self.solution[i, 8] = calc_peak_power(car, self.solution[0, 7])
+        self.solution[i, 8] = calc_peak_power(car, self.solution[i, 7])
         self.solution[i, 9] = self.solution[i - 1, 9] + calc_heat_gen(car, self.solution[i - 1, 7], self.solution[i - 1, 4]) * self.solution[i - 1, 3]
         self.solution[i, 10] = self.solution[i, 9] / (cell_mass * Cp) - 273
 

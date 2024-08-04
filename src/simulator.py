@@ -41,11 +41,11 @@ class Competition:
         fig, ax1 = plt.subplots()
         fig.set_figwidth(6.4 * 2)
         fig.set_figheight(4.8 * 2)
-        ax1.set_xlabel('t (s)')
+        ax1.set_xlabel('Position (m)')
         ax1.set_ylabel('Power draw (kW)')
         ax1.tick_params(axis='y', labelcolor='black')
         ax1.plot(solution[:, 0], solution[:, 4] / 1000, label='P (kW)', color='gold', ls='-')
-        ax1.plot(solution[:, 0], solution[:, 8] / 1000, label='Ppk (kW)', color='gold', ls='--')
+        ax1.plot(solution[:, 0], solution[:, 8] / 1000, label='Ppk (kW)', color='tab:orange', ls='--')
         ax1.set_xlim(0,solution[np.shape(solution)[0] - 1, 0])
         ax1.set_ylim(0,80)
 
@@ -60,7 +60,7 @@ class Competition:
         fig, ax1 = plt.subplots()
         fig.set_figwidth(6.4 * 2)
         fig.set_figheight(4.8 * 2)
-        ax1.set_xlabel('t (s)')
+        ax1.set_xlabel('Position (m)')
         ax1.set_ylabel('SOE (%)')
         ax1.tick_params(axis='y', labelcolor='black')
         ax1.plot(solution[:, 0], solution[:, 6] * 100, label='SOE (%)', color='tab:green', ls='-')
@@ -71,7 +71,7 @@ class Competition:
         ax2.set_ylabel('Capacity (kWh)')
         ax2.plot(solution[:, 0], solution[:, 5] / (3.6E6), label='Capacity (kWh)', color='tab:blue', ls='-')
         ax2.set_xlim(0, solution[np.shape(solution)[0] - 1, 0])
-        ax2.set_ylim(0, solution[np.shape(solution)[0] - 1, 5] / (3.6E6))
+        ax2.set_ylim(0, solution[0, 5] / (3.6E6))
         plt.title('')
         plt.suptitle('')
         fig.legend(loc='upper center', ncols=2)
@@ -80,16 +80,16 @@ class Competition:
         plt.show()
 
         # Temperature change
-        print(solution[:, 10])
         fig, ax1 = plt.subplots()
         fig.set_figwidth(6.4 * 2)
         fig.set_figheight(4.8 * 2)
-        ax1.set_xlabel('t (s)')
+        ax1.set_xlabel('Position (m)')
         ax1.set_ylabel('Temperature (C)')
         ax1.tick_params(axis='y', labelcolor='black')
         ax1.plot(solution[:, 0], solution[:, 10], label='T (C)', color='tab:cyan', ls='-')
         ax1.set_xlim(0, solution[np.shape(solution)[0] - 1, 0])
         ax1.set_ylim(35, 70)
+        print(solution[np.shape(solution)[0] - 1, 10])
 
         ax2 = ax1.twinx()
         ax2.set_ylabel('Heat Capacity (MJ)')
@@ -105,7 +105,43 @@ class Competition:
 
     def draw_plots(self, car):
         #self.Endurance.draw()
-        self.plot_battery(self.Endurance.solve(car))
+        sol = self.Endurance.solve(car)
+        self.plot_velocity(sol)
+        self.plot_battery(sol)
+
+    def plot_power_limits(self, Pmin, Pmax, count=4000):
+        result = np.zeros([int((Pmax - Pmin) / int((Pmax - Pmin) / count)),3])
+        n = 0
+        fig, ax1 = plt.subplots()
+        fig.set_figwidth(6.4 * 2)
+        fig.set_figheight(4.8 * 2)
+        ax1.set_xlabel('Power Limit (kW)')
+        ax1.set_ylabel('Final Temperature (C)')
+        ax1.tick_params(axis='y', labelcolor='black')
+        ax2 = ax1.twinx()
+        ax2.set_xlabel('Power Limit (kW)')
+        ax2.set_ylabel('Time elapsed (s)')
+        ax2.tick_params(axis='y', labelcolor='black')
+        plt.title('')
+        plt.suptitle('')
+        fig.tight_layout()
+        plt.grid()
+
+        for i in range(Pmin, Pmax, int((Pmax - Pmin) / count)):
+            print(i)
+            car.attrs["power_limit"] = i
+            solution = self.Endurance.solve(car)
+            t = np.sum(solution[:, 3])
+            result[n,:] = np.array([i, solution[np.shape(solution)[0] - 1, 10], t])
+            n += 1
+        ax1.plot(result[:, 0] / 1000, result[:, 1], label='T (C)', color='tab:cyan', ls='-')
+        ax2.plot(result[:, 0] / 1000, result[:, 2], label='Lap Time (s)', color='tab:blue', ls='-')
+        plt.legend(ncols=2)
+        plt.show()
+
 
 MIS_2019 = Competition('data/2018MichiganAXTrack_new.csv', 'data/2019MichiganEnduranceTrack.csv')
-MIS_2019.draw_plots(car)
+car.attrs['cells_parallel'] = 7
+car.attrs['mass_battery'] += car.attrs['cell_mass'] * car.attrs['cells_series']
+#MIS_2019.draw_plots(car)
+MIS_2019.plot_power_limits(10000,60000,count=40)

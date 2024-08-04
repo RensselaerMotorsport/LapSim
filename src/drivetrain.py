@@ -18,4 +18,5 @@ def calc_wheel_force(car, v, pbm):
     motor_lim = TM
     rules_lim = 80000 * HVeff * 30 / (MRPM * pi)
     battery_lim = pbm * HVeff * 30 / (MRPM * pi)
-    return min(motor_lim, rules_lim, battery_lim) * DTeff * GR / rT
+    power_lim = car.attrs['power_limit'] * HVeff * 30 / (MRPM * pi)
+    return min(motor_lim, rules_lim, battery_lim, power_lim) * DTeff * GR / rT
