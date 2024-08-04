@@ -3,7 +3,7 @@ import numpy as np
 
 
 def calc_max_longitudinal_force(car, v):
-    m = car.attrs['mass_car'] + car.attrs['mass_driver']
+    m = car.attrs['mass_car'] + car.attrs['mass_battery'] + car.attrs['mass_driver']
     g = car.attrs['gravity']
     Fl = calc_down_force(car,v)
     Fz = m * g + Fl
@@ -15,7 +15,7 @@ def calc_max_longitudinal_force(car, v):
 
 
 def calc_max_lateral_force(car, v):
-    m = car.attrs['mass_car'] + car.attrs['mass_driver']
+    m = car.attrs['mass_car'] + car.attrs['mass_battery'] + car.attrs['mass_driver']
     g = car.attrs['gravity']
     Fl = calc_down_force(car,v)
     Fz = m * g + Fl
@@ -27,7 +27,7 @@ def calc_max_lateral_force(car, v):
 
 
 def calc_apex_speed(car, ir):
-    m = car.attrs['mass_car'] + car.attrs['mass_driver']
+    m = car.attrs['mass_car'] + car.attrs['mass_battery'] + car.attrs['mass_driver']
     g = car.attrs['gravity']
     p = car.attrs['rho']
     A = car.attrs['A']
@@ -54,7 +54,7 @@ def calc_apex_speed(car, ir):
 
 
 def calc_rolling_resistance(car, v):
-    m = car.attrs['mass_car'] + car.attrs['mass_driver']
+    m = car.attrs['mass_car'] + car.attrs['mass_battery'] + car.attrs['mass_driver']
     g = car.attrs['gravity']
     Crr = car.attrs['rolling_resistance_coeff']
     Fl = calc_down_force(car, v)
