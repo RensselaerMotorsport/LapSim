@@ -1,0 +1,81 @@
+how large are yaw effects?
+- do fsae cars slip laterally?
+-> guess is no
+
+therefore
+lat g's all contribute to changing direction
+lon g's all contribute to changing speed
+- traction at rear tires
+-> minus traction contributing to lateral accel
+
+differential affects yaw affects, and exit accels, but not by much
+how do dampers, anti-roll bars, springs, etc. all affect lat accel?
+- only important in transient
+how does steering position, ackerman, SA, SR, all affect lat accel?
+- only important in transient
+
+
+other conclusions:
+yaw effects are only important for unstable cars
+- design for stability, simulate assuming stability
+-> becomes much more important for hub motors
+do not include transient calcs
+do not include suspension
+point mass - single traction circle
+bicicle - two traction circles added with long load transfer
+track - four traction circles added with long, lat load transfer
+
+
+DECISION 1
+point mass
+vs.
+bicicyle model
+vs.
+single track model
+	-> start with point mass
+	-> go to bicicyle model over time
+	-> SINGLE TRACK MODEL
+
+QUESTION 1
+can you add friction elipses
+or
+do you have to take rms
+
+QUESTION 2
+how do you model curved path?
+- take away required traction, rest goes to accel
+- find max speed at next apex
+- find max speed at every apex?
+
+DECISION 2
+inertias
+vs.
+efficiency
+-> inertia only affects transient accel
+-> efficiency is different
+
+QUESTION 3
+how do you create tracks?
+-> build off of actual testing data (need to use old tracks)
+
+
+
+NECESSSARY next steps
+- HIL testing
+- rigorous testing of all written equations and coefficients
+
+FUTURE additions (DONT DO MOST OF THIS)
+- (3%) "driver skill" - predictions for top corner speed
+- (0.05%) transient effects - ramp up speed for torque, voltage, electrical systems
+- (0.001%) turning speed - time taken to turn the steering wheel
+- (0.02%) differential modeling - ramp angles, preload
+- (0.1%) wind Force - wind during comp
+
+FAR Reaches (DONT EVER DO THIS)
+- implement cfd & fea into model
+- automatically spits out optimized sprocket models
+- automatically calculates wear on drivetrain
+- calculates lifetime of vehicle components (bearings, gearboxes)
+- calculates chain stretch
+-> determines ideal chain tension
+- plot steering angle
