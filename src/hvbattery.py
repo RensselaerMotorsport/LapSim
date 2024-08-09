@@ -25,6 +25,6 @@ def calc_Voc(car, E):
     parallel = car.attrs['cells_parallel']
     capacity = car.attrs['cell_capacity']
     Em = series * parallel * capacity * 3600
-    Vmax = 4.5
+    Vmax = 4.2
     Vmin = 2.5
     return (Vmin + E / Em * (Vmax - Vmin)) * series

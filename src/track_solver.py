@@ -75,7 +75,7 @@ class Track:
         cell_mass = series * parallel * car.attrs['cell_mass']
         self.solution[0, 5] = series * parallel * capacity * 3600
         self.solution[0, 6] = self.solution[0, 5] / (series * parallel * capacity * 3600)
-        self.solution[0, 7] = series * 4.5
+        self.solution[0, 7] = series * 4.2
         self.solution[0, 8] = calc_peak_power(car, self.solution[0, 7])
         self.solution[0, 9] = cell_mass * Cp * (273 + 35)
         self.solution[0, 10] = self.solution[0, 9] / (cell_mass * Cp) - 273

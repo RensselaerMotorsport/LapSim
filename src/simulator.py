@@ -22,8 +22,19 @@ class Competition:
         t = 0
         for i in solution[:, 3]:
             t += i
-        plt.plot(x,v)
+        fig, ax1 = plt.subplots()
+        fig.set_figwidth(6.4 * 2)
+        fig.set_figheight(4.8 * 2)
+        ax1.set_xlabel('Position (m)')
+        ax1.set_ylabel('Velocity (m/s)')
+        ax1.tick_params(axis='y', labelcolor='black')
+        ax1.plot(x, v, label='v (m/s)', color='tab:blue', ls='-')
+
         plt.title("Time elapsed (s): "+ str(round(t,2)))
+        plt.suptitle('')
+        fig.legend(loc='upper center', ncols=2)
+        fig.tight_layout()
+        plt.grid()
         plt.show()
 
         #pwr = solution[:, 4]
@@ -89,7 +100,7 @@ class Competition:
         ax1.plot(solution[:, 0], solution[:, 10], label='T (C)', color='tab:cyan', ls='-')
         ax1.set_xlim(0, solution[np.shape(solution)[0] - 1, 0])
         ax1.set_ylim(35, 70)
-        print(solution[np.shape(solution)[0] - 1, 10])
+        #print(solution[np.shape(solution)[0] - 1, 10])
 
         ax2 = ax1.twinx()
         ax2.set_ylabel('Heat Capacity (MJ)')
@@ -105,11 +116,11 @@ class Competition:
 
     def draw_plots(self, car):
         #self.Endurance.draw()
-        sol = self.Endurance.solve(car)
+        sol = self.Acceleration.solve(car)
         self.plot_velocity(sol)
-        self.plot_battery(sol)
+        #self.plot_battery(sol)
 
-    def plot_power_limits(self, Pmin, Pmax, count=4000):
+    def plot_power_limits(self, Pmin, Pmax, count=100):
         result = np.zeros([int((Pmax - Pmin) / int((Pmax - Pmin) / count)),3])
         n = 0
         fig, ax1 = plt.subplots()
@@ -139,9 +150,47 @@ class Competition:
         plt.legend(ncols=2)
         plt.show()
 
+    def optimize_gear_ratio(self, car, lower_gear=1.5, upper_gear=5.5, count=1000):
+        gear = np.linspace(lower_gear, upper_gear, count)
+        time = np.zeros_like(gear)
+        for i in range(gear.size):
+            car.attrs['gear_ratio'] = gear[i]
+            time[i] = np.sum(self.Acceleration.solve(car)[:, 3])
+        return gear[np.argmin(time)]
+
+    def sweep_var(self, car, xvar, yvar, min, max, count=50):
+        x = np.linspace(min, max, count)
+        y = np.zeros_like(x)
+        for i in range(x.size):
+            print(str(round(100 * (i + 1) / count,1)) + '%')
+            car.attrs[xvar] = x[i]
+            car.attrs['gear_ratio'] = self.optimize_gear_ratio(car, count=200)
+            sol = self.Endurance.solve(car)[:, yvar]
+            y[i] = sol[sol.size - 1]
+            #N = car.attrs['cells_series'] * car.attrs['cells_parallel']
+            #y[i] = (N * car.attrs['cell_capacity'] - sol[sol.size - 1] / (3600)) / 1000
+        fig, ax1 = plt.subplots()
+        fig.set_figwidth(6.4 * 2)
+        fig.set_figheight(4.8 * 2)
+        ax1.set_xlabel(xvar)
+        ax1.set_ylabel('Final Temperature (C)')
+        ax1.tick_params(axis='y', labelcolor='black')
+        ax1.plot(x/1000, y, label='T (C)', color='tab:red', ls='-')
+        ax1.set_xlim(min/1000, max/1000)
+        #ax1.set_ylim(0, 80)
+
+        #plt.title("Time elapsed (s): " + str(round(t, 2)))
+        plt.suptitle('')
+        #fig.legend(loc='upper center', ncols=2)
+        fig.tight_layout()
+        plt.grid()
+        plt.show()
+
 
 MIS_2019 = Competition('data/2018MichiganAXTrack_new.csv', 'data/2019MichiganEnduranceTrack.csv')
 car.attrs['cells_parallel'] = 7
 car.attrs['mass_battery'] += car.attrs['cell_mass'] * car.attrs['cells_series']
+MIS_2019.sweep_var(car, 'power_limit', 10, 10000, 80000, count=50)
+
 #MIS_2019.draw_plots(car)
-MIS_2019.plot_power_limits(10000,60000,count=40)
+#MIS_2019.plot_power_limits(10000,60000,count=40)
