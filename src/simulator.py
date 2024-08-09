@@ -165,8 +165,11 @@ class Competition:
             print(str(round(100 * (i + 1) / count,1)) + '%')
             car.attrs[xvar] = x[i]
             car.attrs['gear_ratio'] = self.optimize_gear_ratio(car, count=200)
-            sol = self.Endurance.solve(car)[:, yvar]
-            y[i] = sol[sol.size - 1]
+            sol = self.Endurance.solve(car)
+            ysol = sol[:, yvar]
+            y[i] = ysol[ysol.size - 1]
+            df = pd.DataFrame(np.array([sol[:,3], sol[:,9], sol[:,10]]).T, columns=['dt(s)', 'Q(J)', 'T(C)'])
+            df.to_csv('data/heat_gen/' + str(int(x[i])) + 'W_limit.csv')
             #N = car.attrs['cells_series'] * car.attrs['cells_parallel']
             #y[i] = (N * car.attrs['cell_capacity'] - sol[sol.size - 1] / (3600)) / 1000
         fig, ax1 = plt.subplots()
