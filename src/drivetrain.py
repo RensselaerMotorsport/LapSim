@@ -2,18 +2,17 @@ import math
 pi = math.pi
 
 
-def calc_wheel_force(car, v, pbm):
+def calc_wheel_force(car, v, pbm, Voc):
     TM = car.attrs['peak_torque']
     HVeff = car.attrs['tractive_efficiency']
     DTeff = car.attrs['drivetrain_efficiency']
     GR = car.attrs['gear_ratio']
     rT = car.attrs['tire_radius']
-    kV = car.attrs['constant_kv']
-    V = car.attrs['cells_series'] * 4.5
-    # ^ IN FUTURE CALL FROM BATTERY MODEL
+    Kv = car.attrs['constant_kv']
     if v == 0: v = 1E-10
     MRPM = v * GR * 60 / (2 * pi * rT)
-    if MRPM >= kV * V: return 0
+    if MRPM >= Kv * Voc: return 0
+    # FUTURE: Motor efficiency mapping
 
     motor_lim = TM
     rules_lim = 80000 * HVeff * 30 / (MRPM * pi)

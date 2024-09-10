@@ -31,15 +31,15 @@ def calc_max_decel(car, ir, v):
     return (-Fx - calc_drag_force(car, v) - calc_rolling_resistance(car, v)) / m
 
 
-def calc_max_accel(car, ir, v, pbm):
+def calc_max_accel(car, ir, v, pbm, Voc):
     m = car.attrs['mass_car'] + car.attrs['mass_battery'] + car.attrs['mass_driver']
 
     Fym = calc_max_lateral_force(car, v)
     Fy = m * v ** 2 * ir
-    Fxm = calc_max_longitudinal_force(car, v)
+    Fxm = calc_max_longitudinal_force(car, v, RWD=True)
     if (Fy/Fym)**2 >= 1: Fx = 0
     else: Fx = Fxm * ((1 - (Fy / Fym) ** 2) ** 0.5) * (1 - car.attrs['proportion_front']) # In future replace with bicycle model
-    FW = calc_wheel_force(car, v, pbm)
+    FW = calc_wheel_force(car, v, pbm, Voc)
     Feff = min(Fx, FW)
     pdraw = Feff * v
     return (Feff - calc_drag_force(car, v) - calc_rolling_resistance(car, v)) / m, pdraw
@@ -57,13 +57,13 @@ class Track:
         1: ir (1/m) - Inverse radius
         2: v (m/s) - Forward velocity
         3: t (s) - Time elapsed
-        4: p (J/s) - Power drawn
-        5: E
-        6: SOE
-        7: Voc
-        8: Pbm
-        9: Q
-        10: T
+        4: p (W) - Power drawn
+        5: E (J) - Energy capacity
+        6: SOE () - State of energy
+        7: Voc (V) - Open-circuit voltage
+        8: Pbm (W) - Max battery power
+        9: Q (J) - Stored thermal energy
+        10: T (C) - Cell temperature
         """
         self.solution = np.zeros((np.shape(self.x)[0],11))
         self.solution[:, 0] = self.x
@@ -144,10 +144,10 @@ class Track:
         Pbm = calc_peak_power(car, Voc)
 
         for i in range(apex_index1, apex_index2):
-            v.append((v[len(v) - 1] ** 2 + 2 * self.dx * calc_max_accel(car, self.ir[i], v[len(v) - 1], Pbm)[0]) ** 0.5)
+            v.append((v[len(v) - 1] ** 2 + 2 * self.dx * calc_max_accel(car, self.ir[i], v[len(v) - 1], Pbm, Voc)[0]) ** 0.5)
             if v[len(v) - 1] != 0: t.append(self.dx / v[len(v) - 1])
             else: t.append(0)
-            p.append(calc_max_accel(car, self.ir[i], v[len(v) - 1], Pbm)[1] / (HVeff * DTeff))
+            p.append(calc_max_accel(car, self.ir[i], v[len(v) - 1], Pbm, Voc)[1] / (HVeff * DTeff))
             E -= p[len(v) - 1] * t[len(v) - 1]
             Voc = calc_Voc(car, E)
             Pbm = calc_peak_power(car, Voc)

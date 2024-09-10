@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from classes.car_simple import Car
+from plotter import plot_single_yaxis
+from plotter import plot_dual_yaxis
 car = Car("data/rm28.json")
 
 
@@ -164,36 +166,30 @@ class Competition:
         for i in range(x.size):
             print(str(round(100 * (i + 1) / count,1)) + '%')
             car.attrs[xvar] = x[i]
-            car.attrs['gear_ratio'] = self.optimize_gear_ratio(car, count=200)
+            #car.attrs['gear_ratio'] = self.optimize_gear_ratio(car, count=200)
             sol = self.Endurance.solve(car)
             ysol = sol[:, yvar]
             y[i] = ysol[ysol.size - 1]
             df = pd.DataFrame(np.array([sol[:,3], sol[:,9], sol[:,10]]).T, columns=['dt(s)', 'Q(J)', 'T(C)'])
             df.to_csv('data/heat_gen/' + str(int(x[i])) + 'W_limit.csv')
-            #N = car.attrs['cells_series'] * car.attrs['cells_parallel']
-            #y[i] = (N * car.attrs['cell_capacity'] - sol[sol.size - 1] / (3600)) / 1000
-        fig, ax1 = plt.subplots()
-        fig.set_figwidth(6.4 * 2)
-        fig.set_figheight(4.8 * 2)
-        ax1.set_xlabel(xvar)
-        ax1.set_ylabel('Final Temperature (C)')
-        ax1.tick_params(axis='y', labelcolor='black')
-        ax1.plot(x/1000, y, label='T (C)', color='tab:red', ls='-')
-        ax1.set_xlim(min/1000, max/1000)
-        #ax1.set_ylim(0, 80)
-
-        #plt.title("Time elapsed (s): " + str(round(t, 2)))
-        plt.suptitle('')
-        #fig.legend(loc='upper center', ncols=2)
-        fig.tight_layout()
-        plt.grid()
-        plt.show()
+        return x, y
 
 
 MIS_2019 = Competition('data/2018MichiganAXTrack_new.csv', 'data/2019MichiganEnduranceTrack.csv')
-car.attrs['cells_parallel'] = 7
-car.attrs['mass_battery'] += car.attrs['cell_mass'] * car.attrs['cells_series']
-MIS_2019.sweep_var(car, 'power_limit', 10, 10000, 80000, count=50)
+
+#x, y = MIS_2019.sweep_var(car, 'power_limit', 10, 10000, 80000, count=5)
+x = np.array([])
+y = np.array([])
+for i in range(6,11):
+    car.attrs["mass_battery"] += 0.057 * 95
+    car.attrs['cells_parallel'] = i
+    xi, yi = MIS_2019.sweep_var(car, 'power_limit', 10, 10000, 80000, count=2)
+    x = np.append(x, xi)
+    y = np.append(y, yi)
+print(x)
+print(y)
+
+plot_single_yaxis(x,y,'Cells in parallel','Laptime (s)',['6P','7P','8P','9P','10P'],['#0149fe','#00637a','#005a64','#00583d','#2e4d1a'],['-','-','-','-','-','-'])
 
 #MIS_2019.draw_plots(car)
 #MIS_2019.plot_power_limits(10000,60000,count=40)

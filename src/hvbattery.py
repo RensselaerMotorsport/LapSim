@@ -1,4 +1,5 @@
-def calc_peak_power(car, Voc): # FUTURE: account for internal resistance thermal sensitivity
+def calc_peak_power(car, Voc):
+    # FUTURE: account for internal resistance thermal sensitivity
     If = car.attrs['max_current']
     series = car.attrs['cells_series']
     parallel = car.attrs['cells_parallel']

@@ -2,16 +2,23 @@ from aerodynamics import calc_down_force
 import numpy as np
 
 
-def calc_max_longitudinal_force(car, v):
+def calc_max_longitudinal_force(car, v, RWD=False):
     m = car.attrs['mass_car'] + car.attrs['mass_battery'] + car.attrs['mass_driver']
     g = car.attrs['gravity']
+    h = car.attrs['CG_height']
+    L = car.attrs['wheelbase']
+    pct_rear = 1 - car.attrs['proportion_front']
     Fl = calc_down_force(car,v)
-    Fz = m * g + Fl
+    if RWD: Fz = (m * g) * pct_rear
+    else: Fz = m * g + Fl
 
     # u0 = car.attrs['load_sensitivity']
     # return Fz * (mu0 + dmu/dFz * (N0 - Fz))
+    # FUTURE: Account for load sensitivity
     ux = car.attrs['CoF']
-    return Fz * ux
+    # Does this account for load transfer properly?
+    if RWD: return Fz * ux / (1 - h * ux / L) + Fl * pct_rear * ux
+    else: return Fz * ux
 
 
 def calc_max_lateral_force(car, v):
@@ -22,6 +29,8 @@ def calc_max_lateral_force(car, v):
 
     # u0 = car.attrs['load_sensitivity']
     # return Fz * (mu0 + dmu/dFz * (N0 - Fz))
+    # FUTURE: Account for load transfer
+    # FUTURE: Account for load sensitivity
     uy = car.attrs['CoF']
     return Fz * uy
 
@@ -44,6 +53,8 @@ def calc_apex_speed(car, ir):
 
     # u0 = car.attrs['load_sensitivity']
     # return Fz * (mu0 + dmu/dFz * (N0 - Fz))
+    # FUTURE: Account for load transfer
+    # FUTURE: Account for load sensitivity
     uy = car.attrs['CoF']
     weight_grip = m * g * r * uy
     aero_grip = p * A * Cl * r * uy / 2
