@@ -1,12 +1,14 @@
 from track_solver import Track
+import plotly.graph_objects as pgo
+import plotly.io as pio
+from plotly.subplots import make_subplots
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from classes.car_simple import Car
 from plotter import plot_single_yaxis
 from plotter import plot_dual_yaxis
-import os
-print(os.getcwd())
+
 car = Car("data/rm28.json")
 
 
@@ -172,29 +174,40 @@ class Competition:
             sol = self.Endurance.solve(car)
             ysol = sol[:, yvar]
             y[i] = ysol[ysol.size - 1]
-            df = pd.DataFrame(np.array([sol[:,3], sol[:,9], sol[:,10]]).T, columns=['dt(s)', 'Q(J)', 'T(C)'])
+            times = np.zeros_like(sol[:,3])
+            dQ = np.zeros_like(sol[:,9])
+            for j, a in enumerate(sol[:,3]):
+                if j == 0:                  
+                    times[j] = a
+                else:
+                    times[j] = a + np.sum(sol[:j-1,3])
+                    
+            for j, a in enumerate(sol[:,9]):
+                if j == 0:                  
+                    dQ[j] = a/sol[j,3]
+                else:
+                    dQ[j] = (a - sol[j-1,9])/sol[j,3]
+
+            df = pd.DataFrame(np.array([times, dQ, sol[:,10]]).T, columns=['t(s)', 'dQ/dt(W)', 'T(C)'])
             df.to_csv('data/heat_gen/' + str(int(x[i])) + 'W_limit.csv')
         return x, y
 
 
 MIS_2019 = Competition('data/2018MichiganAXTrack_new.csv', 'data/2019MichiganEnduranceTrack.csv')
-MIS_2019.draw_plots(car)
 
 #x, y = MIS_2019.sweep_var(car, 'power_limit', 10, 10000, 80000, count=5)
-#x = np.array([])
-#y = np.array([])
-#for i in range(6,11):
-    #car.attrs["mass_battery"] += 0.057 * 95
-    #car.attrs['cells_parallel'] = i
-    #xi, yi = MIS_2019.sweep_var(car, 'power_limit', 10, 10000, 80000, count=2)
-    #x = np.append(x, xi)
-    #y = np.append(y, yi)
-#print(x)
-#print(y)
+x = np.array([])
+y = np.array([])
+for i in range(6,11):
+    car.attrs["mass_battery"] += 0.057 * 95
+    car.attrs['cells_parallel'] = i
+    xi, yi = MIS_2019.sweep_var(car, 'power_limit', 10, 10000, 80000, count=2)
+    x = np.append(x, xi)
+    y = np.append(y, yi)
+print(x)
+print(y)
 
-#plot_single_yaxis(x,y,'Cells in parallel','Laptime (s)',['6P','7P','8P','9P','10P'],['#0149fe','#00637a','#005a64','#00583d','#2e4d1a'],['-','-','-','-','-','-'])
+# plot_single_yaxis(x, y, 'Cells in parallel','Laptime (s)',['6P','7P','8P','9P','10P'],['#0149fe','#00637a','#005a64','#00583d','#2e4d1a'],['-','-','-','-','-','-','-','-','-','-'])
 
 #MIS_2019.draw_plots(car)
 #MIS_2019.plot_power_limits(10000,60000,count=40)
-
-#I'm about to add more code here 
