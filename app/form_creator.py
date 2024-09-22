@@ -2,9 +2,9 @@
 from flask import (flash, make_response, redirect, render_template,
                    request, session, url_for, Blueprint)
 # Local classes
-from forms import rm_25_form, rm_26_form, brakes_form
-from cookie_utils import can_add_cookie
-from graph import generate_graph
+from app.forms import rm_25_form, rm_26_form, brakes_form
+from app.cookie_utils import can_add_cookie
+from app.graph import generate_graph
 # Looping through all possible combinations of sweep values
 import itertools
 # Generating range of sweep values

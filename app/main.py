@@ -1,7 +1,7 @@
 # Basic Flask modules
 from flask import Flask, render_template
 # Local classes
-from form_creator import create_form, output_bp
+from app.form_creator import create_form, output_bp
 # Additional imports
 import os
 import sys
