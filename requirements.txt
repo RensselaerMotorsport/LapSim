@@ -1,24 +1,8 @@
-blinker @ file:///work/perseverance-python-buildout/croot/blinker_1698846408677/work
-click @ file:///work/perseverance-python-buildout/croot/click_1698845879718/work
-Flask @ file:///croot/flask_1716545870149/work
-Flask-WTF==1.2.1
-gunicorn==23.0.0
-itsdangerous @ file:///croot/itsdangerous_1716533337253/work
-Jinja2 @ file:///croot/jinja2_1716993405101/work
-MarkupSafe @ file:///work/perseverance-python-buildout/croot/markupsafe_1707342994941/work
-mkl-service==2.4.0
-mkl_fft @ file:///croot/mkl_fft_1725370245198/work
-mkl_random @ file:///croot/mkl_random_1725370241878/work
-numpy @ file:///croot/numpy_and_numpy_base_1725470312869/work/dist/numpy-2.0.1-cp312-cp312-linux_x86_64.whl#sha256=e2374991344fa2241a2153ef3d550d3a1cd2d50cb1f1d51eddc82870abc88021
-packaging @ file:///croot/packaging_1720101850331/work
+Flask==3.0.3
+flask_wtf==1.2.1
+matplotlib==3.9.2
+numpy==2.1.1
 pandas==2.2.3
-plotly @ file:///croot/plotly_1726245554316/work
-python-dateutil==2.9.0.post0
-pytz==2024.2
-setuptools==75.1.0
-six==1.16.0
-tenacity @ file:///croot/tenacity_1721222508356/work
-tzdata==2024.1
-Werkzeug @ file:///croot/werkzeug_1716533313107/work
-wheel==0.44.0
+plotly==5.24.1
+Shapely==2.0.6
 WTForms==3.1.2
