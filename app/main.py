@@ -4,6 +4,9 @@ from flask import Flask, render_template
 from form_creator import create_form, output_bp
 # Additional imports
 import os
+import sys
+directory = os.getcwd()
+sys.path.insert(1, directory+'/src')
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)

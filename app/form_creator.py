@@ -17,8 +17,7 @@ import os
 import sys
 
 directory = os.getcwd()
-sys.path.insert(1, directory+'\\src')
-sys.path.insert(1, directory+'\\src\\brakes')
+sys.path.insert(1, directory+'/src')
 from classes.car_simple import Car
 
 output_bp = Blueprint('output_bp', __name__)

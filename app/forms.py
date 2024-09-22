@@ -11,7 +11,7 @@ from wtforms import StringField, DecimalField, SubmitField, RadioField  # Used f
 
 class rm_25_form(FlaskForm):
     directory = os.getcwd()
-    data = json.loads(open(directory+"\\app\\rm25.json").read())
+    data = json.loads(open("src/data/rm25.json").read())
 
     fields = {}
     for key, value in list(data.items()):
@@ -33,7 +33,7 @@ class rm_25_form(FlaskForm):
 class rm_26_form(FlaskForm):
 
     directory = os.getcwd()
-    data = json.loads(open(directory+"\\app\\rm26.json").read())
+    data = json.loads(open("src/data/rm26.json").read())
 
     # create fields dynamically with label set based on data
     fields = {}
@@ -54,7 +54,7 @@ class rm_26_form(FlaskForm):
 class brakes_form(FlaskForm):
 
     directory = os.getcwd()
-    data = json.loads(open(directory+"\\app\\brakes.json").read())
+    data = json.loads(open("src/data/rm26.json").read()) # FIXME: Temp data replacement
 
     # create fields dynamically with label set based on data
     fields = {}
