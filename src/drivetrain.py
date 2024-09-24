@@ -2,7 +2,28 @@ import math
 pi = math.pi
 
 import pandas as pd
-from shapely.geometry import Polygon, Point
+
+def is_point_in_polygon(x, y, polygon):
+    # Determines if point is within a polygon
+    num_points = len(polygon)
+    inside = False
+
+    x0, y0 = polygon[0]
+
+    for i in range(1, num_points + 1):
+        x1, y1 = polygon[i % num_points]
+
+        if y > min(y0, y1):
+            if y <= max(y0, y1):
+                if x <= max(x0, x1):
+                    if y0 != y1:
+                        x_intersection = (y - y0) * (x1 - x0) / (y1 - y0) + x0
+                    if x0 == x1 or x <= x_intersection:
+                        inside = not inside
+
+        x0, y0 = x1, y1
+
+    return inside
 
 
 def get_efficiency_level(speed, torque, csv_file_path='data/wpd_datasets.csv'):
@@ -46,26 +67,18 @@ def get_efficiency_level(speed, torque, csv_file_path='data/wpd_datasets.csv'):
             # Append the x, y coordinates to the corresponding list in the dictionary
             data_points[key].append((x_val, y_val))
 
-    # Create polygons by connecting the data points with linear segments
-    polygons = {}
-    for key, points in data_points.items():
-        if len(points) >= 3:
-            polygons[key] = Polygon(points)
-
-    # Create a point from given speed and torque values
-    point = Point(speed, torque)
-
     # Define the efficiency levels in order from innermost to outermost
     efficiency_order = [str(".96"), str(".95"), str(".94"), str(".92"), str(".88")]
 
     # Iterate from innermost to outermost to find the highest level efficiency polygon containing the point
     for efficiency in efficiency_order:
-        if efficiency in polygons and polygons[efficiency].contains(point):
+        polygon = data_points[efficiency]
+        if len(polygon) >= 3 and is_point_in_polygon(speed, torque, polygon):
             return str(efficiency)
 
     return str(".88")
 
-#g = get_efficiency_level(3000,215)
+#g = get_efficiency_level(3000, 215)
 #print(g)
 
 def calc_wheel_force(car, v, pbm, Voc):
