@@ -1,165 +1,157 @@
-# Basic Flask modules
-from flask import (flash, make_response, redirect, render_template,
-                   request, session, url_for, Blueprint)
-# Local classes
-from forms import rm_25_form, rm_26_form, brakes_form
-from cookie_utils import can_add_cookie
-from graph import generate_graph
-# Looping through all possible combinations of sweep values
-import itertools
-# Generating range of sweep values
-import numpy as np
-# Additional imports
-from decimal import Decimal
+import itertools  # Looping through all possible combinations of sweep values
+import decimal
 import importlib
 import json
-import os
-import sys
+import numpy as np  # Generating range of sweep values
+from flask import (flash, make_response, redirect, render_template, request,
+                   session, url_for, Blueprint)
 
-directory = os.getcwd()
-sys.path.insert(1, directory+'/src')
-from classes.car_simple import Car
+# Local imports
+from app.form import car_form
+from app.cookie_utils import can_add_cookie
+from app.graph import generate_graph
+from src.classes.car_simple import Car
 
 output_bp = Blueprint('output_bp', __name__)
 
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
-        if isinstance(o, Decimal):
+        if isinstance(o, decimal):
             return str(o)
         return super().default(o)
 
 #TODO: used for rm25 and it is not in use
-def fill_blank_with_default(i, car):
-        if request.form[i] != '':
-            # gear_ratios are stored as a list in the json file, we need a special case to split it by commas
-            if i == 'gear_ratios':
-                car[i] = request.form[i].replace(' ','').split(',')
-                # Removing any blank values (in case multiple commas in a row: 1, 2, 3,,,, 4)
-                # Goes backwards through list, so we don't get index out of range
-                for j in range(len(car[i])-1,-1,-1):
-                    if car[i][j] == '':
-                        car[i].remove('')
-                    else:
-                        car[i][j] = Decimal(car[i][j])
-            else:
-                # Otherwise, we can just convert to decimal
-                car[i] = Decimal(request.form[i])
+# def fill_blank_with_default(i, car):
+#         if request.form[i] != '':
+#             # gear_ratios are stored as a list in the json file, we need a special case to split it by commas
+#             if i == 'gear_ratios':
+#                 car[i] = request.form[i].replace(' ','').split(',')
+#                 # Removing any blank values (in case multiple commas in a row: 1, 2, 3,,,, 4)
+#                 # Goes backwards through list, so we don't get index out of range
+#                 for j in range(len(car[i])-1,-1,-1):
+#                     if car[i][j] == '':
+#                         car[i].remove('')
+#                     else:
+#                         car[i][j] = decimal(car[i][j])
+#             else:
+#                 # Otherwise, we can just convert to decimal
+#                 car[i] = decimal(request.form[i])
 
 def create_form(form_name, module, operation, json_file):
-    # pass in json, form name, and function and it creates a form
-    # TODO: Currently the best way to do this as forms is not updated to support dynamic forms
-    if json_file == 'rm25.json':
-        form = rm_25_form(form_name)
-    elif json_file == 'rm26.json':
-        form = rm_26_form(form_name)
-    elif json_file == 'brakes.json':
-        form = brakes_form(form_name)
-    else:
-        raise ValueError(f"Unsupported json_file: {json_file}")
+    # Load data from JSON file
+    with open(json_file) as f:
+        data = json.load(f)
 
-    length = len(form.fields)  # Get length of fields dictionary
+    form = car_form(data)
     formatted_title = form_name.replace('_', ' ').replace('/', '').title()
 
-    # Submit Form
+    # Check if the form is submitted
     if form.is_submitted():
-        # Begins with default JSON data
         car = form.data
 
-        # Create list excluding csrf token, submit button, and also begin, step, and end values
-        keys_to_exclude = ['_begin', '_end', '_step']  # Define the suffixes to exclude
-        filtered_keys = []  # Create an empty list to store the filtered keys
-        sweep_keys = []
+        filtered_keys, sweep_keys = get_filtered_and_sweep_keys(request.form)
 
-        for key in list(request.form.keys())[2:]:
-            if not any(key.endswith(suffix) for suffix in keys_to_exclude):
-                filtered_keys.append(key)
-            else:
-                sweep_keys.append(key)
+        # values, sweep_toggled = process_sweep_keys(sweep_keys, request.form, form, formatted_title)
 
-        values = {}
-        sweep_toggled = False
-
-        # Check Sweep and error check
-        for key in sweep_keys:
-            if request.form[key]:
-                # Remove the suffix ('_begin', '_end', or '_step') to get the base key
-                suffixes = ('_begin', '_end', '_step')
-                base_key = key
-                for suffix in suffixes:
-                    if base_key.endswith(suffix):
-                        base_key = base_key[:-len(suffix)]
-                        break
-
-                # Count the number of filled fields (begin, step, and end) for the current base_key
-                filled_fields = sum(1 for suffix in ('_begin', '_step', '_end') if request.form[base_key + suffix])
-
-                # If not all three fields (begin, step, and end) are filled, show a flash message and render the form again
-                if filled_fields < 3:
-                    flash(f"{base_key.replace('_', ' ').title()} sweep form isn't filled out completely.", 'success')
-                    return render_template('form.html', title=formatted_title, form=form, length=length)
-
-                # If the current key ends with '_begin', set sweep_toggled to True and store the begin, step, and end values
-                if key.endswith('_begin'):
-                    sweep_toggled = True
-                    values[base_key] = (Decimal(request.form[base_key + '_begin']),
-                                        Decimal(request.form[base_key + '_step']),
-                                        Decimal(request.form[base_key + '_end']))
-
-
-
-        if sweep_toggled:
-            # Generate list of all possible combinations of sweep values
-            sweep_values = []
-            for key in values:
-                start = Decimal(values[key][0])
-                stop = Decimal(values[key][2])
-                step = Decimal(values[key][1])
-
-                decimal_array = np.arange(start, stop + step, step)
-                sweep_values.append([float(d) for d in decimal_array])
-
-            sweep_combos = list(itertools.product(*sweep_values))
-
-            values_str = json.dumps(values, cls=DecimalEncoder)
-            sweep_combos_str = json.dumps(sweep_combos, cls=DecimalEncoder)
-            session['sweep_combos_str'] = sweep_combos_str
-            session['values_str'] = values_str
-
-            resp = make_response(redirect(url_for('output_bp.output', module=module, operation=operation, sweep_toggled=sweep_toggled)))
-
-            # Loop through all possible combinations of sweep values
-            for combo in sweep_combos:
-                index = 0
-                for i in range(len(filtered_keys)):
-                    if filtered_keys[i] in values:
-                        car[filtered_keys[i]] = combo[index]
-                        index += 1
-                    else:
-                        if request.form[filtered_keys[i]] != '':
-                            car[filtered_keys[i]] = Decimal(request.form[filtered_keys[i]])
-
-                json_str = json.dumps(car, cls=DecimalEncoder, indent=2)
-
-                new_cookie_key = f"data{combo}"
-                if not can_add_cookie(session, new_cookie_key, json_str):
-                    flash("Data limit exceeded. Please reduce the amount of data.")
-                    return render_template('form.html', title=formatted_title, form=form, length=length)
-
-                session[new_cookie_key] = json_str
-
+        # Handle sweep cases
+        if False: #sweep_toggled: # FIXME: Temp disable sweep so can debug
+            return handle_sweep(filtered_keys, values, car, module, operation)
         else:
-            for i in filtered_keys:
-                if request.form[i] != '':
-                    car[i] = Decimal(request.form[i])
+            return handle_regular_submission(filtered_keys, car, form, formatted_title, module, operation)
 
-            json_obj = json.dumps(car, cls=DecimalEncoder, indent=2)
-            resp = make_response(redirect(url_for('output_bp.output', module=module, operation=operation)))
-            session['data'] = json_obj
+    # Render the form if not submitted
+    return render_template('form.html', title=formatted_title, form=form, length=len(form._fields))
 
-        return resp
+def get_filtered_and_sweep_keys(form_data):
+    """Filter out keys that are sweep-related and return filtered and sweep keys."""
+    keys_to_exclude = ['_begin', '_end', '_step']
+    filtered_keys = [key for key in list(form_data.keys())[2:] if not any(key.endswith(suffix) for suffix in keys_to_exclude)]
+    sweep_keys = [key for key in list(form_data.keys())[2:] if any(key.endswith(suffix) for suffix in keys_to_exclude)]
+    return filtered_keys, sweep_keys
 
-    return render_template('form.html', title=formatted_title, form=form, length=length)
+def process_sweep_keys(sweep_keys, form_data, form, title):
+    """Process sweep keys and validate that all sweep-related fields are filled."""
+    values = {}
+    sweep_toggled = False
 
+    for key in sweep_keys:
+        if form_data[key]:
+            base_key = get_base_key(key)
+
+            if not are_sweep_fields_filled(base_key, form_data):
+                flash(f"{base_key.replace('_', ' ').title()} sweep form isn't filled out completely.", 'error')
+                return values, sweep_toggled
+
+            if key.endswith('_begin'):
+                sweep_toggled = True
+                values[base_key] = (
+                    decimal(form_data[base_key + '_begin']),
+                    decimal(form_data[base_key + '_step']),
+                    decimal(form_data[base_key + '_end'])
+                )
+
+    return values, sweep_toggled
+
+def get_base_key(key):
+    """Extract base key by removing sweep suffixes."""
+    for suffix in ['_begin', '_end', '_step']:
+        if key.endswith(suffix):
+            return key[:-len(suffix)]
+    return key
+
+def are_sweep_fields_filled(base_key, form_data):
+    """Check if all sweep fields (begin, step, end) are filled for a given base key."""
+    return all(form_data.get(f"{base_key}{suffix}") for suffix in ['_begin', '_step', '_end'])
+
+def handle_sweep(filtered_keys, values, car, module, operation):
+    """Handle the sweep logic by creating combinations of sweep values."""
+    sweep_values = [
+        list(np.arange(decimal(values[key][0]), Decimal(values[key][2]) + Decimal(values[key][1]), Decimal(values[key][1])))
+        for key in values
+    ]
+
+    sweep_combos = list(itertools.product(*sweep_values))
+    save_sweep_data_to_session(values, sweep_combos)
+
+    for combo in sweep_combos:
+        update_car_data(filtered_keys, values, car, combo)
+        json_str = json.dumps(car, cls=DecimalEncoder, indent=2)
+
+        if not can_add_cookie(session, f"data{combo}", json_str):
+            flash("Data limit exceeded. Please reduce the amount of data.")
+            return render_template('form.html', title="Error", form=form)
+
+        session[f"data{combo}"] = json_str
+
+    return make_response(redirect(url_for('output_bp.output', module=module, operation=operation, sweep_toggled=True)))
+
+def handle_regular_submission(filtered_keys, car, form, title, module, operation):
+    """Handle a regular (non-sweep) form submission."""
+    for key in filtered_keys:
+        if request.form[key]:
+            car[key] = decimal(request.form[key])
+
+    json_obj = json.dumps(car, cls=DecimalEncoder, indent=2)
+    session['data'] = json_obj
+
+    return make_response(redirect(url_for('output_bp.output', module=module, operation=operation)))
+
+def save_sweep_data_to_session(values, sweep_combos):
+    """Save sweep data and combinations to the session."""
+    session['sweep_combos_str'] = json.dumps(sweep_combos, cls=DecimalEncoder)
+    session['values_str'] = json.dumps(values, cls=DecimalEncoder)
+
+def update_car_data(filtered_keys, values, car, combo):
+    """Update car data with a combination of sweep values."""
+    index = 0
+    for i in range(len(filtered_keys)):
+        if filtered_keys[i] in values:
+            car[filtered_keys[i]] = combo[index]
+            index += 1
+        elif request.form[filtered_keys[i]]:
+            car[filtered_keys[i]] = decimal(request.form[filtered_keys[i]])
+
+# move this to output.py
 @output_bp.route('/output', methods=['GET', 'POST'])
 def output():
     # Retrieve args
@@ -191,7 +183,7 @@ def output():
                 caliperModel = caliperModel_np.tolist()
                 padModel = padModel_np.tolist()
             else:
-                time_data.append(Decimal(round(operation(car), 3)))
+                time_data.append(decimal(round(operation(car), 3)))
 
         if operation.__name__ == 'brake_input':
             response = make_response(render_template('brake_output.html', brake_info=brake_info, sweep_combos=sweep_combos,
@@ -225,7 +217,7 @@ def output():
                                                      padBrand=padBrand, caliperModel=caliperModel, padModel=padModel))
         else:
             time_data = []
-            time_data.append(Decimal(round(operation(car), 3)))
+            time_data.append(decimal(round(operation(car), 3)))
             response = make_response(render_template('output.html', time_data=time_data, sweep_combos=[], values={}))
 
         session.pop('data', None)
