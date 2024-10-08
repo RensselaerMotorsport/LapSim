@@ -99,5 +99,5 @@ def calc_wheel_force(car, v, pbm, Voc):
     power_lim = car.attrs['power_limit'] * HVeff * 30 / (MRPM * pi)
     
     torque =  min(motor_lim, rules_lim, battery_lim, power_lim) * DTeff * GR / rT
-    DTeff = get_efficiency_level(MRPM, torque)
+    #DTeff = get_efficiency_level(MRPM, torque)
     return float(DTeff) * torque
