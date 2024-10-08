@@ -164,6 +164,41 @@ class Competition:
             time[i] = np.sum(self.Acceleration.solve(car)[:, 3])
         return gear[np.argmin(time)]
 
+        def plot_gear_ratio_vs_time(self, car, lower_gear=1.5, upper_gear=5.5, count=1000):
+        # Shorten endurance to decrease run time
+        original_endurance_track = self.Endurance
+        self.Endurance = Track(self.Endurance.x[:int(len(self.Endurance.x) / 20)],self.Endurance.ir[:int(len(self.Endurance.ir) / 20)])
+
+        # Get ratios and times from above functions
+        gear = np.linspace(lower_gear, upper_gear, count)
+        accel_time = np.zeros_like(gear)
+        endurance_time = np.zeros_like(gear)
+
+        for i in range(gear.size):
+            car.attrs['gear_ratio'] = gear[i]
+            accel_time[i] = np.sum(self.Acceleration.solve(car)[:, 3])
+            endurance_time[i] = np.sum(self.Endurance.solve(car)[:, 3])
+
+        fig, ax1 = plt.subplots(figsize=(10, 6))
+        ax1.plot(gear, accel_time, label="Acceleration Time", color="blue")
+        ax1.set_xlabel('Gear Ratio')
+        ax1.set_ylabel('Acceleration Time (s)', color='blue')
+        ax1.tick_params(axis='y', labelcolor='blue')
+
+        ax2 = ax1.twinx()
+        ax2.plot(gear, endurance_time, label="Endurance Time", color="green")
+        ax2.set_ylabel('Endurance Single Lap Time (s)', color='green')
+        ax2.tick_params(axis='y', labelcolor='green')
+
+        fig.tight_layout()
+        plt.grid(True)
+        plt.title('Gear Ratio vs. Acceleration and Endurance Time')
+        fig.legend(loc='upper center', ncols=2)
+        plt.show()
+
+        # Restore the original endurance track after done
+        self.Endurance = original_endurance_track
+
     def sweep_var(self, car, xvar, yvar, min, max, count=50):
         x = np.linspace(min, max, count)
         y = np.zeros_like(x)
