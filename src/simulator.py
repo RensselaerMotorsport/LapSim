@@ -164,12 +164,8 @@ class Competition:
             time[i] = np.sum(self.Acceleration.solve(car)[:, 3])
         return gear[np.argmin(time)]
 
-        def plot_gear_ratio_vs_time(self, car, lower_gear=1.5, upper_gear=5.5, count=1000):
-        # Shorten endurance to decrease run time
-        original_endurance_track = self.Endurance
-        self.Endurance = Track(self.Endurance.x[:int(len(self.Endurance.x) / 20)],self.Endurance.ir[:int(len(self.Endurance.ir) / 20)])
-
-        # Get ratios and times from above functions
+    def plot_gear_ratio_vs_time(self, car, lower_gear=1.5, upper_gear=5.5, count=20):
+        # Get the gear ratios and times from the optimization function
         gear = np.linspace(lower_gear, upper_gear, count)
         accel_time = np.zeros_like(gear)
         endurance_time = np.zeros_like(gear)
@@ -179,26 +175,29 @@ class Competition:
             accel_time[i] = np.sum(self.Acceleration.solve(car)[:, 3])
             endurance_time[i] = np.sum(self.Endurance.solve(car)[:, 3])
 
-        fig, ax1 = plt.subplots(figsize=(10, 6))
-        ax1.plot(gear, accel_time, label="Acceleration Time", color="blue")
-        ax1.set_xlabel('Gear Ratio')
-        ax1.set_ylabel('Acceleration Time (s)', color='blue')
-        ax1.tick_params(axis='y', labelcolor='blue')
-
-        ax2 = ax1.twinx()
-        ax2.plot(gear, endurance_time, label="Endurance Time", color="green")
-        ax2.set_ylabel('Endurance Single Lap Time (s)', color='green')
-        ax2.tick_params(axis='y', labelcolor='green')
-
-        fig.tight_layout()
-        plt.grid(True)
-        plt.title('Gear Ratio vs. Acceleration and Endurance Time')
-        fig.legend(loc='upper center', ncols=2)
-        plt.show()
-
-        # Restore the original endurance track after done
-        self.Endurance = original_endurance_track
-
+        # Use the plotter module to create the plot
+        from plotter import plot_dual_yaxis
+        x = gear
+        y1 = [accel_time]
+        y2 = [endurance_time]
+        y1_labels = ["Acceleration Time"]
+        y2_labels = ["Endurance Time"]
+        y1_colors = ["blue"]
+        y2_colors = ["green"]
+        y1_ls = ["-"]
+        y2_ls = ["-"]
+        
+        plot_dual_yaxis(x, y1, y2,
+                        x_axis='Gear Ratio',
+                        y1_axis='Acceleration Time (s)',
+                        y2_axis='Endurance Time (s)',
+                        y1_labels=y1_labels,
+                        y2_labels=y2_labels,
+                        y1_colors=y1_colors,
+                        y2_colors=y2_colors,
+                        y1_ls=y1_ls,
+                        y2_ls=y2_ls)
+    
     def sweep_var(self, car, xvar, yvar, min, max, count=50):
         x = np.linspace(min, max, count)
         y = np.zeros_like(x)
