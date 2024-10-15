@@ -164,39 +164,39 @@ class Competition:
             time[i] = np.sum(self.Acceleration.solve(car)[:, 3])
         return gear[np.argmin(time)]
 
-    def plot_gear_ratio_vs_time(self, car, lower_gear=1.5, upper_gear=5.5, count=20):
-        # Get the gear ratios and times from the optimization function
-        gear = np.linspace(lower_gear, upper_gear, count)
-        accel_time = np.zeros_like(gear)
-        endurance_time = np.zeros_like(gear)
+    # def plot_gear_ratio_vs_time(self, car, lower_gear=1.5, upper_gear=5.5, count=20):
+    #     # Get the gear ratios and times from the optimization function
+    #     gear = np.linspace(lower_gear, upper_gear, count)
+    #     accel_time = np.zeros_like(gear)
+    #     endurance_time = np.zeros_like(gear)
 
-        for i in range(gear.size):
-            car.attrs['gear_ratio'] = gear[i]
-            accel_time[i] = np.sum(self.Acceleration.solve(car)[:, 3])
-            endurance_time[i] = np.sum(self.Endurance.solve(car)[:, 3])
+    #     for i in range(gear.size):
+    #         car.attrs['gear_ratio'] = gear[i]
+    #         accel_time[i] = np.sum(self.Acceleration.solve(car)[:, 3])
+    #         endurance_time[i] = np.sum(self.Endurance.solve(car)[:, 3])
 
-        # Use the plotter module to create the plot
-        from plotter import plot_dual_yaxis
-        x = gear
-        y1 = [accel_time]
-        y2 = [endurance_time]
-        y1_labels = ["Acceleration Time"]
-        y2_labels = ["Endurance Time"]
-        y1_colors = ["blue"]
-        y2_colors = ["green"]
-        y1_ls = ["-"]
-        y2_ls = ["-"]
+    #     # Use the plotter module to create the plot
+    #     from plotter import plot_dual_yaxis
+    #     x = gear
+    #     y1 = [accel_time]
+    #     y2 = [endurance_time]
+    #     y1_labels = ["Acceleration Time"]
+    #     y2_labels = ["Endurance Time"]
+    #     y1_colors = ["blue"]
+    #     y2_colors = ["green"]
+    #     y1_ls = ["-"]
+    #     y2_ls = ["-"]
         
-        plot_dual_yaxis(x, y1, y2,
-                        x_axis='Gear Ratio',
-                        y1_axis='Acceleration Time (s)',
-                        y2_axis='Endurance Time (s)',
-                        y1_labels=y1_labels,
-                        y2_labels=y2_labels,
-                        y1_colors=y1_colors,
-                        y2_colors=y2_colors,
-                        y1_ls=y1_ls,
-                        y2_ls=y2_ls)
+    #     plot_dual_yaxis(x, y1, y2,
+    #                     x_axis='Gear Ratio',
+    #                     y1_axis='Acceleration Time (s)',
+    #                     y2_axis='Endurance Time (s)',
+    #                     y1_labels=y1_labels,
+    #                     y2_labels=y2_labels,
+    #                     y1_colors=y1_colors,
+    #                     y2_colors=y2_colors,
+    #                     y1_ls=y1_ls,
+    #                     y2_ls=y2_ls)
     
     def sweep_var(self, car, xvar, yvar, min, max, count=50):
         x = np.linspace(min, max, count)
@@ -226,20 +226,89 @@ class Competition:
             df.to_csv('data/heat_gen/' + str(int(x[i])) + 'W_limit.csv')
         return x, y
 
+class GearOptimization:
+    def __init__(self, autox_file, endurance_file):
+        # Hash table to store gear ratios and their corresponding times
+        self.gear_times_hash_table = {}
+        resolution = 0.1  # m
+        autox_df = pd.read_csv(autox_file, header=None)
+        endurance_df = pd.read_csv(endurance_file, header=None)
+        self.Acceleration = Track(np.linspace(0, 75, int(75 / resolution) + 1), np.zeros(int(75 / resolution + 1)))
+        self.Skidpad = Track(np.linspace(0, 180.4, int(180.4 / resolution) + 1),
+                             np.full(int(180.4 / resolution + 1), 0.11594202))
+        self.Autocross = Track(autox_df[0].to_numpy(), autox_df[1].to_numpy())
+        self.Endurance = Track(endurance_df[0].to_numpy(), endurance_df[1].to_numpy())
 
-MIS_2019 = Competition('data/2018MichiganAXTrack_new.csv', 'data/2019MichiganEnduranceTrack.csv')
+    def optimize_gear_ratio(self, car, lower_gear=1.5, upper_gear=5.5, count=20):
+        gear = np.linspace(lower_gear, upper_gear, count)
+        time = np.zeros_like(gear)
+        for i in range(gear.size):
+            car.attrs['gear_ratio'] = gear[i]
+            time[i] = np.sum(self.Acceleration.solve(car)[:, 3])
+            # Store gear ratio and acceleration time in hash table
+            if gear[i] not in self.gear_times_hash_table:
+                self.gear_times_hash_table[gear[i]] = {}
+            self.gear_times_hash_table[gear[i]]['acceleration_time'] = time[i]
+        return gear, time
+
+    def optimize_gear_ratio_endurance(self, car, lower_gear=1.5, upper_gear=5.5, count=20):
+        gear = np.linspace(lower_gear, upper_gear, count)
+        endurance_time = np.zeros_like(gear)
+        for i in range(gear.size):
+            car.attrs['gear_ratio'] = gear[i]
+            endurance_time[i] = np.sum(self.Endurance.solve(car)[:, 3])
+            # Store gear ratio and endurance time in hash table
+            if gear[i] not in self.gear_times_hash_table:
+                self.gear_times_hash_table[gear[i]] = {}
+            self.gear_times_hash_table[gear[i]]['endurance_time'] = endurance_time[i]
+        return gear, endurance_time
+
+    def plot_gear_times(self):
+        # Extract from hash table
+        gear_ratios = np.array(list(self.gear_times_hash_table.keys()))
+        acceleration_times = np.array([self.gear_times_hash_table[g]['acceleration_time'] for g in gear_ratios])
+        endurance_times = np.array([self.gear_times_hash_table[g]['endurance_time'] for g in gear_ratios])
+
+        # Sort values by gear ratio for plotting
+        sorted_indices = np.argsort(gear_ratios)
+        gear_ratios = gear_ratios[sorted_indices]
+        acceleration_times = acceleration_times[sorted_indices]
+        endurance_times = endurance_times[sorted_indices]
+
+        plot_dual_yaxis(
+            x=gear_ratios,
+            y1=[acceleration_times],
+            y2=[endurance_times],
+            x_axis='Gear Ratio',
+            y1_axis='Acceleration Time (s)',
+            y2_axis='Endurance Time (s)',
+            y1_labels=['Acceleration'],
+            y2_labels=['Endurance'],
+            y1_colors=['blue'],
+            y2_colors=['red'],
+            y1_ls=['-'],
+            y2_ls=['--'],
+            save_plot=None
+        )
+
+gear_optimizer = GearOptimization('data/2018MichiganAXTrack_new.csv', 'data/2019MichiganEnduranceTrack.csv', csv_file = 'data/gear_data.csv')
+gear_optimizer.optimize_gear_ratio(car)
+gear_optimizer.optimize_gear_ratio_endurance(car)
+
+#MIS_2019 = Competition('data/2018MichiganAXTrack_new.csv', 'data/2019MichiganEnduranceTrack.csv')
+
 
 #x, y = MIS_2019.sweep_var(car, 'power_limit', 10, 10000, 80000, count=5)
-x = np.array([])
-y = np.array([])
-for i in range(6,11):
-    car.attrs["mass_battery"] += 0.057 * 95
-    car.attrs['cells_parallel'] = i
-    xi, yi = MIS_2019.sweep_var(car, 'power_limit', 10, 10000, 80000, count=2)
-    x = np.append(x, xi)
-    y = np.append(y, yi)
-print(x)
-print(y)
+# x = np.array([])
+# y = np.array([])
+# for i in range(6,11):
+#     car.attrs["mass_battery"] += 0.057 * 95
+#     car.attrs['cells_parallel'] = i
+#     xi, yi = MIS_2019.sweep_var(car, 'power_limit', 10, 10000, 80000, count=2)
+#     x = np.append(x, xi)
+#     y = np.append(y, yi)
+# print(x)
+# print(y)
 
 # plot_single_yaxis(x, y, 'Cells in parallel','Laptime (s)',['6P','7P','8P','9P','10P'],['#0149fe','#00637a','#005a64','#00583d','#2e4d1a'],['-','-','-','-','-','-','-','-','-','-'])
 
