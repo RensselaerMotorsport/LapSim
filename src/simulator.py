@@ -227,49 +227,78 @@ class Competition:
         return x, y
 
 class GearOptimization:
-    def __init__(self, autox_file, endurance_file):
-        # Hash table to store gear ratios and their corresponding times
-        self.gear_times_hash_table = {}
+    def __init__(self, autox_file, endurance_file, csv_file='gear_data.csv'):
+        self.csv_file = csv_file
+        self.gear_times = self.load_gear_data()
+
         resolution = 0.1  # m
-        autox_df = pd.read_csv(autox_file, header=None)
         endurance_df = pd.read_csv(endurance_file, header=None)
         self.Acceleration = Track(np.linspace(0, 75, int(75 / resolution) + 1), np.zeros(int(75 / resolution + 1)))
-        self.Skidpad = Track(np.linspace(0, 180.4, int(180.4 / resolution) + 1),
-                             np.full(int(180.4 / resolution + 1), 0.11594202))
-        self.Autocross = Track(autox_df[0].to_numpy(), autox_df[1].to_numpy())
         self.Endurance = Track(endurance_df[0].to_numpy(), endurance_df[1].to_numpy())
+
+    def load_gear_data(self):
+        """Loads the gear data from the CSV file, if it exists."""
+        try:
+            return pd.read_csv(self.csv_file)
+        except FileNotFoundError:
+            return pd.DataFrame(columns=['gear_ratio', 'acceleration_time', 'endurance_time'])
+
+    def save_gear_data(self):
+        """Saves the gear data to the CSV file."""
+        self.gear_times.to_csv(self.csv_file, index=False)
 
     def optimize_gear_ratio(self, car, lower_gear=1.5, upper_gear=5.5, count=20):
         gear = np.linspace(lower_gear, upper_gear, count)
         time = np.zeros_like(gear)
+        new_data = []
+
         for i in range(gear.size):
             car.attrs['gear_ratio'] = gear[i]
             time[i] = np.sum(self.Acceleration.solve(car)[:, 3])
-            # Store gear ratio and acceleration time in hash table
-            if gear[i] not in self.gear_times_hash_table:
-                self.gear_times_hash_table[gear[i]] = {}
-            self.gear_times_hash_table[gear[i]]['acceleration_time'] = time[i]
+
+            # Populate new data if the gear ratio doesnt exist already
+            if not (self.gear_times['gear_ratio'] == gear[i]).any():
+                new_data.append([gear[i], time[i], np.nan])
+
+        if new_data:
+            new_df = pd.DataFrame(new_data, columns=['gear_ratio', 'acceleration_time', 'endurance_time'])
+
+            if not new_df.empty and not new_df.isna().all().all():
+                self.gear_times = pd.concat([self.gear_times, new_df], ignore_index=True)
+                self.save_gear_data()
+
         return gear, time
 
     def optimize_gear_ratio_endurance(self, car, lower_gear=1.5, upper_gear=5.5, count=20):
         gear = np.linspace(lower_gear, upper_gear, count)
         endurance_time = np.zeros_like(gear)
+
         for i in range(gear.size):
             car.attrs['gear_ratio'] = gear[i]
             endurance_time[i] = np.sum(self.Endurance.solve(car)[:, 3])
-            # Store gear ratio and endurance time in hash table
-            if gear[i] not in self.gear_times_hash_table:
-                self.gear_times_hash_table[gear[i]] = {}
-            self.gear_times_hash_table[gear[i]]['endurance_time'] = endurance_time[i]
+
+            #Does the gear ratio already exist?
+            if not (self.gear_times['gear_ratio'] == gear[i]).any():
+                new_df = pd.DataFrame([[gear[i], np.nan, endurance_time[i]]],
+                                      columns=['gear_ratio', 'acceleration_time', 'endurance_time'])
+
+                #Does new df already contain any data?
+                if not new_df.empty and not new_df.isna().all().all():
+                    self.gear_times = pd.concat([self.gear_times, new_df], ignore_index=True)
+            else:
+                #Update by adding endurance time
+                self.gear_times.loc[self.gear_times['gear_ratio'] == gear[i], 'endurance_time'] = endurance_time[i]
+
+        self.save_gear_data()
         return gear, endurance_time
 
     def plot_gear_times(self):
-        # Extract from hash table
-        gear_ratios = np.array(list(self.gear_times_hash_table.keys()))
-        acceleration_times = np.array([self.gear_times_hash_table[g]['acceleration_time'] for g in gear_ratios])
-        endurance_times = np.array([self.gear_times_hash_table[g]['endurance_time'] for g in gear_ratios])
+        # Pull gear ratio, accel time, and endurance time from csv
+        gear_ratios = self.gear_times['gear_ratio'].to_numpy()
+        acceleration_times = self.gear_times['acceleration_time'].to_numpy()
+        endurance_times = self.gear_times['endurance_time'].to_numpy()
 
-        # Sort values by gear ratio for plotting
+        # Sort by gear ratio and ploit it
         sorted_indices = np.argsort(gear_ratios)
         gear_ratios = gear_ratios[sorted_indices]
         acceleration_times = acceleration_times[sorted_indices]
