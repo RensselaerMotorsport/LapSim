@@ -162,42 +162,61 @@ class Competition:
         for i in range(gear.size):
             car.attrs['gear_ratio'] = gear[i]
             time[i] = np.sum(self.Acceleration.solve(car)[:, 3])
-        return gear[np.argmin(time)]
+        return gear, time
 
-    # def plot_gear_ratio_vs_time(self, car, lower_gear=1.5, upper_gear=5.5, count=20):
-    #     # Get the gear ratios and times from the optimization function
-    #     gear = np.linspace(lower_gear, upper_gear, count)
-    #     accel_time = np.zeros_like(gear)
-    #     endurance_time = np.zeros_like(gear)
 
-    #     for i in range(gear.size):
-    #         car.attrs['gear_ratio'] = gear[i]
-    #         accel_time[i] = np.sum(self.Acceleration.solve(car)[:, 3])
-    #         endurance_time[i] = np.sum(self.Endurance.solve(car)[:, 3])
+    def plot_gear_ratio_vs_time(self, car, lower_gear=1.5, upper_gear=5.5, count=20, lower_fric=1, upper_fric=1.8, fric_count=8):
+        # Initialize containers for data corresponding to each friction coefficient
+        friction_coeffs = np.linspace(lower_fric, upper_fric, fric_count)
 
-    #     # Use the plotter module to create the plot
-    #     from plotter import plot_dual_yaxis
-    #     x = gear
-    #     y1 = [accel_time]
-    #     y2 = [endurance_time]
-    #     y1_labels = ["Acceleration Time"]
-    #     y2_labels = ["Endurance Time"]
-    #     y1_colors = ["blue"]
-    #     y2_colors = ["green"]
-    #     y1_ls = ["-"]
-    #     y2_ls = ["-"]
-        
-    #     plot_dual_yaxis(x, y1, y2,
-    #                     x_axis='Gear Ratio',
-    #                     y1_axis='Acceleration Time (s)',
-    #                     y2_axis='Endurance Time (s)',
-    #                     y1_labels=y1_labels,
-    #                     y2_labels=y2_labels,
-    #                     y1_colors=y1_colors,
-    #                     y2_colors=y2_colors,
-    #                     y1_ls=y1_ls,
-    #                     y2_ls=y2_ls)
-    
+        accel_time_by_friction = []
+        endurance_time_by_friction = []
+
+        # Loop over the list of friction coefficients
+        for coeff in friction_coeffs:
+            car.attrs['friction_coefficient'] = coeff  # Update the friction coefficient in the car attributes
+
+            # Get the gear ratios and times for each friction coefficient
+            gear = np.linspace(lower_gear, upper_gear, count)
+            accel_time = np.zeros_like(gear)
+            endurance_time = np.zeros_like(gear)
+
+            for i in range(gear.size):
+                car.attrs['gear_ratio'] = gear[i]
+                accel_time[i] = np.sum(self.Acceleration.solve(car)[:, 3])
+                endurance_time[i] = np.sum(self.Endurance.solve(car)[:, 3])
+
+            # Append results to the lists
+            accel_time_by_friction.append(accel_time)
+            endurance_time_by_friction.append(endurance_time)
+
+        # Use the plotter module to create the plot
+        from plotter import plot_dual_yaxis
+
+        # Prepare the data for plot_dual_yaxis
+        x = gear
+        y1 = accel_time_by_friction  # Contains acceleration times for each friction coefficient
+        y2 = endurance_time_by_friction  # Contains endurance times for each friction coefficient
+        y1_labels = [f"Acceleration Time (Friction {fc})" for fc in friction_coeffs]
+        y2_labels = [f"Endurance Time (Friction {fc})" for fc in friction_coeffs]
+        y1_colors = ["blue", "cyan", "navy"]  # Assign different colors for each friction coefficient
+        y2_colors = ["green", "lime", "darkgreen"]
+        y1_ls = ["-", "--", "-."]  # Different line styles for each friction coefficient
+        y2_ls = ["-", "--", "-."]
+
+        # Call plot_dual_yaxis with the prepared data
+        plot_dual_yaxis(x, y1, y2,
+                        x_axis='Gear Ratio',
+                        y1_axis='Acceleration Time (s)',
+                        y2_axis='Endurance Time (s)',
+                        y1_labels=y1_labels,
+                        y2_labels=y2_labels,
+                        y1_colors=y1_colors,
+                        y2_colors=y2_colors,
+                        y1_ls=y1_ls,
+                        y2_ls=y2_ls)
+
+
     def sweep_var(self, car, xvar, yvar, min, max, count=50):
         x = np.linspace(min, max, count)
         y = np.zeros_like(x)
@@ -226,105 +245,107 @@ class Competition:
             df.to_csv('data/heat_gen/' + str(int(x[i])) + 'W_limit.csv')
         return x, y
 
-class GearOptimization:
-    def __init__(self, autox_file, endurance_file, csv_file='gear_data.csv'):
-        self.csv_file = csv_file
-        self.gear_times = self.load_gear_data()
+# class GearOptimization:
+#     def __init__(self, autox_file, endurance_file, csv_file='gear_data.csv'):
+#         self.csv_file = csv_file
+#         self.gear_times = self.load_gear_data()
 
-        resolution = 0.1  # m
-        endurance_df = pd.read_csv(endurance_file, header=None)
-        self.Acceleration = Track(np.linspace(0, 75, int(75 / resolution) + 1), np.zeros(int(75 / resolution + 1)))
-        self.Endurance = Track(endurance_df[0].to_numpy(), endurance_df[1].to_numpy())
+#         resolution = 0.1  # m
+#         endurance_df = pd.read_csv(endurance_file, header=None)
+#         self.Acceleration = Track(np.linspace(0, 75, int(75 / resolution) + 1), np.zeros(int(75 / resolution + 1)))
+#         self.Endurance = Track(endurance_df[0].to_numpy(), endurance_df[1].to_numpy())
 
-    def load_gear_data(self):
-        """Loads the gear data from the CSV file, if it exists."""
-        try:
-            return pd.read_csv(self.csv_file)
-        except FileNotFoundError:
-            return pd.DataFrame(columns=['gear_ratio', 'acceleration_time', 'endurance_time'])
+#     def load_gear_data(self):
+#         """Loads the gear data from the CSV file, if it exists."""
+#         try:
+#             return pd.read_csv(self.csv_file)
+#         except FileNotFoundError:
+#             return pd.DataFrame(columns=['gear_ratio', 'acceleration_time', 'endurance_time'])
 
-    def save_gear_data(self):
-        """Saves the gear data to the CSV file."""
-        self.gear_times.to_csv(self.csv_file, index=False)
+#     def save_gear_data(self):
+#         """Saves the gear data to the CSV file."""
+#         self.gear_times.to_csv(self.csv_file, index=False)
 
-    def optimize_gear_ratio(self, car, lower_gear=1.5, upper_gear=5.5, count=20):
-        gear = np.linspace(lower_gear, upper_gear, count)
-        time = np.zeros_like(gear)
-        new_data = []
+#     def optimize_gear_ratio(self, car, lower_gear=1.5, upper_gear=5.5, count=20):
+#         gear = np.linspace(lower_gear, upper_gear, count)
+#         time = np.zeros_like(gear)
+#         new_data = []
 
-        for i in range(gear.size):
-            car.attrs['gear_ratio'] = gear[i]
-            time[i] = np.sum(self.Acceleration.solve(car)[:, 3])
+#         for i in range(gear.size):
+#             car.attrs['gear_ratio'] = gear[i]
+#             time[i] = np.sum(self.Acceleration.solve(car)[:, 3])
 
-            # Populate new data if the gear ratio doesnt exist already
-            if not (self.gear_times['gear_ratio'] == gear[i]).any():
-                new_data.append([gear[i], time[i], np.nan])
+#             # Populate new data if the gear ratio doesnt exist already
+#             if not (self.gear_times['gear_ratio'] == gear[i]).any():
+#                 new_data.append([gear[i], time[i], np.nan])
 
-        if new_data:
-            new_df = pd.DataFrame(new_data, columns=['gear_ratio', 'acceleration_time', 'endurance_time'])
+#         if new_data:
+#             new_df = pd.DataFrame(new_data, columns=['gear_ratio', 'acceleration_time', 'endurance_time'])
 
-            if not new_df.empty and not new_df.isna().all().all():
-                self.gear_times = pd.concat([self.gear_times, new_df], ignore_index=True)
-                self.save_gear_data()
+#             if not new_df.empty and not new_df.isna().all().all():
+#                 self.gear_times = pd.concat([self.gear_times, new_df], ignore_index=True)
+#                 self.save_gear_data()
 
-        return gear, time
+#         return gear, time
 
-    def optimize_gear_ratio_endurance(self, car, lower_gear=1.5, upper_gear=5.5, count=20):
-        gear = np.linspace(lower_gear, upper_gear, count)
-        endurance_time = np.zeros_like(gear)
+#     def optimize_gear_ratio_endurance(self, car, lower_gear=1.5, upper_gear=5.5, count=20):
+#         gear = np.linspace(lower_gear, upper_gear, count)
+#         endurance_time = np.zeros_like(gear)
 
-        for i in range(gear.size):
-            car.attrs['gear_ratio'] = gear[i]
-            endurance_time[i] = np.sum(self.Endurance.solve(car)[:, 3])
+#         for i in range(gear.size):
+#             car.attrs['gear_ratio'] = gear[i]
+#             endurance_time[i] = np.sum(self.Endurance.solve(car)[:, 3])
 
-            #Does the gear ratio already exist?
-            if not (self.gear_times['gear_ratio'] == gear[i]).any():
-                new_df = pd.DataFrame([[gear[i], np.nan, endurance_time[i]]],
-                                      columns=['gear_ratio', 'acceleration_time', 'endurance_time'])
+#             #Does the gear ratio already exist?
+#             if not (self.gear_times['gear_ratio'] == gear[i]).any():
+#                 new_df = pd.DataFrame([[gear[i], np.nan, endurance_time[i]]],
+#                                       columns=['gear_ratio', 'acceleration_time', 'endurance_time'])
 
-                #Does new df already contain any data?
-                if not new_df.empty and not new_df.isna().all().all():
-                    self.gear_times = pd.concat([self.gear_times, new_df], ignore_index=True)
-            else:
-                #Update by adding endurance time
-                self.gear_times.loc[self.gear_times['gear_ratio'] == gear[i], 'endurance_time'] = endurance_time[i]
+#                 #Does new df already contain any data?
+#                 if not new_df.empty and not new_df.isna().all().all():
+#                     self.gear_times = pd.concat([self.gear_times, new_df], ignore_index=True)
+#             else:
+#                 #Update by adding endurance time
+#                 self.gear_times.loc[self.gear_times['gear_ratio'] == gear[i], 'endurance_time'] = endurance_time[i]
 
-        self.save_gear_data()
-        return gear, endurance_time
+#         self.save_gear_data()
+#         return gear, endurance_time
 
-    def plot_gear_times(self):
-        # Pull gear ratio, accel time, and endurance time from csv
-        gear_ratios = self.gear_times['gear_ratio'].to_numpy()
-        acceleration_times = self.gear_times['acceleration_time'].to_numpy()
-        endurance_times = self.gear_times['endurance_time'].to_numpy()
+#     def plot_gear_times(self):
+#         # Pull gear ratio, accel time, and endurance time from csv
+#         gear_ratios = self.gear_times['gear_ratio'].to_numpy()
+#         acceleration_times = self.gear_times['acceleration_time'].to_numpy()
+#         endurance_times = self.gear_times['endurance_time'].to_numpy()
 
-        # Sort by gear ratio and ploit it
-        sorted_indices = np.argsort(gear_ratios)
-        gear_ratios = gear_ratios[sorted_indices]
-        acceleration_times = acceleration_times[sorted_indices]
-        endurance_times = endurance_times[sorted_indices]
+#         # Sort by gear ratio and ploit it
+#         sorted_indices = np.argsort(gear_ratios)
+#         gear_ratios = gear_ratios[sorted_indices]
+#         acceleration_times = acceleration_times[sorted_indices]
+#         endurance_times = endurance_times[sorted_indices]
 
-        plot_dual_yaxis(
-            x=gear_ratios,
-            y1=[acceleration_times],
-            y2=[endurance_times],
-            x_axis='Gear Ratio',
-            y1_axis='Acceleration Time (s)',
-            y2_axis='Endurance Time (s)',
-            y1_labels=['Acceleration'],
-            y2_labels=['Endurance'],
-            y1_colors=['blue'],
-            y2_colors=['red'],
-            y1_ls=['-'],
-            y2_ls=['--'],
-            save_plot=None
-        )
+#         plot_dual_yaxis(
+#             x=gear_ratios,
+#             y1=[acceleration_times],
+#             y2=[endurance_times],
+#             x_axis='Gear Ratio',
+#             y1_axis='Acceleration Time (s)',
+#             y2_axis='Endurance Time (s)',
+#             y1_labels=['Acceleration'],
+#             y2_labels=['Endurance'],
+#             y1_colors=['blue'],
+#             y2_colors=['red'],
+#             y1_ls=['-'],
+#             y2_ls=['--'],
+#             save_plot=None
+#         )
 
-gear_optimizer = GearOptimization('data/2018MichiganAXTrack_new.csv', 'data/2019MichiganEnduranceTrack.csv', csv_file = 'data/gear_data.csv')
-gear_optimizer.optimize_gear_ratio(car)
-gear_optimizer.optimize_gear_ratio_endurance(car)
+# gear_optimizer = GearOptimization('data/2018MichiganAXTrack_new.csv', 'data/2019MichiganEnduranceTrack.csv', csv_file = 'data/gear_data.csv')
+# gear_optimizer.optimize_gear_ratio(car)
+# gear_optimizer.optimize_gear_ratio_endurance(car)
 
-#MIS_2019 = Competition('data/2018MichiganAXTrack_new.csv', 'data/2019MichiganEnduranceTrack.csv')
+MIS_2019 = Competition('data/2018MichiganAXTrack_new.csv', 'data/2019MichiganEnduranceTrack.csv')
+MIS_2019.plot_gear_ratio_vs_time(car, lower_gear=1, upper_gear=5.5, count=5, lower_fric=1, upper_fric=1.8, fric_count=2)
+
 
 
 #x, y = MIS_2019.sweep_var(car, 'power_limit', 10, 10000, 80000, count=5)
