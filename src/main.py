@@ -1,5 +1,6 @@
 from classes.car_simple import Car
 from simulator import Competition
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -122,4 +123,13 @@ def plot_battery(solution):
 
 if __name__ == '__main__':
     '''Outputs heat gen csvs'''
-    print('yo')
+    x, sols = MIS_2019.sweep_var(car, 'power_limit', 10000,80000, count=200)
+    for i in range(x.size):
+        t = np.zeros_like(sols[i][:,3])
+        t[0] = sols[i][0,3]
+        Qxyz = np.zeros_like(t)
+        for j in range(1, np.shape(sols[i])[0]):
+            t[j] = t[j-1] + sols[i][j,3]
+            Qxyz[j] = (sols[i][j,9] - sols[i][j-1,9]) / (sols[i][j,3]) / 1.654049e-5
+        df = pd.DataFrame(np.array([t, Qxyz]).T, columns=["t(s)", "Q'''(W/m^3)"])
+        df.to_csv('data/heat_gen/' + str(int(x[i])/1000) + 'kW_limit.csv', index=False)

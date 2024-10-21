@@ -14,6 +14,7 @@ class Competition:
         self.Skidpad = Track(np.linspace(0, 180.4, int(180.4 / resolution) + 1), np.full(int(180.4 / resolution + 1),0.11594202))
         self.Autocross = Track(autox_df[0].to_numpy(),autox_df[1].to_numpy())
         self.Endurance = Track(endurance_df[0].to_numpy(), endurance_df[1].to_numpy())
+        #self.car = car
 
     def plot_power_limits(self, Pmin, Pmax, car, count=100):
         result = np.zeros([int((Pmax - Pmin) / int((Pmax - Pmin) / count)),3])
@@ -45,7 +46,7 @@ class Competition:
         plt.legend(ncols=2)
         plt.show()
 
-    def optimize_gear_ratio(self, car, lower_gear=1.5, upper_gear=5.5, count=1000):
+    def optimize_gear_ratio(self, car, lower_gear=2, upper_gear=4, count=1000):
         gear = np.linspace(lower_gear, upper_gear, count)
         time = np.zeros_like(gear)
         for i in range(gear.size):
@@ -87,30 +88,13 @@ class Competition:
                         y1_ls=y1_ls,
                         y2_ls=y2_ls)
     
-    def sweep_var(self, car, xvar, yvar, min, max, count=50):
+    def sweep_var(self, car, xvar, min, max, count=50):
         x = np.linspace(min, max, count)
-        y = np.zeros_like(x)
+        sols = np.empty((count,), dtype=object)
+        print('Variable sweep progress: 0.0%')
         for i in range(x.size):
-            print(str(round(100 * (i + 1) / count,1)) + '%')
             car.attrs[xvar] = x[i]
-            #car.attrs['gear_ratio'] = self.optimize_gear_ratio(car, count=200)
-            sol = self.Endurance.solve(car)
-            ysol = sol[:, yvar]
-            y[i] = ysol[ysol.size - 1]
-            times = np.zeros_like(sol[:,3])
-            dQ = np.zeros_like(sol[:,9])
-            for j, a in enumerate(sol[:,3]):
-                if j == 0:                  
-                    times[j] = a
-                else:
-                    times[j] = a + np.sum(sol[:j-1,3])
-                    
-            for j, a in enumerate(sol[:,9]):
-                if j == 0:                  
-                    dQ[j] = a/sol[j,3]
-                else:
-                    dQ[j] = (a - sol[j-1,9])/sol[j,3]
-
-            df = pd.DataFrame(np.array([times, dQ, sol[:,10]]).T, columns=['t(s)', 'dQ/dt(W)', 'T(C)'])
-            df.to_csv('data/heat_gen/' + str(int(x[i])) + 'W_limit.csv')
-        return x, y
+            car.attrs['gear_ratio'] = self.optimize_gear_ratio(car, count=100)
+            sols[i] = self.Endurance.solve(car)
+            print('Variable sweep progress: ' + str(round(100 * (i + 1) / count, 1)) + '%')
+        return x, sols
