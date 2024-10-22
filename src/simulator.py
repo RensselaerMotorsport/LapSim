@@ -165,7 +165,7 @@ class Competition:
         return gear, time
 
 
-    def plot_gear_ratio_vs_time(self, car, lower_gear=1.5, upper_gear=5.5, count=20, lower_fric=1, upper_fric=1.8, fric_count=8):
+    def plot_gear_ratio_vs_time(self, car, lower_gear=1.5, upper_gear=5.5, count=10, lower_fric=1.2, upper_fric=1.6, fric_count=5):
         # Initialize containers for data corresponding to each friction coefficient
         friction_coeffs = np.linspace(lower_fric, upper_fric, fric_count)
 
@@ -174,9 +174,9 @@ class Competition:
 
         # Loop over the list of friction coefficients
         for coeff in friction_coeffs:
-            car.attrs['friction_coefficient'] = coeff  # Update the friction coefficient in the car attributes
+            car.attrs['friction_coefficient'] = coeff  # Update Cf in the car attributes
 
-            # Get the gear ratios and times for each friction coefficient
+    
             gear = np.linspace(lower_gear, upper_gear, count)
             accel_time = np.zeros_like(gear)
             endurance_time = np.zeros_like(gear)
@@ -186,25 +186,24 @@ class Competition:
                 accel_time[i] = np.sum(self.Acceleration.solve(car)[:, 3])
                 endurance_time[i] = np.sum(self.Endurance.solve(car)[:, 3])
 
-            # Append results to the lists
+            #append lsist
             accel_time_by_friction.append(accel_time)
             endurance_time_by_friction.append(endurance_time)
 
-        # Use the plotter module to create the plot
+        #dual plot from plotter module
         from plotter import plot_dual_yaxis
 
-        # Prepare the data for plot_dual_yaxis
+
         x = gear
-        y1 = accel_time_by_friction  # Contains acceleration times for each friction coefficient
-        y2 = endurance_time_by_friction  # Contains endurance times for each friction coefficient
+        y1 = accel_time_by_friction
+        y2 = endurance_time_by_friction
         y1_labels = [f"Acceleration Time (Friction {fc})" for fc in friction_coeffs]
         y2_labels = [f"Endurance Time (Friction {fc})" for fc in friction_coeffs]
-        y1_colors = ["blue", "cyan", "navy"]  # Assign different colors for each friction coefficient
-        y2_colors = ["green", "lime", "darkgreen"]
-        y1_ls = ["-", "--", "-."]  # Different line styles for each friction coefficient
-        y2_ls = ["-", "--", "-."]
+        y1_colors = ["blue", "cyan", "navy", "mediumblue", "slateblue"]
+        y2_colors = ["green", "lime", "darkgreen", "forestgreen", "springgreen"]
+        y1_line = ["-", "-", "-", "-", "-"]
+        y2_line = ["-", "-", "-", "-", "-"]
 
-        # Call plot_dual_yaxis with the prepared data
         plot_dual_yaxis(x, y1, y2,
                         x_axis='Gear Ratio',
                         y1_axis='Acceleration Time (s)',
@@ -213,8 +212,8 @@ class Competition:
                         y2_labels=y2_labels,
                         y1_colors=y1_colors,
                         y2_colors=y2_colors,
-                        y1_ls=y1_ls,
-                        y2_ls=y2_ls)
+                        y1_ls = y1_line,
+                        y2_ls = y2_line)
 
 
     def sweep_var(self, car, xvar, yvar, min, max, count=50):
