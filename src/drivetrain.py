@@ -5,7 +5,7 @@ import pandas as pd
 from shapely.geometry import Polygon, Point
 
 
-def get_efficiency_level(speed, torque, csv_file_path='data/wpd_datasets.csv'):
+def get_efficiency_level(speed, torque, csv_file_path='src/data/wpd_datasets.csv'):
     # Load CSV file
     df = pd.read_csv(csv_file_path, skiprows=2, header=None)
 

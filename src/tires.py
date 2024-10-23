@@ -1,4 +1,4 @@
-from aerodynamics import calc_down_force
+from .aerodynamics import calc_down_force
 import numpy as np
 
 

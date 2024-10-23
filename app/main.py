@@ -22,8 +22,8 @@ def homepage():
 def acceleration():
     return create_form(
         '/acceleration',
-        'acceleration',
-        'run_accel',
+        'acceleration', # No longer needed
+        'Acceleration',
         'src/data/rm28.json'
     )
 

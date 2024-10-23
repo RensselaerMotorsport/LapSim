@@ -1,14 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from tires import calc_apex_speed
-from tires import calc_max_longitudinal_force
-from tires import calc_max_lateral_force
-from tires import calc_rolling_resistance
-from aerodynamics import calc_drag_force
-from drivetrain import calc_wheel_force
-from hvbattery import calc_peak_power
-from hvbattery import calc_Voc
-from hvbattery import calc_heat_gen
+from .tires import calc_apex_speed
+from .tires import calc_max_longitudinal_force
+from .tires import calc_max_lateral_force
+from .tires import calc_rolling_resistance
+from .aerodynamics import calc_drag_force
+from .drivetrain import calc_wheel_force
+from .hvbattery import calc_peak_power
+from .hvbattery import calc_Voc
+from .hvbattery import calc_heat_gen
 
 
 def list_apexes(car, ir):

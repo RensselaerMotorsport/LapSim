@@ -11,6 +11,7 @@ from app.form import car_form
 from app.cookie_utils import can_add_cookie
 from app.graph import generate_graph
 from src.classes.car_simple import Car
+from src.simulator import Competition
 
 output_bp = Blueprint('output_bp', __name__)
 
@@ -157,10 +158,17 @@ def output():
     # Retrieve args
     sweep_toggled = request.args.get('sweep_toggled')
     # Might be a security risk
-    module = importlib.import_module(request.args.get('module'))
-    operation = getattr(module, request.args.get('operation'))
+    # module = importlib.import_module(request.args.get('module'))
+    operation = request.args.get('operation')
 
-    if sweep_toggled:
+    comp = Competition(
+        'src/data/2018MichiganAXTrack_new.csv',
+        'src/data/2019MichiganEnduranceTrack.csv'
+    )
+
+    operation_method = getattr(comp, operation)
+
+    if False: #sweep_toggled: # FIXME: Temp disable sweep so can debug
         # Retrieve args
         values = json.loads(session.get('values_str'))
         value_names = list(values.keys())
@@ -205,20 +213,22 @@ def output():
             session.pop('data' + str(combo), None)
     else:
         data = session.get('data')
-        car = Car(data)
-        if operation.__name__ == 'brake_input':
-            brake_info, caliperBrands_np, padBrand_np, caliperModel_np, padModel_np = operation(car)
-            brake_info = [brake_info.tolist()]
-            caliperBrands = caliperBrands_np.tolist()
-            padBrand = padBrand_np.tolist()
-            caliperModel = caliperModel_np.tolist()
-            padModel = padModel_np.tolist()
-            response = make_response(render_template('brake_output.html', brake_info=brake_info, caliperBrands=caliperBrands,
-                                                     padBrand=padBrand, caliperModel=caliperModel, padModel=padModel))
-        else:
-            time_data = []
-            time_data.append(decimal(round(operation(car), 3)))
-            response = make_response(render_template('output.html', time_data=time_data, sweep_combos=[], values={}))
+        car = Car("src/data/rm28.json") # FIXME should be a dynamic file
+
+        # if operation.__name__ == 'brake_input':
+        #     brake_info, caliperBrands_np, padBrand_np, caliperModel_np, padModel_np = operation(car)
+        #     brake_info = [brake_info.tolist()]
+        #     caliperBrands = caliperBrands_np.tolist()
+        #     padBrand = padBrand_np.tolist()
+        #     caliperModel = caliperModel_np.tolist()
+        #     padModel = padModel_np.tolist()
+        #     response = make_response(render_template('brake_output.html', brake_info=brake_info, caliperBrands=caliperBrands,
+        #                                              padBrand=padBrand, caliperModel=caliperModel, padModel=padModel))
+        # else:
+        time_data = []
+        # print(operation_method.solve(car)[3])
+        time_data.extend(operation_method.solve(car)[3])
+        response = make_response(render_template('output.html', time_data=time_data, sweep_combos=[], values={}))
 
         session.pop('data', None)
 
