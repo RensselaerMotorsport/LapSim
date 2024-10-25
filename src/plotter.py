@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 
-def plot_single_yaxis(x, y, x_axis, y_axis, y_labels, y_colors, y_ls, save_plot=None):
+def plot_single_yaxis(x, y, x_axis, y_axis, y_labels, y_colors, y_ls, y_lim=None, save_plot=None):
     fig, ax1 = plt.subplots()
     fig.set_figwidth(6.4 * 2)
     fig.set_figheight(4.8 * 2)
@@ -12,7 +12,10 @@ def plot_single_yaxis(x, y, x_axis, y_axis, y_labels, y_colors, y_ls, save_plot=
     for i in range(len(y_labels)):
         ax1.plot(x, y[i], label=y_labels[i], color=y_colors[i], ls=y_ls[i])
         ax1.set_xlim(min(x), max(x))
-    ax1.set_ylim(0,)
+    if y_lim:
+        ax1.set_ylim(y_lim)
+    else:
+        ax1.set_ylim(0, )
     plt.title('')
     plt.suptitle('')
     fig.legend(loc='upper center', ncols=len(y_labels))
