@@ -62,10 +62,11 @@ class Track:
         6: SOE () - State of energy
         7: Voc (V) - Open-circuit voltage
         8: Pbm (W) - Max battery power
-        9: Q (J) - Stored thermal energy
-        10: T (C) - Cell temperature
+        9: Q̇ (W) - Heat generation
+        10: Q (J) - Stored thermal energy
+        11: T (C) - Cell temperature
         """
-        self.solution = np.zeros((np.shape(self.x)[0],11))
+        self.solution = np.zeros((np.shape(self.x)[0],12))
         self.solution[:, 0] = self.x
         self.solution[:, 1] = self.ir
         series = car.attrs['cells_series']
@@ -77,8 +78,9 @@ class Track:
         self.solution[0, 6] = self.solution[0, 5] / (series * parallel * capacity * 3600)
         self.solution[0, 7] = series * 4.2
         self.solution[0, 8] = calc_peak_power(car, self.solution[0, 7])
-        self.solution[0, 9] = cell_mass * Cp * (273 + 35)
-        self.solution[0, 10] = self.solution[0, 9] / (cell_mass * Cp) - 273
+        self.solution[0, 9] = 0
+        self.solution[0, 10] = cell_mass * Cp * (273 + 35)
+        self.solution[0, 11] = self.solution[0, 10] / (cell_mass * Cp) - 273
 
         self.apexes = list_apexes(car, self.ir)
         self.dx = self.x[1] - self.x[0]
@@ -164,10 +166,11 @@ class Track:
         self.solution[i, 6] = self.solution[i, 5] / (series * parallel * capacity * 3600)
         self.solution[i, 7] = calc_Voc(car, self.solution[i, 5])
         self.solution[i, 8] = calc_peak_power(car, self.solution[i, 7])
-        self.solution[i, 9] = self.solution[i - 1, 9] + calc_heat_gen(car, self.solution[i - 1, 7], self.solution[i - 1, 4]) * self.solution[i - 1, 3]
-        self.solution[i, 10] = self.solution[i, 9] / (cell_mass * Cp) - 273
+        self.solution[i, 9] = calc_heat_gen(car, self.solution[i, 7], self.solution[i, 4])
+        self.solution[i, 10] = self.solution[i - 1, 10] + self.solution[i, 9] * self.solution[i - 1, 3]
+        self.solution[i, 11] = self.solution[i, 10] / (cell_mass * Cp) - 273
 
-    def draw(self):
+    def draw_track(self):
         with np.errstate(divide='ignore', invalid='ignore'):
             r = 1.0 / self.ir
         r = np.where(np.isfinite(r), r, 1E9)

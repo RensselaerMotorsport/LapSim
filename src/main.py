@@ -23,7 +23,7 @@ def sweep_parallel_count():
 
 def plot_velocity(solution):
     x = solution[:, 0]
-    v = solution[:, 2]
+    v = solution[:, 7]
     t = 0
     for i in solution[:, 3]:
         t += i
@@ -124,12 +124,14 @@ def plot_battery(solution):
 if __name__ == '__main__':
     '''Outputs heat gen csvs'''
     x, sols = MIS_2019.sweep_var(car, 'power_limit', 10000,80000, count=200)
+    series = car.attrs['cells_series']
+    parallel = car.attrs['cells_parallel']
     for i in range(x.size):
         t = np.zeros_like(sols[i][:,3])
         t[0] = sols[i][0,3]
         Qxyz = np.zeros_like(t)
         for j in range(1, np.shape(sols[i])[0]):
             t[j] = t[j-1] + sols[i][j,3]
-            Qxyz[j] = (sols[i][j,9] - sols[i][j-1,9]) / (sols[i][j,3]) / 1.654049e-5
+            Qxyz[j] = sols[i][j,9] / (1.654049e-5 * series * parallel)
         df = pd.DataFrame(np.array([t, Qxyz]).T, columns=["t(s)", "Q'''(W/m^3)"])
         df.to_csv('data/heat_gen/' + str(int(x[i])/1000) + 'kW_limit.csv', index=False)

@@ -18,7 +18,7 @@
   "Cl": 1.6,
   "A": 1,
   "rho": 1.162,
-  "max_current": 210,
+  "fuse_current": 210,
   "cells_series": 95,
   "cells_parallel": 6,
   "cell_resistance": 0.02,
@@ -32,5 +32,6 @@
   "gear_ratio": 2.25,
   "tractive_efficiency": 0.98,
   "drivetrain_efficiency": 0.95,
-  "power_limit": 80000
+  "power_limit": 80000,
+  "current_limit": 210
 }

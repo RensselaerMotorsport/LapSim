@@ -16,6 +16,9 @@ class Competition:
         self.Endurance = Track(endurance_df[0].to_numpy(), endurance_df[1].to_numpy())
         #self.car = car
 
+    def solve_accel(self, car):
+        return self.Acceleration.solve(car)
+
     def plot_power_limits(self, Pmin, Pmax, car, count=100):
         result = np.zeros([int((Pmax - Pmin) / int((Pmax - Pmin) / count)),3])
         n = 0

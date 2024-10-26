@@ -1,13 +1,18 @@
 def calc_peak_power(car, Voc):
     # FUTURE: account for internal resistance thermal sensitivity
-    If = car.attrs['max_current']
+    # FUTURE: account for internal resistance sensitivity to current draw
+    Ifuse = car.attrs['fuse_current']
+    Ilimit = car.attrs["current_limit"]
     series = car.attrs['cells_series']
     parallel = car.attrs['cells_parallel']
     R = car.attrs['cell_resistance']
-    Vmin = 2.5
+    vmin = 2.5
+    voc = Voc / series
 
-    Im = min(If / parallel, (Voc / series - Vmin) / R)
-    return series * parallel * Im * (Voc / series - R * Im)
+    Imin = min(Ifuse / parallel, Ilimit / parallel)
+    pmax = R * ((voc / (2*R))**2 - (voc / (2*R) - Imin)**2)
+    ppk = vmin * (voc - vmin) / R
+    return series * parallel * min(pmax, ppk)
 
 
 def calc_heat_gen(car, Voc, P):

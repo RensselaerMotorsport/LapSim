@@ -18,7 +18,7 @@
   "brake_bias": 0.6,
   "tire_radius": 0.2032,
   "gear_ratios": 2.9,
-  "max_current": 135,
+  "fuse_current": 135,
   "max_voltage": 399,
   "max_cont_torque": 112,
   "max_peak_torque": 230,
