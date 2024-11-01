@@ -244,6 +244,33 @@ class Competition:
             y_lim=(min_accel_time - y_range_margin, max_accel_time + y_range_margin)
         )
 
+        def derivative_gear_ratio_vs_time(self, car, lower_gear=1.5, upper_gear=5.5, count=10, lower_fric=1.0, upper_fric=1.4,fric_count=5):
+        friction_coeffs = np.linspace(lower_fric, upper_fric, fric_count)
+        endurance_time_by_friction = []
+        transition_points = []
+
+        for coeff in friction_coeffs:
+            car.attrs['CoF'] = coeff
+            gear = np.linspace(lower_gear, upper_gear, count)
+            endurance_time = np.zeros_like(gear)
+
+            for i in range(gear.size):
+                car.attrs['gear_ratio'] = gear[i]
+                endurance_time[i] = np.sum(self.Endurance.solve(car)[:, 3])
+
+            endurance_time_by_friction.append(endurance_time)
+
+            derivative = np.gradient(endurance_time, gear)
+
+            # find where the derivative first transitions from zero to nonzero
+            transition_index = np.argmax(derivative > 0)
+
+            transition_points.append(gear[transition_index] if transition_index < len(gear) else None)
+
+            print(transition_points)
+
+        return endurance_time_by_friction, transition_points
+
     def sweep_var(self, car, xvar, yvar, min, max, count=50):
         x = np.linspace(min, max, count)
         y = np.zeros_like(x)
