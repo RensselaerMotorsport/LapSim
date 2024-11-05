@@ -262,8 +262,8 @@ class Competition:
 
             derivative = np.gradient(endurance_time, gear)
 
-            # find where the derivative first transitions from zero to nonzero
-            transition_index = np.argmax(derivative > 0)
+    
+            transition_index = np.argmax(derivative > 25)
 
             transition_points.append(gear[transition_index] if transition_index < len(gear) else None)
 
