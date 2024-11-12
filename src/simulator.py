@@ -272,7 +272,7 @@ class Competition:
         return endurance_time_by_friction, transition_points
 
     def sprocket_force(self, sprocket_dia):
-        solution = self.Acceleration.solve(car)
+        solution = self.Endurance.solve(car)
         x = solution[:, 0]
         v = solution[:, 2]
         m = car.attrs['mass_car'] + car.attrs['mass_battery'] + car.attrs['mass_driver']
@@ -287,10 +287,25 @@ class Competition:
 
         t_wheel_adjusted = t_wheel * car.attrs['drivetrain_efficiency']
 
-        sprocket_force = t_wheel_adjusted / sprocket_rad
+        sprocket_force = abs(t_wheel_adjusted / sprocket_rad)
 
         max_sprocket_force = np.max(sprocket_force)
         avg_sprocket_force = np.mean(sprocket_force)
+
+        plt.plot(x, sprocket_force, label="Sprocket Force")
+
+        # horizontal lines for the max and avg forces
+        plt.axhline(y=max_sprocket_force, color='r', linestyle='--',
+                    label=f"Max Sprocket Force: {max_sprocket_force:.2f} N")
+        plt.axhline(y=avg_sprocket_force, color='g', linestyle='--',
+                    label=f"Avg Sprocket Force: {avg_sprocket_force:.2f} N")
+
+        plt.xlabel("Distance (m)")
+        plt.ylabel("Sprocket Force (N)")
+        plt.title("Sprocket Force vs Distance")
+        plt.legend()
+        plt.grid()
+        plt.show()
 
         return max_sprocket_force, avg_sprocket_force
 
