@@ -165,86 +165,7 @@ class Competition:
         return gear, time
 
 
-    def plot_gear_ratio_vs_time(self, car, lower_gear=1.5, upper_gear=5.5, count=10, lower_fric=1.0, upper_fric=1.4,fric_count=5):
-        friction_coeffs = np.linspace(lower_fric, upper_fric, fric_count)
-        endurance_time_by_friction = []
-
-        # Loop over the list of friction coefficients
-        for coeff in friction_coeffs:
-            car.attrs['CoF'] = coeff
-            gear = np.linspace(lower_gear, upper_gear, count)
-            endurance_time = np.zeros_like(gear)
-
-            for i in range(gear.size):
-                car.attrs['gear_ratio'] = gear[i]
-                endurance_time[i] = np.sum(self.Endurance.solve(car)[:, 3])
-
-            endurance_time_by_friction.append(endurance_time)
-
-        #Zooming in on the endursnce data plotted
-        min_endurance_time = min(map(np.min, endurance_time_by_friction))
-        max_endurance_time = max(map(np.max, endurance_time_by_friction))
-        y_range_margin = 0.05 * (max_endurance_time - min_endurance_time)  # 5% margin for aesthetics
-
-        from plotter import plot_single_yaxis
-
-        x = gear
-        y2 = endurance_time_by_friction
-        y2_labels = [f"Endurance Time (Friction {fc})" for fc in friction_coeffs]
-        y2_colors = ["green", "red", "blue", "yellow", "orange"]
-        y2_line = ["-", "-", "-", "-", "-"]
-
-        plot_single_yaxis(
-            x, y2,
-            x_axis='Gear Ratio',
-            y_axis='Endurance Time (s)',
-            y_labels=y2_labels,
-            y_colors=y2_colors,
-            y_ls=y2_line,
-            y_lim=(min_endurance_time - y_range_margin, max_endurance_time + y_range_margin)
-        )
-
-
-    def plot_accel_gear_ratio_vs_time(self, car, lower_gear=1.5, upper_gear=5.5, count=10, lower_fric=1.0, upper_fric=1.4,fric_count=5):
-        friction_coeffs = np.linspace(lower_fric, upper_fric, fric_count)
-        accel_time_by_friction = []
-
-        # Loop over the list of friction coefficients
-        for coeff in friction_coeffs:
-            car.attrs['CoF'] = coeff 
-            gear = np.linspace(lower_gear, upper_gear, count)
-            accel_time = np.zeros_like(gear)
-
-            for i in range(gear.size):
-                car.attrs['gear_ratio'] = gear[i]
-                accel_time[i] = np.sum(self.Acceleration.solve(car)[:, 3])
-
-            accel_time_by_friction.append(accel_time)
-
-        #Zooming in on the accel data plotted
-        min_accel_time = min(map(np.min, accel_time_by_friction))
-        max_accel_time = max(map(np.max, accel_time_by_friction))
-        y_range_margin = 0.05 * (max_accel_time - min_accel_time)
-
-        from plotter import plot_single_yaxis
-
-        x = gear
-        y2 = accel_time_by_friction
-        y2_labels = [f"Accel Time (Friction {fc})" for fc in friction_coeffs]
-        y2_colors = ["green", "red", "blue", "yellow", "orange"]
-        y2_line = ["-", "-", "-", "-", "-"]
-
-        plot_single_yaxis(
-            x, y2,
-            x_axis='Gear Ratio',
-            y_axis='Accel Time (s)',
-            y_labels=y2_labels,
-            y_colors=y2_colors,
-            y_ls=y2_line,
-            y_lim=(min_accel_time - y_range_margin, max_accel_time + y_range_margin)
-        )
-
-    def derivative_gear_ratio_vs_time(self, car, lower_gear=1.5, upper_gear=5.5, count=10, lower_fric=1.0, upper_fric=1.4,fric_count=5):
+    def derivative_gear_ratio_vs_time(self, car, lower_gear=1.5, upper_gear=5.5, count=10, lower_fric=1.2, upper_fric=1.2,fric_count=1):
         friction_coeffs = np.linspace(lower_fric, upper_fric, fric_count)
         endurance_time_by_friction = []
         transition_points = []
@@ -262,7 +183,7 @@ class Competition:
 
             derivative = np.gradient(endurance_time, gear)
 
-    
+            # find where the derivative first transitions from zero to nontrivial
             transition_index = np.argmax(derivative > 25)
 
             transition_points.append(gear[transition_index] if transition_index < len(gear) else None)
@@ -270,6 +191,96 @@ class Competition:
             print(transition_points)
 
         return endurance_time_by_friction, transition_points
+
+
+    def plot_gear_ratio_vs_time(self, car, lower_gear=1.5, upper_gear=5.5, count=10, lower_fric=1.0, upper_fric=1.4,fric_count=5):
+        friction_coeffs = np.linspace(lower_fric, upper_fric, fric_count)
+        endurance_time_by_friction = []
+
+        # Loop over the list of friction coefficients
+        for coeff in friction_coeffs:
+            car.attrs['CoF'] = coeff  # Update the friction coefficient in the car attributes
+            gear = np.linspace(lower_gear, upper_gear, count)
+            endurance_time = np.zeros_like(gear)
+
+            for i in range(gear.size):
+                car.attrs['gear_ratio'] = gear[i]
+                endurance_time[i] = np.sum(self.Endurance.solve(car)[:, 3])
+
+            endurance_time_by_friction.append(endurance_time)
+
+        #Zooming in on the endursnce data plotted
+        min_endurance_time = min(map(np.min, endurance_time_by_friction))
+        max_endurance_time = max(map(np.max, endurance_time_by_friction))
+        y_range_margin = 0.05 * (max_endurance_time - min_endurance_time)  # 5% margin for aesthetics
+
+        transition_points = self.derivative_gear_ratio_vs_time(car, lower_gear=1.5, upper_gear=5.5, count=10,
+                                                               lower_fric=1.2, upper_fric=1.2, fric_count=1)
+
+
+        from plotter import plot_single_yaxis
+
+        x = gear
+        y2 = endurance_time_by_friction
+        y2_labels = [f"Friction {fc}" for fc in friction_coeffs]
+        y2_colors = ["green", "red", "blue", "yellow", "orange"]
+        y2_line = ["-", "-", "-", "-", "-"]
+
+        plot_single_yaxis(
+            x, y2,
+            x_axis='Gear Ratio',
+            y_axis='Endurance Time (s)',
+            y_labels=y2_labels,
+            y_colors=y2_colors,
+            y_ls=y2_line,
+            y_lim=(min_endurance_time - y_range_margin, max_endurance_time + y_range_margin),
+            vlines = transition_points,
+            vline_style={'color': 'black', 'linestyle': '--'}
+        )
+
+
+    def plot_accel_gear_ratio_vs_time(self, car, lower_gear=1.5, upper_gear=5.5, count=10, lower_fric=1.0, upper_fric=1.4,fric_count=5):
+        friction_coeffs = np.linspace(lower_fric, upper_fric, fric_count)
+        accel_time_by_friction = []
+
+        # Loop over the list of friction coefficients
+        for coeff in friction_coeffs:
+            car.attrs['CoF'] = coeff  # Update the friction coefficient in the car attributes
+            gear = np.linspace(lower_gear, upper_gear, count)
+            accel_time = np.zeros_like(gear)
+
+            for i in range(gear.size):
+                car.attrs['gear_ratio'] = gear[i]
+                accel_time[i] = np.sum(self.Endurance.solve(car)[:, 3])
+
+            accel_time_by_friction.append(accel_time)
+
+        #Zooming in on the accel data plotted
+        min_accel_time = min(map(np.min, accel_time_by_friction))
+        max_accel_time = max(map(np.max, accel_time_by_friction))
+        y_range_margin = 0.05 * (max_accel_time - min_accel_time)
+
+        transition_points = self.derivative_gear_ratio_vs_time(car, lower_gear=1.5, upper_gear=5.5, count=10, lower_fric=1.2, upper_fric=1.2,fric_count=1)
+
+        from plotter import plot_single_yaxis
+
+        x = gear
+        y2 = accel_time_by_friction
+        y2_labels = [f"Accel Time (Friction {fc})" for fc in friction_coeffs]
+        y2_colors = ["green", "red", "blue", "yellow", "orange"]
+        y2_line = ["-", "-", "-", "-", "-"]
+
+        plot_single_yaxis(
+            x, y2,
+            x_axis='Gear Ratio',
+            y_axis='Accel Time (s)',
+            y_labels=y2_labels,
+            y_colors=y2_colors,
+            y_ls=y2_line,
+            y_lim=(min_accel_time - y_range_margin, max_accel_time + y_range_margin),
+            vlines = transition_points,
+            vline_style = {'color': 'black', 'linestyle': '--'}
+        )
 
     def sprocket_force(self, sprocket_dia):
         solution = self.Endurance.solve(car)
