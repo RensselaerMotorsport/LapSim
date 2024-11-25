@@ -1,5 +1,6 @@
 from classes.car_simple import Car
 from simulator import Competition
+from drivetrain import get_efficiency_level
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -121,17 +122,35 @@ def plot_battery(solution):
     plt.show()
 
 
-if __name__ == '__main__':
+if __name__ != '__main__':
     '''Outputs heat gen csvs'''
-    x, sols = MIS_2019.sweep_var(car, 'power_limit', 10000,80000, count=200)
+    x, sols = MIS_2019.sweep_var(car, 'power_limit', 10000,80000, count=1)
     series = car.attrs['cells_series']
     parallel = car.attrs['cells_parallel']
     for i in range(x.size):
         t = np.zeros_like(sols[i][:,3])
         t[0] = sols[i][0,3]
         Qxyz = np.zeros_like(t)
+        Qm = np.zeros_like(t)
+        gr = car.attrs['gear_ratio']
         for j in range(1, np.shape(sols[i])[0]):
             t[j] = t[j-1] + sols[i][j,3]
             Qxyz[j] = sols[i][j,9] / (1.654049e-5 * series * parallel)
-        df = pd.DataFrame(np.array([t, Qxyz]).T, columns=["t(s)", "Q'''(W/m^3)"])
+            rpm = sols[i][j,2] / (2 * 3.1416 * 0.2032) * gr / 60
+            trq = sols[i][j,8] / rpm * 9.5 * sols[i][j,8]
+            print(rpm)
+            print(trq)
+            Qm[j] = get_efficiency_level(rpm, trq)
+            print(Qm[j])
+            print()
+            #Qi =
+        df = pd.DataFrame(np.array([t, Qxyz, Qm]).T, columns=["t(s)", "Q'''(W/m^3)", "Qmotor (W)"])
         df.to_csv('data/heat_gen/' + str(int(x[i])/1000) + 'kW_limit.csv', index=False)
+
+if __name__ == '__main__':
+    x, sols = MIS_2019.sweep_var(car, 'Cl', 1, 3, count=50)
+    t = np.zeros_like(x)
+    for i in range(x.size):
+        t[i] = np.sum(sols[i][:, 3])
+    plt.plot(x, t)
+    plt.show()

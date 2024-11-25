@@ -62,9 +62,11 @@ class Track:
         6: SOE () - State of energy
         7: Voc (V) - Open-circuit voltage
         8: Pbm (W) - Max battery power
-        9: Q̇ (W) - Heat generation
-        10: Q (J) - Stored thermal energy
+        9: Q̇b (W) - Battery heat generation
+        10: Qb (J) - Stored thermal energy
         11: T (C) - Cell temperature
+        NOT IMPLEMENTED 12: Q̇m (W) - Motor heat generation
+        NOT IMPLEMENTED 13: Q̇i (W) - Inverter heat generation
         """
         self.solution = np.zeros((np.shape(self.x)[0],12))
         self.solution[:, 0] = self.x
@@ -81,6 +83,8 @@ class Track:
         self.solution[0, 9] = 0
         self.solution[0, 10] = cell_mass * Cp * (273 + 35)
         self.solution[0, 11] = self.solution[0, 10] / (cell_mass * Cp) - 273
+        #self.solution[0, 12] = 0
+        #self.solution[0, 13] = 0
 
         self.apexes = list_apexes(car, self.ir)
         self.dx = self.x[1] - self.x[0]
