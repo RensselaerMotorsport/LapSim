@@ -111,7 +111,7 @@ def calc_motor_heat_gen(car, v, p):
     DTeff = float(get_efficiency_level(MRPM, torque))
     return (1 - DTeff) * p
 
-def calc_inverter_heat_gen(car, v, p, voc):
+def calc_inverter_heat_gen(car, v, p, voc, inverter='PM100DX'):
     GR = car.attrs['gear_ratio']
     rT = car.attrs['tire_radius']
     Kt = car.attrs['constant_kt']
@@ -122,4 +122,8 @@ def calc_inverter_heat_gen(car, v, p, voc):
     torque = p * 9.55 / MRPM
     Arms = torque / Kt
 
-    return voc * Arms * 0.01
+    if inverter == 'PM100DX':
+        return voc * Arms * 0.01
+
+    elif inverter == 'DTI-500':
+        return 0.00242143 * Arms**2 + 3.27193 * Arms + 32.1
