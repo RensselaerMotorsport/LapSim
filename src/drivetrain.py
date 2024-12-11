@@ -89,7 +89,6 @@ def calc_wheel_force(car, v, pbm, Voc):
     if v == 0: v = 1E-10
     MRPM = v * GR * 60 / (2 * pi * rT)
     if MRPM >= Kv * Voc: return 0
-    # FUTURE: Motor efficiency mapping
 
     motor_lim = TM
     rules_lim = 80000 * HVeff * 30 / (MRPM * pi)
