@@ -97,5 +97,30 @@ def calc_wheel_force(car, v, pbm, Voc):
     power_lim = car.attrs['power_limit'] * HVeff * 30 / (MRPM * pi)
     
     torque =  min(motor_lim, rules_lim, battery_lim, power_lim) * GR / rT
-    DTeff = get_efficiency_level(MRPM, torque)
-    return float(DTeff) * torque
+    DTeff = float(get_efficiency_level(MRPM, torque))
+    return DTeff * torque
+
+def calc_motor_heat_gen(car, v, p):
+    GR = car.attrs['gear_ratio']
+    rT = car.attrs['tire_radius']
+    if v != 0:
+        MRPM = v * GR * 60 / (2 * pi * rT)
+    else:
+        MRPM = 0.0000001
+    torque = p * 9.55 / MRPM
+
+    DTeff = float(get_efficiency_level(MRPM, torque))
+    return (1 - DTeff) * p
+
+def calc_inverter_heat_gen(car, v, p, voc):
+    GR = car.attrs['gear_ratio']
+    rT = car.attrs['tire_radius']
+    Kt = car.attrs['constant_kt']
+    if v != 0:
+        MRPM = v * GR * 60 / (2 * pi * rT)
+    else:
+        MRPM = 0.0000001
+    torque = p * 9.55 / MRPM
+    Arms = torque / Kt
+
+    return voc * Arms * 0.01

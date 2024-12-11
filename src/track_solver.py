@@ -6,6 +6,8 @@ from tires import calc_max_lateral_force
 from tires import calc_rolling_resistance
 from aerodynamics import calc_drag_force
 from drivetrain import calc_wheel_force
+from drivetrain import calc_motor_heat_gen
+from drivetrain import calc_inverter_heat_gen
 from hvbattery import calc_peak_power
 from hvbattery import calc_Voc
 from hvbattery import calc_heat_gen
@@ -65,10 +67,10 @@ class Track:
         9: Q̇b (W) - Battery heat generation
         10: Qb (J) - Stored thermal energy
         11: T (C) - Cell temperature
-        NOT IMPLEMENTED 12: Q̇m (W) - Motor heat generation
-        NOT IMPLEMENTED 13: Q̇i (W) - Inverter heat generation
+        12: Q̇m (W) - Motor heat generation
+        13: Q̇i (W) - Inverter heat generation
         """
-        self.solution = np.zeros((np.shape(self.x)[0],12))
+        self.solution = np.zeros((np.shape(self.x)[0],14))
         self.solution[:, 0] = self.x
         self.solution[:, 1] = self.ir
         series = car.attrs['cells_series']
@@ -83,8 +85,8 @@ class Track:
         self.solution[0, 9] = 0
         self.solution[0, 10] = cell_mass * Cp * (273 + 35)
         self.solution[0, 11] = self.solution[0, 10] / (cell_mass * Cp) - 273
-        #self.solution[0, 12] = 0
-        #self.solution[0, 13] = 0
+        self.solution[0, 12] = 0
+        self.solution[0, 13] = 0
 
         self.apexes = list_apexes(car, self.ir)
         self.dx = self.x[1] - self.x[0]
@@ -117,6 +119,7 @@ class Track:
 
             for i in range(apex_index1, apex_index2 + 1):
                 self.iter_battery(car, i)
+                self.iter_drivetrain(car, i)
         last_apex = int(self.apexes[np.shape(self.apexes)[0] - 1,0])
         last_index = np.shape(self.solution)[0]
         v, t, p = self.fwd_int(car, last_apex, last_index - 1)
@@ -125,6 +128,7 @@ class Track:
         self.solution[last_apex:last_index, 4] = p
         for i in range(last_apex, last_index):
             self.iter_battery(car, i)
+            self.iter_drivetrain(car, i)
         return self.solution
 
     def back_int(self, car, apex_index1, apex_index2, j):
@@ -173,6 +177,11 @@ class Track:
         self.solution[i, 9] = calc_heat_gen(car, self.solution[i, 7], self.solution[i, 4])
         self.solution[i, 10] = self.solution[i - 1, 10] + self.solution[i, 9] * self.solution[i - 1, 3]
         self.solution[i, 11] = self.solution[i, 10] / (cell_mass * Cp) - 273
+
+    def iter_drivetrain(self, car, i):
+        self.solution[i, 12] = calc_motor_heat_gen(car, self.solution[i, 2], self.solution[i, 4])
+        self.solution[i, 13] = calc_inverter_heat_gen(car, self.solution[i, 2], self.solution[i, 4], self.solution[i, 7])
+
 
     def draw_track(self):
         with np.errstate(divide='ignore', invalid='ignore'):

@@ -24,7 +24,7 @@ def sweep_parallel_count():
 
 def plot_velocity(solution):
     x = solution[:, 0]
-    v = solution[:, 7]
+    v = solution[:, 12]
     t = 0
     for i in solution[:, 3]:
         t += i
@@ -147,10 +147,14 @@ if __name__ != '__main__':
         df = pd.DataFrame(np.array([t, Qxyz, Qm]).T, columns=["t(s)", "Q'''(W/m^3)", "Qmotor (W)"])
         df.to_csv('data/heat_gen/' + str(int(x[i])/1000) + 'kW_limit.csv', index=False)
 
-if __name__ == '__main__':
+if __name__ != '__main__':
     x, sols = MIS_2019.sweep_var(car, 'Cl', 1, 3, count=50)
     t = np.zeros_like(x)
     for i in range(x.size):
         t[i] = np.sum(sols[i][:, 3])
     plt.plot(x, t)
     plt.show()
+
+if __name__ == '__main__':
+    sol = MIS_2019.solve_accel(car)
+    plot_velocity(sol)
