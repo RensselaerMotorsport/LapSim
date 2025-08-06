@@ -29,8 +29,12 @@
   "constant_kv": 10.14,
   "constant_kt": 0.94,
   "induced_voltage": 0.07348,
-  "gear_ratio": 2.25,
+  "gear_ratio": 2.75,
   "tractive_efficiency": 0.98,
   "drivetrain_efficiency": 0.95,
   "power_limit": 80000
+  "J_wheel": 0.6 #m
+  "J_halfshaft": 0.15 #m
+  "J_diff_output": 0.15 #m
+
 }
