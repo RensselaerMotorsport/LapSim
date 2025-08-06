@@ -320,6 +320,58 @@ class Competition:
 
         return max_sprocket_force, avg_sprocket_force
 
+    def sprocket_force_dynamic(self, sprocket_dia):
+        # Vehicle dynamics - position derived
+        solution = self.Endurance.solve(car)
+        x = solution[:, 0]
+        v = solution[:, 2]
+
+        #pull patrameters from json
+        r_tire = car.attrs['tire_radius']
+        eff = car.attrs.get('drivetrain_efficiency', 0.9)
+        r_sprocket = sprocket_dia / 2
+
+        G_sprocket = car.attrs['gear_ratio']
+
+        #All rotational inertias in kg*m^2
+        J_wheel = car.attrs.get('J_wheel', 0.6)
+        J_halfshaft = car.attrs.get('J_halfshaft', 0.15)
+        J_diff_output = car.attrs.get('J_diff_output', 0.05)
+        J_total = J_wheel + J_halfshaft + J_diff_output  # All rotate at wheel speed
+
+    
+        # Angular velocity to accel (position)
+        omega_wheel = v / r_tire
+        domega_dx = np.gradient(omega_wheel, x)
+        alpha_wheel = domega_dx * v
+
+        #Wheel torque
+        T_wheel = J_total * alpha_wheel  # Nm
+    
+        #wheel torque -> sprocket torque
+        T_sprocket = T_wheel / G_sprocket  # Nm
+        T_sprocket /= eff
+
+        #tangential force at sprocket teeth (N)
+        F_chain = np.abs(T_sprocket / r_sprocket)
+
+        max_force = np.max(F_chain)
+        avg_force = np.mean(F_chain)
+
+        # Plot
+        plt.plot(x, F_chain, label="Chain Force (Rear Sprocket)")
+        plt.axhline(y=max_force, color='r', linestyle='--', label=f"Max: {max_force:.2f} N")
+        plt.axhline(y=avg_force, color='g', linestyle='--', label=f"Avg: {avg_force:.2f} N")
+        plt.xlabel("Distance (m)")
+        plt.ylabel("Chain Force (N)")
+        plt.title("Dynamic Chain Force on Rear Sprocket")
+        plt.legend()
+        plt.grid()
+        plt.show()
+
+        return max_force, avg_force
+
+
     def sweep_var(self, car, xvar, yvar, min, max, count=50):
         x = np.linspace(min, max, count)
         y = np.zeros_like(x)
